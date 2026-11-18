@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geometría fractal · Grupo 8</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --bg:#0e1018; --card:#171b26; --line:#2a3144; --text:#e8eaf2; --muted:#9aa3b8; --gold:#f5b942; --cyan:#3dd6c6; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  main { max-width: 880px; margin: 0 auto; padding: 48px 20px; }
+  .eyebrow { color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { font-family: Cambria, Georgia, serif; font-size: clamp(32px, 6vw, 48px); margin: 6px 0 8px; }
+  p.lead { color: var(--muted); margin: 0 0 32px; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  a.card { display:block; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; color:inherit; text-decoration:none; }
+  a.card:hover { border-color: var(--gold); }
+  a.card.off { opacity: .55; pointer-events: none; }
+  .n { color: var(--gold); font-weight: 700; font-size: 13px; }
+  h2 { font-size: 18px; margin: 4px 0 6px; }
+  .d { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+  .tag { font-size: 12px; color: var(--muted); }
+  .tag.ok { color: var(--cyan); }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Computación Visual · 8.º ciclo</div>
+  <h1>Geometría fractal</h1>
+  <p class="lead">Grupo 8 · Aplicación gráfica interactiva con los algoritmos del trabajo.</p>
+  <div class="grid">
+    <a class="card" href="modulos/01-conjuntos-escape/">
+      <div class="n">MÓDULO 1</div><h2>Conjuntos de escape</h2>
+      <p class="d">Mandelbrot y Julia con zoom interactivo.</p><span class="tag ok">Disponible</span>
+    </a>
+    <a class="card off" href="modulos/02-ifs-chaos-game/">
+      <div class="n">MÓDULO 2</div><h2>IFS y Chaos Game</h2>
+      <p class="d">Helecho de Barnsley y triángulo de Sierpinski.</p><span class="tag">Pendiente</span>
+    </a>
+    <a class="card off" href="modulos/03-l-systems/">
+      <div class="n">MÓDULO 3</div><h2>L-systems</h2>
+      <p class="d">Plantas y curva de Koch por reglas de reescritura.</p><span class="tag">Pendiente</span>
+    </a>
+    <a class="card off" href="modulos/04-terreno-fractal/">
+      <div class="n">MÓDULO 4</div><h2>Terreno fractal</h2>
+      <p class="d">Ruido fBm o diamond-square en 3D.</p><span class="tag">Pendiente</span>
+    </a>
+    <a class="card off" href="modulos/05-dimension-fractal/">
+      <div class="n">MÓDULO 5</div><h2>Dimensión fractal</h2>
+      <p class="d">Box-counting sobre una imagen cargada por el usuario.</p><span class="tag">Pendiente</span>
+    </a>
+  </div>
+</main>
+</body>
+</html>

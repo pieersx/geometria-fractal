@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geometría fractal · Mandelbrot y Julia</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #0b0d12; --panel: #141821ee; --line: #262c3a; --text: #e6e9f0;
+    --muted: #8b93a7; --accent: #f5b942;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+  canvas.dragging { cursor: grabbing; }
+  #panel { position: fixed; top: 16px; left: 16px; width: 272px; max-height: calc(100% - 32px); overflow: auto;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px;
+    backdrop-filter: blur(8px); }
+  h1 { font-size: 15px; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+  label { display: block; color: var(--muted); font-size: 12px; margin: 10px 0 4px; }
+  .row { display: flex; gap: 6px; }
+  button, select { font: inherit; color: var(--text); background: #1c2230; border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  button:hover, select:hover { border-color: var(--accent); }
+  button.active { background: var(--accent); color: #1a1405; border-color: var(--accent); font-weight: 600; }
+  .row > button { flex: 1; }
+  select { width: 100%; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .val { float: right; color: var(--text); font-variant-numeric: tabular-nums; }
+  #julia { display: none; }
+  .stats { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted);
+    font-size: 12px; font-variant-numeric: tabular-nums; }
+  .stats b { color: var(--text); font-weight: 500; }
+  #warn { color: var(--accent); display: none; margin-top: 6px; }
+  .hint { margin-top: 10px; color: var(--muted); font-size: 12px; }
+  #nogl { display: none; position: fixed; inset: 0; place-items: center; text-align: center; padding: 24px; }
+  @media (max-width: 560px) { #panel { width: calc(100% - 32px); max-height: 46%; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="nogl">Tu navegador no soporta WebGL. Prueba con Chrome, Firefox o Edge actualizados.</div>
+
+<div id="panel">
+  <h1>Geometría fractal</h1>
+  <div class="sub">Módulo 1 · Conjuntos de escape (Mandelbrot / Julia)</div>
+
+  <label>Conjunto</label>
+  <div class="row">
+    <button id="mMandel" class="active">Mandelbrot</button>
+    <button id="mJulia">Julia</button>
+  </div>
+
+  <div id="julia">
+    <label>c real <span class="val" id="vCr"></span></label>
+    <input id="cr" type="range" min="-2" max="2" step="0.001" value="-0.8">
+    <label>c imaginario <span class="val" id="vCi"></span></label>
+    <input id="ci" type="range" min="-2" max="2" step="0.001" value="0.156">
+    <label>Conjuntos famosos</label>
+    <select id="presets">
+      <option value="-0.8,0.156">Dragón (−0.8 + 0.156i)</option>
+      <option value="-0.4,0.6">Coral (−0.4 + 0.6i)</option>
+      <option value="0.285,0.01">Galaxia (0.285 + 0.01i)</option>
+      <option value="-0.70176,-0.3842">Serpiente (−0.702 − 0.384i)</option>
+      <option value="-0.123,0.745">Conejo de Douady (−0.123 + 0.745i)</option>
+      <option value="0,1">Dendrita (i)</option>
+    </select>
+  </div>
+
+  <label>Iteraciones máximas <span class="val" id="vIt"></span></label>
+  <input id="it" type="range" min="30" max="1500" step="10" value="200">
+
+  <label>Paleta</label>
+  <select id="pal">
+    <option value="0">Atardecer</option>
+    <option value="1">Arcoíris</option>
+    <option value="2">Fuego</option>
+    <option value="3">Hielo</option>
+    <option value="4">Monocromo</option>
+  </select>
+
+  <label>Animar colores <span class="val" id="vAnim"></span></label>
+  <input id="anim" type="range" min="0" max="1" step="0.01" value="0">
+
+  <div class="row" style="margin-top:12px">
+    <button id="reset">Reiniciar vista</button>
+    <button id="shot">Guardar PNG</button>
+  </div>
+  <div id="warn">⚠ Límite de precisión (float32) alcanzado.</div>
+
+  <div class="stats">
+    Zoom <b id="sZoom">1×</b> · Centro <b id="sCenter"></b><br>
+    <span id="sFps"></span>
+  </div>
+  <div class="hint">Rueda: zoom · Arrastrar: mover · Doble clic en Mandelbrot: abrir su conjunto de Julia</div>
+</div>
+
+<script>
+"use strict";
+const canvas = document.getElementById("c");
+const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true, antialias: false });
+if (!gl) {
+  document.getElementById("nogl").style.display = "grid";
+  document.getElementById("panel").style.display = "none";
+  throw new Error("WebGL no disponible");
+}
+
+/* ---------- Shaders ---------- */
+const VS = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
+
+const FS = `
+precision highp float;
+uniform vec2  uRes;
+uniform vec2  uCenter;
+uniform float uScale;      // unidades del plano complejo por píxel de alto / altura
+uniform int   uMaxIter;
+uniform int   uJulia;
+uniform vec2  uC;
+uniform float uTime;
+uniform vec3  pa, pb, pc, pd;
+
+const int HARD_MAX = 1500;
+
+vec3 palette(float t) {
+  return clamp(pa + pb * cos(6.28318 * (pc * t + pd)), 0.0, 1.0);
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
+  vec2 pos = uCenter + uv * uScale;
+
+  vec2 z, c;
+  if (uJulia == 1) { z = pos; c = uC; } else { z = vec2(0.0); c = pos; }
+
+  float n = 0.0;
+  bool escaped = false;
+  for (int i = 0; i < HARD_MAX; i++) {
+    if (i >= uMaxIter) break;
+    z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
+    if (dot(z, z) > 256.0) { escaped = true; break; }
+    n += 1.0;
+  }
+
+  if (!escaped) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
+
+  // Coloreado suave: elimina las bandas entre iteraciones enteras
+  float mu = n + 1.0 - log2(log2(dot(z, z)) * 0.5);
+  float t = log(max(mu, 1.0) + 1.0) * 0.55 + uTime;   // escala log: sin ruido cerca del borde
+  gl_FragColor = vec4(palette(t), 1.0);
+}`;
+
+function compile(type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+const prog = gl.createProgram();
+gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
+gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
+gl.linkProgram(prog);
+if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+gl.useProgram(prog);
+
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+const loc = gl.getAttribLocation(prog, "p");
+gl.enableVertexAttribArray(loc);
+gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+const U = {};
+["uRes","uCenter","uScale","uMaxIter","uJulia","uC","uTime","pa","pb","pc","pd"]
+  .forEach(n => U[n] = gl.getUniformLocation(prog, n));
+
+/* ---------- Paletas (cosenoidales: a + b·cos(2π(c·t + d))) ---------- */
+const PALETTES = [
+  { a:[0.5,0.5,0.5],  b:[0.5,0.5,0.5], c:[1.0,0.7,0.4], d:[0.00,0.15,0.20] }, // Atardecer
+  { a:[0.5,0.5,0.5],  b:[0.5,0.5,0.5], c:[1.0,1.0,1.0], d:[0.00,0.33,0.67] }, // Arcoíris
+  { a:[0.5,0.25,0.1], b:[0.5,0.35,0.2], c:[1.0,1.0,1.0], d:[0.00,0.10,0.20] }, // Fuego
+  { a:[0.4,0.6,0.7],  b:[0.4,0.4,0.3], c:[1.0,1.0,1.0], d:[0.00,0.10,0.25] }, // Hielo
+  { a:[0.5,0.5,0.5],  b:[0.5,0.5,0.5], c:[1.0,1.0,1.0], d:[0.00,0.00,0.00] }, // Monocromo
+];
+
+/* ---------- Estado ---------- */
+const HOME = { cx: -0.5, cy: 0.0, scale: 3.0 };
+const MIN_SCALE = 3e-5;            // por debajo, float32 se pixela
+const state = {
+  cx: HOME.cx, cy: HOME.cy, scale: HOME.scale,
+  julia: false, cr: -0.8, ci: 0.156,
+  maxIter: 200, pal: 0, anim: 0, time: 0,
+};
+let dirty = true;
+
+/* ---------- Render ---------- */
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.floor(canvas.clientWidth * dpr), h = Math.floor(canvas.clientHeight * dpr);
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); dirty = true;
+  }
+}
+
+function draw() {
+  resize();
+  const P = PALETTES[state.pal];
+  gl.uniform2f(U.uRes, canvas.width, canvas.height);
+  gl.uniform2f(U.uCenter, state.cx, state.cy);
+  gl.uniform1f(U.uScale, state.scale);
+  gl.uniform1i(U.uMaxIter, state.maxIter);
+  gl.uniform1i(U.uJulia, state.julia ? 1 : 0);
+  gl.uniform2f(U.uC, state.cr, state.ci);
+  gl.uniform1f(U.uTime, state.time);
+  gl.uniform3fv(U.pa, P.a); gl.uniform3fv(U.pb, P.b);
+  gl.uniform3fv(U.pc, P.c); gl.uniform3fv(U.pd, P.d);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+let last = performance.now(), frames = 0, acc = 0;
+function loop(now) {
+  const dt = (now - last) / 1000; last = now;
+  if (state.anim > 0) { state.time += dt * state.anim * 0.25; dirty = true; }
+  if (dirty) {
+    draw(); dirty = false;
+    frames++; acc += dt;
+    if (acc > 0.5) { fpsEl.textContent = state.anim > 0 ? Math.round(frames / acc) + " fps" : ""; frames = 0; acc = 0; }
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ---------- UI ---------- */
+const $ = id => document.getElementById(id);
+const fpsEl = $("sFps");
+
+function fmt(x) { return (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(state.scale < 1e-3 ? 7 : 4); }
+function updateStats() {
+  const z = HOME.scale / state.scale;
+  $("sZoom").textContent = (z >= 1000 ? z.toExponential(1) : z.toFixed(z < 10 ? 1 : 0)) + "×";
+  $("sCenter").textContent = fmt(state.cx) + " " + fmt(state.cy) + "i";
+  $("warn").style.display = state.scale <= MIN_SCALE * 1.5 ? "block" : "none";
+}
+function changed() { dirty = true; updateStats(); }
+
+function setMode(julia) {
+  state.julia = julia;
+  $("mMandel").classList.toggle("active", !julia);
+  $("mJulia").classList.toggle("active", julia);
+  $("julia").style.display = julia ? "block" : "none";
+  resetView();
+}
+function resetView() {
+  state.cx = state.julia ? 0 : HOME.cx; state.cy = 0; state.scale = state.julia ? 3.2 : HOME.scale;
+  changed();
+}
+function setC(r, i) {
+  state.cr = r; state.ci = i;
+  $("cr").value = r; $("ci").value = i;
+  $("vCr").textContent = r.toFixed(3); $("vCi").textContent = i.toFixed(3);
+  changed();
+}
+
+$("mMandel").onclick = () => setMode(false);
+$("mJulia").onclick  = () => setMode(true);
+$("cr").oninput = e => setC(parseFloat(e.target.value), state.ci);
+$("ci").oninput = e => setC(state.cr, parseFloat(e.target.value));
+$("presets").onchange = e => { const [r, i] = e.target.value.split(",").map(Number); setC(r, i); };
+$("it").oninput = e => { state.maxIter = +e.target.value; $("vIt").textContent = state.maxIter; changed(); };
+$("pal").onchange = e => { state.pal = +e.target.value; changed(); };
+$("anim").oninput = e => { state.anim = +e.target.value; $("vAnim").textContent = state.anim ? state.anim.toFixed(2) : "off"; dirty = true; };
+$("reset").onclick = resetView;
+$("shot").onclick = () => {
+  draw();
+  const a = document.createElement("a");
+  a.download = (state.julia ? "julia" : "mandelbrot") + ".png";
+  a.href = canvas.toDataURL("image/png"); a.click();
+};
+
+/* ---------- Interacción ---------- */
+function toComplex(px, py) {
+  const dpr = canvas.width / canvas.clientWidth;
+  const x = (px * dpr - canvas.width / 2) / canvas.height;
+  const y = (canvas.height / 2 - py * dpr) / canvas.height;   // eje y hacia arriba
+  return [state.cx + x * state.scale, state.cy + y * state.scale];
+}
+
+canvas.addEventListener("wheel", e => {
+  e.preventDefault();
+  const [bx, by] = toComplex(e.clientX, e.clientY);
+  const k = Math.exp(e.deltaY * 0.0015);
+  state.scale = Math.min(Math.max(state.scale * k, MIN_SCALE), 6);
+  const [ax, ay] = toComplex(e.clientX, e.clientY);       // mantener fijo el punto bajo el cursor
+  state.cx += bx - ax; state.cy += by - ay;
+  changed();
+}, { passive: false });
+
+let drag = null;
+canvas.addEventListener("pointerdown", e => {
+  canvas.setPointerCapture(e.pointerId);
+  drag = { x: e.clientX, y: e.clientY };
+  canvas.classList.add("dragging");
+});
+canvas.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const dpr = canvas.width / canvas.clientWidth;
+  const k = dpr * state.scale / canvas.height;
+  state.cx -= (e.clientX - drag.x) * k;
+  state.cy += (e.clientY - drag.y) * k;
+  drag = { x: e.clientX, y: e.clientY };
+  changed();
+});
+const endDrag = () => { drag = null; canvas.classList.remove("dragging"); };
+canvas.addEventListener("pointerup", endDrag);
+canvas.addEventListener("pointercancel", endDrag);
+
+canvas.addEventListener("dblclick", e => {
+  if (state.julia) return;
+  const [r, i] = toComplex(e.clientX, e.clientY);
+  setC(+r.toFixed(4), +i.toFixed(4));
+  setMode(true);
+});
+
+window.addEventListener("resize", () => { dirty = true; });
+
+/* ---------- Arranque ---------- */
+$("vIt").textContent = state.maxIter;
+$("vAnim").textContent = "off";
+setC(state.cr, state.ci);
+updateStats();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITULO}} · Geometría fractal</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --bg:#0b0d12; --panel:#141821ee; --line:#262c3a; --text:#e6e9f0; --muted:#8b93a7; --accent:#f5b942; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text);
+    font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif; overflow:hidden; }
+  canvas { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+  #panel { position:fixed; top:16px; left:16px; width:272px; max-height:calc(100% - 32px); overflow:auto;
+    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; backdrop-filter:blur(8px); }
+  h1 { font-size:15px; margin:0 0 2px; }
+  .sub { color:var(--muted); font-size:12px; margin-bottom:12px; }
+  a.back { color:var(--muted); font-size:12px; text-decoration:none; display:inline-block; margin-bottom:8px; }
+  a.back:hover { color:var(--accent); }
+  label { display:block; color:var(--muted); font-size:12px; margin:10px 0 4px; }
+  .row { display:flex; gap:6px; }
+  button, select { font:inherit; color:var(--text); background:#1c2230; border:1px solid var(--line);
+    border-radius:8px; padding:6px 10px; cursor:pointer; }
+  button:hover, select:hover { border-color:var(--accent); }
+  .row > button { flex:1; }
+  select { width:100%; }
+  input[type=range] { width:100%; accent-color:var(--accent); }
+  .val { float:right; color:var(--text); font-variant-numeric:tabular-nums; }
+  .stats { margin-top:12px; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+  .stats b { color:var(--text); font-weight:500; }
+  .hint { margin-top:10px; color:var(--muted); font-size:12px; }
+  @media (max-width:560px) { #panel { width:calc(100% - 32px); max-height:46%; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="panel">
+  <a class="back" href="../../">← Portada</a>
+  <h1>{{TITULO}}</h1>
+  <div class="sub">Módulo {{N}} · {{DESC}}</div>
+
+  <!-- TODO: reemplaza este control de ejemplo por los parámetros de tu algoritmo.
+       Mantén el mismo estilo (label + input) para que todos los módulos se vean igual. -->
+  <label>Parámetro de ejemplo <span class="val" id="vP"></span></label>
+  <input id="p" type="range" min="1" max="100" step="1" value="50">
+
+  <div class="row" style="margin-top:12px">
+    <button id="reset">Reiniciar</button>
+    <button id="shot">Guardar PNG</button>
+  </div>
+
+  <div class="stats"><span id="stats"></span></div>
+  <div class="hint">{{HINT}}</div>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   PLANTILLA BASE · Módulo {{N}}: {{TITULO}}
+   Qué hacer:
+{{TODO}}
+   Reglas: ver CONTRIBUTING.md. Este archivo debe funcionar sin instalar nada.
+   ===================================================================== */
+
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");   // Si necesitas GPU, cambia a getContext("webgl") (ver módulo 1)
+
+/* Estado del módulo: guarda aquí todos los parámetros */
+const DEFAULTS = { p: 50 };
+const state = { ...DEFAULTS };
+
+/* Ajusta el lienzo a la pantalla y a la densidad de píxeles */
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.floor(canvas.clientWidth * dpr), h = Math.floor(canvas.clientHeight * dpr);
+  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+}
+
+/* ---------------------------------------------------------------------
+   TODO: implementa aquí tu algoritmo. Se llama cada vez que algo cambia.
+   Dibuja en `ctx`; el tamaño real del lienzo es canvas.width × canvas.height.
+   --------------------------------------------------------------------- */
+function render() {
+  resize();
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = "#0b0d12"; ctx.fillRect(0, 0, W, H);
+
+  // Ejemplo mínimo: una circunferencia cuyo radio depende del parámetro. Bórralo.
+  ctx.strokeStyle = "#f5b942"; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(W * 0.6, H / 2, (state.p / 100) * Math.min(W, H) * 0.35, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = "#8b93a7"; ctx.font = `${Math.round(16 * (W / canvas.clientWidth))}px system-ui`;
+  ctx.textAlign = "center";
+  ctx.fillText("Módulo {{N}} · implementa render()", W * 0.6, H - 40);
+
+  document.getElementById("stats").textContent = "Parámetro: " + state.p;   // TODO: muestra tus datos (iteraciones, puntos, dimensión…)
+}
+
+/* ---------- Controles (patrón común a todos los módulos) ---------- */
+const $ = id => document.getElementById(id);
+
+$("p").oninput = e => { state.p = +e.target.value; $("vP").textContent = state.p; render(); };
+
+$("reset").onclick = () => {
+  Object.assign(state, DEFAULTS);
+  $("p").value = state.p; $("vP").textContent = state.p;
+  render();
+};
+
+$("shot").onclick = () => {
+  render();
+  const a = document.createElement("a");
+  a.download = "modulo-{{N}}.png";
+  a.href = canvas.toDataURL("image/png");
+  a.click();
+};
+
+window.addEventListener("resize", render);
+
+/* ---------- Arranque ---------- */
+$("vP").textContent = state.p;
+render();
+</script>
+</body>
+</html>
