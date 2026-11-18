@@ -1,6 +1,6 @@
-# Capítulo 5. Terreno fractal (fBm / diamond-square)
+# Capítulo 5. Terreno fractal (diamond-square)
 
-> **Estado:** borrador. El módulo 4 está pendiente; el texto describe lo que se planea implementar. **Su responsable debe ajustarlo al terminar y precisar cuál de los dos métodos implementa.**
+> **Estado:** ajustado al módulo 4 implementado (Keyla Sihuacollo). El módulo usa **diamond-square**; el fBm se describe solo como método alternativo de referencia.
 
 ## 5.1 Descripción del algoritmo
 
@@ -16,7 +16,15 @@ Parte de una cuadrícula cuadrada con las cuatro esquinas fijadas y repite dos p
 
 ### En la aplicación
 
-Se mostrará el terreno en 3D con control de rugosidad, semilla aleatoria, número de octavas o ronda de subdivisión, y coloreado por altura.
+El módulo implementa **diamond-square** sobre una cuadrícula de lado 2ⁿ+1, con n entre 3 y 6 (de 9 × 9 a 65 × 65 puntos). Las cuatro esquinas parten de valores aleatorios pequeños y la amplitud inicial del desplazamiento es 0,78. Al terminar cada ronda, la amplitud se multiplica por la **rugosidad** *r* (entre 0,15 y 0,90; 0,59 por defecto). En los bordes, los puntos del paso *square* promedian solo los vecinos que existen, sin envolver la malla.
+
+Multiplicar la amplitud por *r* en cada ronda equivale a un exponente de Hurst *H* = −log₂ *r* (derivación propia a partir de la relación entre ambos parámetros). Con *r* = 0,59, *H* ≈ 0,76 y *D* ≈ 2,24. Esto es una estimación teórica; el módulo no mide la dimensión de la superficie.
+
+Los desplazamientos salen de un generador pseudoaleatorio congruencial con **semilla** (0 a 4 294 967 295), así que una misma semilla reproduce el mismo terreno. El botón «Generar otro terreno» elige una semilla nueva.
+
+La visualización usa **Canvas 2D**, no WebGL. La malla se proyecta con una rotación (giro y cabeceo) y se divide en triángulos que se ordenan por profundidad y se dibujan de atrás hacia delante (algoritmo del pintor). Cada triángulo se colorea según su **elevación**, con tres paletas (alpina, desierto, violeta), y se sombrea con una luz fija a partir de su pendiente.
+
+Controles disponibles: paleta, rugosidad, altura del relieve (0,35× a 1,8×; solo reescala la altura, no regenera), nivel de detalle, semilla, malla visible, giro con ratón o flechas, zoom con rueda o teclas + y −, reinicio de vista y guardado en PNG.
 
 ## 5.2 Fortalezas
 
@@ -24,6 +32,7 @@ Se mostrará el terreno en 3D con control de rugosidad, semilla aleatoria, núme
 - **Control de la rugosidad** mediante un único parámetro (*H* o la persistencia).
 - **Eficiencia.** El diamond-square calcula una malla de lado 2ⁿ+1 en tiempo lineal respecto al número de puntos; el fBm se evalúa por punto y se puede paralelizar.
 - **Reproducibilidad** al fijar la semilla del generador aleatorio.
+- **Interactividad.** Con la malla máxima (65 × 65, unos 8 192 triángulos) la vista se redibuja al girar y hacer zoom; no se midieron tiempos en este informe.
 
 ## 5.3 Debilidades
 
@@ -31,12 +40,13 @@ Se mostrará el terreno en 3D con control de rugosidad, semilla aleatoria, núme
 - **Artefactos.** El diamond-square puede dejar marcas en forma de cuadrícula; el fBm con ruido de gradiente puede mostrar direcciones preferentes.
 - **Restricciones de tamaño.** El diamond-square exige mallas de lado 2ⁿ+1.
 - **Control local limitado.** Es difícil colocar a propósito un valle o una cima concretos.
+- **Resolución acotada en la aplicación.** El detalle máximo es 65 × 65 puntos y el algoritmo del pintor reordena todos los triángulos en cada cuadro, por lo que no escala bien a mallas mucho mayores.
 
 ## 5.4 Caso práctico de aplicación
 
-Los terrenos fractales son habituales en **videojuegos, simulación y cine** para generar paisajes sin modelarlos a mano. El ruido de gradiente de Perlin (1985) nació precisamente como herramienta de síntesis de texturas en imágenes por computadora. En la aplicación, ajustar la rugosidad permite pasar de llanuras suaves a cordilleras abruptas.
+Los terrenos fractales son habituales en **videojuegos, simulación y cine** para generar paisajes sin modelarlos a mano. El ruido de gradiente de Perlin (1985) nació precisamente como herramienta de síntesis de texturas en imágenes por computadora. En la aplicación, bajar la rugosidad produce llanuras suaves y subirla produce cordilleras abruptas.
 
 ## 5.5 Capturas y demostración
 
-- Captura: **[pendiente — módulo 4]**
+- Captura: **[pendiente: tomar con la semilla 4817 (valor por defecto) para que sea reproducible]**
 - Demostración: `modulos/04-terreno-fractal/index.html`

@@ -16,7 +16,7 @@ El diagrama `arquitectura-app.drawio` resume la estructura: la portada enlaza a 
 | `modulos/01-conjuntos-escape` | Mandelbrot y Julia en WebGL (implementado) |
 | `modulos/02-ifs-chaos-game` | Juego del caos: Sierpinski y helecho (pendiente) |
 | `modulos/03-l-systems` | Curva de Koch y plantas (pendiente) |
-| `modulos/04-terreno-fractal` | Terreno 3D con fBm o diamond-square (pendiente) |
+| `modulos/04-terreno-fractal` | Terreno 3D con diamond-square, renderizado en Canvas 2D |
 | `modulos/05-dimension-fractal` | Box-counting sobre una imagen cargada (pendiente) |
 | `modulos/_plantilla` | Base común: panel, lienzo, Reiniciar y Guardar PNG |
 
