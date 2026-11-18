@@ -1,19 +1,17 @@
 # Módulo 4 · Terreno fractal
 
 **Responsable:** Sihuacollo Sierra, Keyla Noemi
-**Estado:** prototipo listo (Diamond–Square 3D, importado del avance de Keyla)
+**Estado:** prototipo listo (diamond-square en WebGL)
 
-## Qué debe entregar
+Base de Keyla (diamond-square en Canvas 2D), rediseñada en WebGL con agua, cielo, niebla, sol regulable y paisajes predefinidos. El estilo sigue al módulo 1: lienzo a pantalla completa y panel flotante.
 
-- `index.html` autocontenido que funcione sin instalar nada
-- Terreno generado con fBm o diamond-square, con control de rugosidad
-- Controles en un panel a la izquierda y lienzo a pantalla completa (referencia: módulo 1)
+## Qué hace
+
+- Genera el terreno con diamond-square (malla de 33 × 33 a 513 × 513) y semilla reproducible.
+- Controles: paisajes, paleta, rugosidad, altura, nivel del agua, altura del sol, detalle, semilla, forma de isla, malla, órbita automática, reinicio y PNG.
+- Muestra *H* y *D* teóricos (*H* = −log₂ *r*; *D* = 3 − *H*), no medidos.
+- Requiere un navegador con WebGL.
 
 ## Para el informe
 
-Descripción del algoritmo, fortalezas, debilidades y un caso práctico de aplicación. Texto en `docs/informe/`.
-
-## Cómo empezar
-
-`index.html` ya trae la plantilla base: panel de controles, lienzo, botones Reiniciar y Guardar PNG.
-Busca los comentarios `TODO` y reemplaza la función `render()` por tu algoritmo. La lista de qué implementar está al inicio del `<script>`.
+Capítulo 5: `docs/informe/capitulo-5.md`.
