@@ -2,8 +2,8 @@
 
 > **Estado:** borrador. Se redacta con base en el diseño del proyecto; ajustar al finalizar los cinco módulos.
 
-El presente informe documenta el trabajo del Grupo 8 del curso Computación Visual (8.º ciclo, Ingeniería de Sistemas) sobre **geometría fractal**. El trabajo consiste en una aplicación web interactiva, desarrollada con HTML, JavaScript y WebGL, que reproduce en tiempo real cinco familias de algoritmos fractales y permite explorarlas modificando sus parámetros.
+El presente informe documenta el trabajo del Grupo 8 del curso Computación Visual (8.º ciclo, Ingeniería de Sistemas) sobre **geometría fractal**. El trabajo consiste en una aplicación web interactiva, desarrollada con HTML y JavaScript (con WebGL en los conjuntos de escape y Canvas 2D en otros módulos), que reproduce en tiempo real cinco familias de algoritmos fractales y permite explorarlas modificando sus parámetros.
 
 El informe se organiza en seis capítulos. El primero introduce los conceptos de autosimilitud y dimensión fraccionaria y repasa su historia. Los capítulos 2 a 6 estudian, uno por técnica: los conjuntos de escape de Mandelbrot y Julia, los sistemas de funciones iteradas con el juego del caos, los sistemas de Lindenmayer (L-systems), el terreno fractal y la estimación de la dimensión fractal mediante conteo de cajas. Cada capítulo de técnica describe el algoritmo, sus fortalezas y debilidades, un caso práctico de aplicación y la demostración correspondiente en la aplicación. Después se describe la aplicación gráfica, se presentan las conclusiones y la bibliografía en formato APA, y se anexa la bitácora de uso de inteligencia artificial exigida por la rúbrica.
 
-**Palabras clave:** geometría fractal, autosimilitud, dimensión fractal, WebGL, computación visual.
+**Palabras clave:** geometría fractal, autosimilitud, dimensión fractal, WebGL, Canvas 2D, computación visual.

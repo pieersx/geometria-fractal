@@ -4,7 +4,7 @@
 
 ## 1. Visión general
 
-La aplicación es un conjunto de páginas web interactivas, escritas en **HTML, JavaScript y WebGL**, que se ejecutan en el navegador sin instalar nada. Una portada (`index.html`) enlaza a cinco módulos independientes, uno por técnica estudiada en el informe.
+La aplicación es un conjunto de páginas web interactivas, escritas en **HTML y JavaScript**, que usan **WebGL** en el cálculo por píxel de los conjuntos de escape y **Canvas 2D** en el resto de los módulos, y que se ejecutan en el navegador sin instalar nada. Una portada (`index.html`) enlaza a cinco módulos independientes, uno por técnica estudiada en el informe.
 
 ## 2. Arquitectura
 
@@ -29,7 +29,7 @@ El diagrama `arquitectura-app.drawio` resume la estructura: la portada enlaza a 
 
 ## 4. Requisitos y ejecución
 
-- Navegador actual con soporte de WebGL (Chrome, Firefox o Edge).
+- Navegador actual (Chrome, Firefox o Edge). El módulo 1 requiere además soporte de WebGL.
 - Abrir `index.html` o el módulo deseado. Opcionalmente, servir la carpeta con `python3 -m http.server 8000` y entrar a `http://localhost:8000`.
 
 ## 5. Interacción del módulo 1
