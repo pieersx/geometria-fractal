@@ -1,7 +1,7 @@
 # Módulo 4 · Terreno fractal
 
 **Responsable:** Sihuacollo Sierra, Keyla Noemi
-**Estado:** pendiente
+**Estado:** prototipo listo (Diamond–Square 3D, importado del avance de Keyla)
 
 ## Qué debe entregar
 
