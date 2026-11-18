@@ -1,6 +1,6 @@
 # Capítulo 5. Terreno fractal (diamond-square)
 
-> **Estado:** ajustado al módulo 4 implementado (Keyla Sihuacollo). El módulo usa **diamond-square**; el fBm se describe solo como método alternativo de referencia.
+> **Estado:** ajustado al módulo 4 implementado. Base de Keyla Sihuacollo (diamond-square en Canvas 2D), rediseñada en WebGL con agua, cielo y niebla. El fBm se describe solo como método alternativo de referencia.
 
 ## 5.1 Descripción del algoritmo
 
@@ -16,15 +16,19 @@ Parte de una cuadrícula cuadrada con las cuatro esquinas fijadas y repite dos p
 
 ### En la aplicación
 
-El módulo implementa **diamond-square** sobre una cuadrícula de lado 2ⁿ+1, con n entre 3 y 6 (de 9 × 9 a 65 × 65 puntos). Las cuatro esquinas parten de valores aleatorios pequeños y la amplitud inicial del desplazamiento es 0,78. Al terminar cada ronda, la amplitud se multiplica por la **rugosidad** *r* (entre 0,15 y 0,90; 0,59 por defecto). En los bordes, los puntos del paso *square* promedian solo los vecinos que existen, sin envolver la malla.
+El módulo implementa **diamond-square** sobre una cuadrícula de lado 2ⁿ+1, con n entre 5 y 9 (de 33 × 33 a 513 × 513 puntos, es decir, hasta 524 288 triángulos). Las cuatro esquinas parten de valores aleatorios pequeños y la amplitud inicial del desplazamiento es 1. Al terminar cada ronda, la amplitud se multiplica por la **rugosidad** *r* (entre 0,30 y 0,90; 0,59 por defecto). En los bordes, los puntos del paso *square* promedian solo los vecinos que existen, sin envolver la malla.
 
-Multiplicar la amplitud por *r* en cada ronda equivale a un exponente de Hurst *H* = −log₂ *r* (derivación propia a partir de la relación entre ambos parámetros). Con *r* = 0,59, *H* ≈ 0,76 y *D* ≈ 2,24. Esto es una estimación teórica; el módulo no mide la dimensión de la superficie.
+Multiplicar la amplitud por *r* en cada ronda equivale a un exponente de Hurst *H* = −log₂ *r* (derivación propia a partir de la relación entre ambos parámetros). Con *r* = 0,59, *H* ≈ 0,76 y *D* ≈ 2,24. Cuando *r* < 0,5 resulta *H* > 1 y la superficie es lisa, por lo que el panel muestra *D* = 2. El módulo presenta estos valores como **estimación teórica** de la superficie generada; no mide la dimensión fractal del resultado.
 
-Los desplazamientos salen de un generador pseudoaleatorio congruencial con **semilla** (0 a 4 294 967 295), así que una misma semilla reproduce el mismo terreno. El botón «Generar otro terreno» elige una semilla nueva.
+Los desplazamientos salen de un generador pseudoaleatorio con **semilla** (0 a 4 294 967 295), así que una misma semilla reproduce el mismo terreno. Después de generar, las alturas se normalizan al rango 0–1, se elevan a la potencia 1,4 para marcar los picos y, si está activa la opción «Forma de isla», se atenúan hacia los bordes del mapa. Estos dos últimos pasos modifican la forma global, no la rugosidad local.
 
-La visualización usa **Canvas 2D**, no WebGL. La malla se proyecta con una rotación (giro y cabeceo) y se divide en triángulos que se ordenan por profundidad y se dibujan de atrás hacia delante (algoritmo del pintor). Cada triángulo se colorea según su **elevación**, con tres paletas (alpina, desierto, violeta), y se sombrea con una luz fija a partir de su pendiente.
+La visualización usa **WebGL**. La altura de cada punto y su pendiente se envían a la GPU como una malla triangular; un *fragment shader* calcula el color final:
 
-Controles disponibles: paleta, rugosidad, altura del relieve (0,35× a 1,8×; solo reescala la altura, no regenera), nivel de detalle, semilla, malla visible, giro con ratón o flechas, zoom con rueda o teclas + y −, reinicio de vista y guardado en PNG.
+- **Elevación y pendiente:** seis colores por altura (orilla, pasto, bosque, altiplano, roca y nieve), con roca en las laderas empinadas y nieve en las cumbres planas.
+- **Agua:** una superficie al nivel del mar, con color según la profundidad, oleaje, reflejo del cielo (efecto Fresnel) y espuma en la orilla.
+- **Luz y atmósfera:** iluminación difusa con un sol de altura regulable, cielo en degradado y niebla que difumina el horizonte.
+
+Controles disponibles: paisajes predefinidos, paleta (alpina, desierto, violeta, ártico), rugosidad, altura del relieve (reescala sin regenerar), nivel del agua, altura del sol, nivel de detalle, semilla, forma de isla, malla visible, órbita automática, giro con ratón, pellizco o flechas, zoom con rueda o teclas + y −, reinicio de vista y guardado en PNG. El panel muestra el tamaño de la malla, *H*, *D*, el zoom y los cuadros por segundo.
 
 ## 5.2 Fortalezas
 
@@ -32,7 +36,7 @@ Controles disponibles: paleta, rugosidad, altura del relieve (0,35× a 1,8×; so
 - **Control de la rugosidad** mediante un único parámetro (*H* o la persistencia).
 - **Eficiencia.** El diamond-square calcula una malla de lado 2ⁿ+1 en tiempo lineal respecto al número de puntos; el fBm se evalúa por punto y se puede paralelizar.
 - **Reproducibilidad** al fijar la semilla del generador aleatorio.
-- **Interactividad.** Con la malla máxima (65 × 65, unos 8 192 triángulos) la vista se redibuja al girar y hacer zoom; no se midieron tiempos en este informe.
+- **Interactividad.** El dibujo corre en la GPU. En una prueba con un navegador automatizado, la malla máxima (513 × 513) se redibujó a cerca de 60 cuadros por segundo; no se midió en otros equipos.
 
 ## 5.3 Debilidades
 
@@ -40,7 +44,7 @@ Controles disponibles: paleta, rugosidad, altura del relieve (0,35× a 1,8×; so
 - **Artefactos.** El diamond-square puede dejar marcas en forma de cuadrícula; el fBm con ruido de gradiente puede mostrar direcciones preferentes.
 - **Restricciones de tamaño.** El diamond-square exige mallas de lado 2ⁿ+1.
 - **Control local limitado.** Es difícil colocar a propósito un valle o una cima concretos.
-- **Resolución acotada en la aplicación.** El detalle máximo es 65 × 65 puntos y el algoritmo del pintor reordena todos los triángulos en cada cuadro, por lo que no escala bien a mallas mucho mayores.
+- **Iluminación local.** La aplicación calcula luz difusa por punto, sin sombras proyectadas ni erosión, y limita la malla a 513 × 513 puntos.
 
 ## 5.4 Caso práctico de aplicación
 
@@ -48,5 +52,5 @@ Los terrenos fractales son habituales en **videojuegos, simulación y cine** par
 
 ## 5.5 Capturas y demostración
 
-- Captura: **[pendiente: tomar con la semilla 4817 (valor por defecto) para que sea reproducible]**
+- Captura: **[pendiente: tomar con la semilla 4817 (paisaje «Cordillera alpina») para que sea reproducible]**
 - Demostración: `modulos/04-terreno-fractal/index.html`

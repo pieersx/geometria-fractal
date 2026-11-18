@@ -3,350 +3,599 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Terreno fractal · Geometría fractal</title>
+<title>Geometría fractal · Terreno fractal</title>
+<link rel="icon" href="data:,">
 <style>
-:root{color-scheme:dark;--bg:#0c1516;--panel:#142122;--line:#304647;--text:#e6efea;--muted:#a8bfba;--accent:#9ee7c5}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,sans-serif}
-main{max-width:1200px;margin:auto;padding:32px clamp(16px,4vw,48px) 52px}
-a{color:var(--accent)}
-h1{font-size:clamp(2.75rem,7vw,5rem);line-height:1.04;letter-spacing:-.055em;margin:24px 0 12px}
-h2{font-size:1.2rem;margin:0 0 12px}
-p{margin:0 0 14px} .intro{color:var(--muted);max-width:66ch;margin-bottom:28px}
-.workspace{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:16px}
-.viewer,aside{border:1px solid var(--line);border-radius:16px;background:var(--panel)}
-.viewer{overflow:hidden;display:flex;flex-direction:column}
-canvas{width:100%;height:clamp(330px,49vw,520px);display:block;touch-action:none;cursor:grab;background:radial-gradient(ellipse at 50% 42%,#203637,#101c20 75%)}
-canvas:active{cursor:grabbing}
-.caption{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 16px;color:var(--muted);font-size:.82rem;border-top:1px solid var(--line)}
-.legend{display:inline-flex;align-items:center;gap:7px}
-.gradient{width:68px;height:8px;border-radius:12px;background:linear-gradient(90deg,#2b7390,#4f9875,#a49066,#eee9da)}
-aside{padding:18px;align-self:start}
-label{display:flex;justify-content:space-between;gap:8px;font-size:.9rem;margin:12px 0 4px}
-output{color:var(--accent);font-variant-numeric:tabular-nums}
-input,button{font:inherit} input[type=range]{display:block;width:100%;margin:0;accent-color:var(--accent)}
-input[type=number],button{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#101b1d;color:var(--text)}
-.check{justify-content:flex-start;align-items:center;margin:14px 0}
-.check input{accent-color:var(--accent)}
-button{cursor:pointer;margin-top:7px}button.primary{background:var(--accent);color:#102320;font-weight:700}
-button:hover{filter:brightness(1.13)}:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-@media(max-width:760px){.workspace{grid-template-columns:1fr}.caption{font-size:.78rem}}
-
-:root{--bg:#0f1020;--panel:#17192c;--line:#33374d;--text:#f1eef9;--muted:#b8b6cd;--accent:#d4b8ff}
-main{max-width:1680px;padding:24px clamp(16px,3vw,44px) 42px}
-nav{font-size:.88rem}
-.workspace{grid-template-columns:300px minmax(0,1fr);align-items:start;gap:18px;margin-top:18px}
-aside{grid-column:1;grid-row:1}
-.viewer{grid-column:2;grid-row:1}
-h1{font-size:clamp(1.7rem,3vw,2.25rem);margin:14px 0 9px}
-.intro{font-size:.9rem;margin-bottom:18px}
-canvas{height:clamp(465px,calc(100svh - 106px),850px)}
-select{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#111426;color:var(--text)}
-input[type=number],button{background:#111426}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.zoom{white-space:nowrap}
-@media(max-width:800px){
-  .workspace{grid-template-columns:1fr}
-  .viewer{grid-column:1;grid-row:2}
-  aside{grid-row:1}
-  canvas{height:clamp(320px,65vw,520px)}
-}
+  :root {
+    --bg: #0b0d12; --panel: #141821ee; --line: #262c3a; --text: #e6e9f0;
+    --muted: #8b93a7; --accent: #f5b942;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+  canvas.dragging { cursor: grabbing; }
+  canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  #panel { position: fixed; top: 16px; left: 16px; width: 272px; max-height: calc(100% - 32px); overflow: auto;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px;
+    backdrop-filter: blur(8px); }
+  h1 { font-size: 15px; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+  a { color: var(--accent); }
+  label { display: block; color: var(--muted); font-size: 12px; margin: 10px 0 4px; }
+  .row { display: flex; gap: 6px; }
+  button, select { font: inherit; color: var(--text); background: #1c2230; border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  button:hover, select:hover { border-color: var(--accent); }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); color: #1a1405; border-color: var(--accent); font-weight: 600; }
+  .row > button { flex: 1; }
+  select { width: 100%; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  input[type=number] { width: 100%; font: inherit; color: var(--text); background: #1c2230;
+    border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+  .val { float: right; color: var(--text); font-variant-numeric: tabular-nums; }
+  .check { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; color: var(--text); cursor: pointer; }
+  .check input { accent-color: var(--accent); margin: 0; }
+  .stats { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted);
+    font-size: 12px; font-variant-numeric: tabular-nums; }
+  .stats b { color: var(--text); font-weight: 500; }
+  .hint { margin-top: 10px; color: var(--muted); font-size: 12px; }
+  #nogl { display: none; position: fixed; inset: 0; place-items: center; text-align: center; padding: 24px; }
+  @media (max-width: 560px) { #panel { width: calc(100% - 32px); max-height: 46%; } }
 </style>
 </head>
 <body>
-<main>
-<nav><a href="../../">← Geometría fractal</a></nav>
-<div class="workspace">
-<aside aria-labelledby="settings">
-<header>
-<p class="intro">Geometría fractal · Módulo 4</p>
-<h1>Terreno fractal</h1>
-<p class="intro">Explora un paisaje en 3D generado con el algoritmo Diamond–Square.</p>
-</header>
-<h2 id="settings">Controles</h2>
-<label for="palette">Paleta de elevación</label>
-<select id="palette">
-<option value="alpine">Alpina</option>
-<option value="desert">Desierto</option>
-<option value="violet">Violeta</option>
-</select>
-<label for="roughness">Rugosidad <output id="roughValue" for="roughness"></output></label>
-<input id="roughness" type="range" min=".15" max=".9" step=".01" value=".59">
-<label for="height">Altura del relieve <output id="heightValue" for="height"></output></label>
-<input id="height" type="range" min=".35" max="1.8" step=".05" value="1">
-<label for="detail">Nivel de detalle <output id="detailValue" for="detail"></output></label>
-<input id="detail" type="range" min="3" max="6" step="1" value="6">
-<label for="seed">Semilla</label>
-<input id="seed" type="number" min="0" max="4294967295" step="1" value="4817">
-<label class="check"><input id="mesh" type="checkbox"> Mostrar malla</label>
-<button class="primary" id="random" type="button">Generar otro terreno</button>
-<div class="actions">
-<button id="reset" type="button">Reiniciar vista</button>
-<button id="save" type="button">Guardar PNG</button>
+<canvas id="c" tabindex="0" aria-label="Terreno 3D. Flechas para girar, más y menos para acercar y alejar."></canvas>
+<div id="nogl">Tu navegador no soporta WebGL. Prueba con Chrome, Firefox o Edge actualizados.</div>
+
+<div id="panel">
+  <h1>Geometría fractal</h1>
+  <div class="sub">Módulo 4 · Terreno fractal (diamond-square)</div>
+
+  <label for="presets">Paisajes famosos</label>
+  <select autocomplete="off" id="presets">
+    <option value="0">Cordillera alpina</option>
+    <option value="1">Isla solitaria</option>
+    <option value="2">Dunas de Marte</option>
+    <option value="3">Fiordos al anochecer</option>
+    <option value="4">Archipiélago helado</option>
+  </select>
+
+  <label for="pal">Paleta</label>
+  <select autocomplete="off" id="pal">
+    <option value="alpine">Alpina</option>
+    <option value="desert">Desierto</option>
+    <option value="violet">Violeta</option>
+    <option value="arctic">Ártico</option>
+  </select>
+
+  <label for="rough">Rugosidad <span class="val" id="vRough"></span></label>
+  <input autocomplete="off" id="rough" type="range" min="0.3" max="0.9" step="0.01" value="0.59">
+
+  <label for="height">Altura del relieve <span class="val" id="vHeight"></span></label>
+  <input autocomplete="off" id="height" type="range" min="0.3" max="2" step="0.05" value="1">
+
+  <label for="water">Nivel del agua <span class="val" id="vWater"></span></label>
+  <input autocomplete="off" id="water" type="range" min="0" max="0.7" step="0.01" value="0.3">
+
+  <label for="sun">Altura del sol <span class="val" id="vSun"></span></label>
+  <input autocomplete="off" id="sun" type="range" min="4" max="75" step="1" value="30">
+
+  <label for="detail">Nivel de detalle <span class="val" id="vDetail"></span></label>
+  <input autocomplete="off" id="detail" type="range" min="5" max="9" step="1" value="8">
+
+  <label for="seed">Semilla</label>
+  <input autocomplete="off" id="seed" type="number" min="0" max="4294967295" step="1" value="4817">
+
+  <label class="check"><input autocomplete="off" id="island" type="checkbox" checked> Forma de isla</label>
+  <label class="check"><input autocomplete="off" id="mesh" type="checkbox"> Mostrar malla</label>
+  <label class="check"><input autocomplete="off" id="orbit" type="checkbox" checked> Órbita automática</label>
+
+  <div class="row" style="margin-top:12px">
+    <button id="random" class="primary">Generar otro terreno</button>
+  </div>
+  <div class="row" style="margin-top:6px">
+    <button id="reset">Reiniciar vista</button>
+    <button id="shot">Guardar PNG</button>
+  </div>
+
+  <div class="stats">
+    Malla <b id="sMesh"></b><br>
+    <span title="H = −log₂ r. Estimación teórica de la superficie de diamond-square, no una medición.">Hurst <b id="sH"></b> · Dimensión <b id="sD"></b></span><br>
+    Zoom <b id="sZoom">1×</b> · <span id="sFps"></span>
+  </div>
+  <div class="hint">Arrastrar: girar · Rueda o pellizco: zoom · Teclas: flechas y + / − · <a href="../../">← Portada</a></div>
 </div>
-</aside>
-<section class="viewer" aria-label="Visualización del terreno">
-<canvas id="terrain" tabindex="0" aria-label="Terreno 3D. Usa las flechas para girar y las teclas más y menos para acercar y alejar."></canvas>
-<div class="caption">
-<span>Arrastra para girar · Rueda o teclas + y − para ajustar el zoom</span>
-<span class="zoom">Zoom <output id="zoomValue">1.0×</output></span>
-<span class="legend">Bajo <span class="gradient" id="gradient" aria-hidden="true"></span> Alto</span>
-</div>
-</section>
-</div>
-</main>
+
 <script>
-'use strict';
-function seededRandom(seed) {
-  let state = seed >>> 0;
+"use strict";
+const canvas = document.getElementById("c");
+const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true, antialias: true });
+if (!gl) {
+  document.getElementById("nogl").style.display = "grid";
+  document.getElementById("panel").style.display = "none";
+  throw new Error("WebGL no disponible");
+}
+const uintExt = gl.getExtension("OES_element_index_uint");
+const MAX_DETAIL = uintExt ? 9 : 7;      // 513×513 si hay índices de 32 bits; si no, 129×129
+const detailInput = document.getElementById("detail");
+detailInput.max = MAX_DETAIL;
+if (+detailInput.value > MAX_DETAIL) detailInput.value = MAX_DETAIL;
+
+/* ---------- Shaders ---------- */
+const SKY_FN = `
+uniform vec3 uSun, uSunCol, uSkyTop, uSkyHor;
+vec3 skyColor(vec3 d) {
+  float t = clamp(d.y, 0.0, 1.0);
+  vec3 c = mix(uSkyHor, uSkyTop, smoothstep(0.0, 0.8, t));
+  float s = max(dot(d, uSun), 0.0);
+  c += uSunCol * (pow(s, 900.0) * 2.0 + pow(s, 40.0) * 0.30 + pow(s, 6.0) * 0.12);
+  return c;
+}`;
+
+const PRECISION = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif`;
+
+const SKY_VS = `attribute vec2 p; varying vec2 vUv;
+void main(){ vUv = p; gl_Position = vec4(p, 1.0, 1.0); }`;
+
+const SKY_FS = PRECISION + `
+varying vec2 vUv;
+uniform vec3 uRight, uUp, uFwd;
+uniform float uTanY, uAspect;
+${SKY_FN}
+void main() {
+  vec3 d = normalize(uFwd + vUv.x * uAspect * uTanY * uRight + vUv.y * uTanY * uUp);
+  gl_FragColor = vec4(skyColor(d), 1.0);
+}`;
+
+const TER_VS = `
+attribute vec3 aPos;      // x, altura normalizada (0..1), z
+attribute vec2 aGrad;     // dh/dx, dh/dz
+uniform mat4 uVP;
+uniform float uScale, uWater;
+varying vec3 vWorld; varying float vH; varying vec2 vGrad; varying vec2 vXZ;
+void main() {
+  vec3 w = vec3(aPos.x, max(aPos.y, uWater) * uScale, aPos.z);
+  vWorld = w; vH = aPos.y; vGrad = aGrad; vXZ = aPos.xz;
+  gl_Position = uVP * vec4(w, 1.0);
+}`;
+
+const TER_FS = PRECISION + `
+varying vec3 vWorld; varying float vH; varying vec2 vGrad; varying vec2 vXZ;
+uniform vec3 uEye;
+uniform float uScale, uWater, uTime, uMesh, uGridN, uFog, uSunI, uEdge, uSq;
+uniform vec3 uL0, uL1, uL2, uL3, uL4, uL5, uWShallow, uWDeep;
+${SKY_FN}
+
+void main() {
+  vec3 Vv = uEye - vWorld;
+  float dist = length(Vv);
+  vec3 V = Vv / dist;
+  vec3 N = normalize(vec3(-vGrad.x * uScale, 1.0, -vGrad.y * uScale));
+  vec3 col;
+
+  if (vH <= uWater) {
+    // Agua: oleaje barato, color por profundidad, reflejo del cielo y espuma en la orilla.
+    vec2 p = vXZ * 20.0;
+    vec2 d1 = vec2(0.83, 0.55), d2 = vec2(-0.36, 0.93), d3 = vec2(0.97, -0.24), d4 = vec2(-0.71, -0.70);
+    float w1 = cos(dot(p, d1) * 2.3 + uTime * 1.1), w2 = cos(dot(p, d2) * 3.7 - uTime * 0.9);
+    float w3 = cos(dot(p, d3) * 5.9 + uTime * 1.6), w4 = cos(dot(p, d4) * 8.3 - uTime * 1.3);
+    vec2 rip = (d1 * w1 * 0.5 + d2 * w2 * 0.35 + d3 * w3 * 0.2 + d4 * w4 * 0.12) * 0.045 / (1.0 + dist * 0.6);
+    vec3 Nw = normalize(vec3(rip.x, 1.0, rip.y));
+    float depth = clamp((uWater - vH) / max(uWater, 0.001), 0.0, 1.0);
+    vec3 base = mix(uWShallow, uWDeep, pow(depth, 0.55));
+    float fres = 0.04 + 0.9 * pow(1.0 - max(dot(Nw, V), 0.0), 4.0);
+    vec3 R = reflect(-V, Nw);
+    vec3 refl = skyColor(vec3(R.x, abs(R.y), R.z));
+    col = mix(base * (0.45 + 0.55 * uSunI), refl, fres);
+    col += uSunCol * pow(max(dot(R, uSun), 0.0), 260.0) * 0.9 * uSunI;
+    float shore = uWater - vH;
+    float foam = smoothstep(0.035, 0.0, shore) * (0.55 + 0.45 * sin(shore * 220.0 - uTime * 1.8));
+    col = mix(col, vec3(1.0), clamp(foam, 0.0, 1.0) * 0.55 * uSunI);
+  } else {
+    float t = clamp((vH - uWater) / max(1.0 - uWater, 0.001), 0.0, 1.0);
+    vec3 c = uL0;
+    c = mix(c, uL1, smoothstep(0.00, 0.18, t));
+    c = mix(c, uL2, smoothstep(0.14, 0.38, t));
+    c = mix(c, uL3, smoothstep(0.34, 0.60, t));
+    c = mix(c, uL4, smoothstep(0.56, 0.80, t));
+    float slope = 1.0 - N.y;
+    c = mix(c, uL4, smoothstep(0.30, 0.62, slope) * (1.0 - smoothstep(0.80, 0.95, t)));
+    float snow = smoothstep(0.72, 0.88, t) * (1.0 - smoothstep(0.34, 0.64, slope));
+    c = mix(c, uL5, snow);
+    float diff = max(dot(N, uSun), 0.0);
+    vec3 amb = mix(vec3(0.30, 0.28, 0.26), uSkyTop * 0.5 + 0.38, N.y * 0.5 + 0.5) * (0.6 + 0.4 * uSunI);
+    col = c * (amb + uSunCol * diff * 1.05 * uSunI);
+    if (uMesh > 0.5) {
+      vec2 g = fract((vXZ * 0.5 + 0.5) * uGridN);
+      float e = min(min(g.x, 1.0 - g.x), min(g.y, 1.0 - g.y));
+      float line = (1.0 - smoothstep(0.0, 0.07, e)) * (1.0 - smoothstep(1.4, 3.2, dist));
+      col = mix(col, vec3(0.04, 0.06, 0.08), line * 0.6);
+    }
+  }
+
+  // Niebla atmosférica y desvanecido del borde del mapa hacia el horizonte.
+  vec3 fogC = skyColor(-V);
+  float ed = mix(length(vXZ), max(abs(vXZ.x), abs(vXZ.y)), uSq);
+  float edge = smoothstep(uEdge, uEdge + 0.42, ed);
+  float f = clamp(1.0 - exp(-pow(dist * uFog, 2.0)) + edge, 0.0, 1.0);
+  col = mix(col, fogC, f);
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+function compile(type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+function program(vs, fs) {
+  const p = gl.createProgram();
+  gl.attachShader(p, compile(gl.VERTEX_SHADER, vs));
+  gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+  return p;
+}
+function uniforms(p, names) {
+  const o = {};
+  for (const n of names) o[n] = gl.getUniformLocation(p, n);
+  return o;
+}
+
+const skyProg = program(SKY_VS, SKY_FS);
+const terProg = program(TER_VS, TER_FS);
+const SKY_COMMON = ["uSun", "uSunCol", "uSkyTop", "uSkyHor"];
+const skyU = uniforms(skyProg, [...SKY_COMMON, "uRight", "uUp", "uFwd", "uTanY", "uAspect"]);
+const terU = uniforms(terProg, [...SKY_COMMON, "uVP", "uEye", "uScale", "uWater", "uTime", "uMesh",
+  "uGridN", "uFog", "uSunI", "uEdge", "uSq", "uL0", "uL1", "uL2", "uL3", "uL4", "uL5", "uWShallow", "uWDeep"]);
+
+/* Triángulo a pantalla completa para el cielo */
+const skyBuf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, skyBuf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+const skyLoc = gl.getAttribLocation(skyProg, "p");
+const aPos = gl.getAttribLocation(terProg, "aPos");
+const aGrad = gl.getAttribLocation(terProg, "aGrad");
+
+/* ---------- Generación del terreno (diamond-square) ---------- */
+function mulberry32(a) {
   return () => {
-    state = (Math.imul(1664525, state) + 1013904223) >>> 0;
-    return state / 4294967296;
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
 
-function makeTerrain(detail, roughness, seed) {
-  const span = 2 ** detail;
-  const size = span + 1;
-  const map = Array.from({length: size}, () => new Float64Array(size));
-  const random = seededRandom(seed);
-  for (const z of [0, span]) {
-    for (const x of [0, span]) map[z][x] = (random() - .5) * .55;
-  }
-
-  let amplitude = .78;
-  for (let step = span; step > 1; step /= 2) {
-    const half = step / 2;
-    for (let z = half; z < span; z += step) {
-      for (let x = half; x < span; x += step) {
-        const sum = map[z-half][x-half] + map[z-half][x+half]
-          + map[z+half][x-half] + map[z+half][x+half];
-        map[z][x] = sum / 4 + (random() - .5) * amplitude;
+function diamondSquare(n, r, seed) {
+  const N = 1 << n, S = N + 1;
+  const m = new Float32Array(S * S);
+  const rnd = mulberry32(seed);
+  const at = (x, z) => m[z * S + x];
+  for (const z of [0, N]) for (const x of [0, N]) m[z * S + x] = rnd() - 0.5;
+  let amp = 1;
+  for (let step = N; step > 1; step >>= 1) {
+    const half = step >> 1;
+    for (let z = half; z < N; z += step) {
+      for (let x = half; x < N; x += step) {
+        m[z * S + x] = (at(x - half, z - half) + at(x + half, z - half) +
+                        at(x - half, z + half) + at(x + half, z + half)) / 4 + (rnd() - 0.5) * amp;
       }
     }
-    for (let z = 0; z <= span; z += half) {
-      const offset = z % step === 0 ? half : 0;
-      for (let x = offset; x <= span; x += step) {
-        let sum = 0;
-        let count = 0;
-        for (const [dx, dz] of [[-half,0],[half,0],[0,-half],[0,half]]) {
-          const row = map[z + dz];
-          if (row && x + dx >= 0 && x + dx <= span) {
-            sum += row[x + dx];
-            count++;
-          }
-        }
-        map[z][x] = sum / count + (random() - .5) * amplitude;
+    for (let z = 0; z <= N; z += half) {
+      const off = (z % step === 0) ? half : 0;
+      for (let x = off; x <= N; x += step) {
+        let s = 0, c = 0;
+        if (x - half >= 0) { s += at(x - half, z); c++; }
+        if (x + half <= N) { s += at(x + half, z); c++; }
+        if (z - half >= 0) { s += at(x, z - half); c++; }
+        if (z + half <= N) { s += at(x, z + half); c++; }
+        m[z * S + x] = s / c + (rnd() - 0.5) * amp;
       }
     }
-    amplitude *= roughness;
+    amp *= r;
   }
-  return map;
+  return m;
 }
 
-const byId = id => document.getElementById(id);
-const canvas = byId('terrain');
-const ctx = canvas.getContext('2d');
-const roughness = byId('roughness');
-const height = byId('height');
-const detail = byId('detail');
-const seed = byId('seed');
-const mesh = byId('mesh');
-const initialCamera = {yaw: -.65, pitch: .59, zoom: 1};
-const camera = {...initialCamera};
-const palettes = {
-  alpine: [[35,74,102],[46,103,111],[79,146,111],[149,151,105],[189,174,145],[243,242,232]],
-  desert: [[79,42,54],[123,64,55],[169,91,54],[206,137,72],[228,178,111],[255,232,183]],
-  violet: [[42,42,102],[74,55,135],[115,81,164],[162,106,194],[204,150,219],[244,218,251]]
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+
+const mesh = { n: -1, count: 0, vbo: gl.createBuffer(), ibo: gl.createBuffer(), N: 0 };
+
+function buildTerrain(n, r, seed, island) {
+  const N = 1 << n, S = N + 1;
+  const h = diamondSquare(n, r, seed);
+  let lo = Infinity, hi = -Infinity;
+  for (let i = 0; i < h.length; i++) { if (h[i] < lo) lo = h[i]; if (h[i] > hi) hi = h[i]; }
+  const span = hi - lo || 1;
+  for (let z = 0; z < S; z++) {
+    for (let x = 0; x < S; x++) {
+      let v = Math.pow((h[z * S + x] - lo) / span, 1.4);
+      if (island) {
+        const px = x / N * 2 - 1, pz = z / N * 2 - 1;
+        v *= smooth(1.12, 0.5, Math.hypot(px, pz));
+      }
+      h[z * S + x] = v;
+    }
+  }
+  const dx = 2 / N;
+  const data = new Float32Array(S * S * 5);
+  for (let z = 0; z < S; z++) {
+    for (let x = 0; x < S; x++) {
+      const i = z * S + x, o = i * 5;
+      const xl = Math.max(x - 1, 0), xr = Math.min(x + 1, N), zu = Math.max(z - 1, 0), zd = Math.min(z + 1, N);
+      data[o] = x / N * 2 - 1;
+      data[o + 1] = h[i];
+      data[o + 2] = z / N * 2 - 1;
+      data[o + 3] = (h[z * S + xr] - h[z * S + xl]) / ((xr - xl) * dx);
+      data[o + 4] = (h[zd * S + x] - h[zu * S + x]) / ((zd - zu) * dx);
+    }
+  }
+  gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vbo);
+  gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
+  if (mesh.n !== n) {
+    const idx = uintExt ? new Uint32Array(N * N * 6) : new Uint16Array(N * N * 6);
+    let k = 0;
+    for (let z = 0; z < N; z++) {
+      for (let x = 0; x < N; x++) {
+        const a = z * S + x, b = a + 1, c = a + S, d = c + 1;
+        idx[k++] = a; idx[k++] = c; idx[k++] = b;
+        idx[k++] = b; idx[k++] = c; idx[k++] = d;
+      }
+    }
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ibo);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
+    mesh.n = n; mesh.count = idx.length; mesh.N = N;
+  }
+}
+
+/* ---------- Paletas ---------- */
+const PALETTES = {
+  alpine: { land: [[.78,.72,.52],[.32,.56,.25],[.20,.42,.22],[.50,.46,.32],[.52,.50,.48],[.96,.97,1]],
+            wS: [.18,.62,.66], wD: [.03,.17,.32], top: [.14,.34,.78], hor: [.68,.80,.93], sun: [1,.92,.75] },
+  desert: { land: [[.93,.80,.55],[.86,.62,.34],[.74,.45,.25],[.60,.33,.22],[.42,.25,.20],[.95,.86,.72]],
+            wS: [.25,.65,.62], wD: [.04,.25,.33], top: [.30,.45,.78], hor: [.98,.78,.55], sun: [1,.85,.6] },
+  violet: { land: [[.55,.45,.70],[.40,.30,.62],[.28,.20,.50],[.50,.35,.65],[.34,.26,.46],[.97,.90,1]],
+            wS: [.35,.35,.78], wD: [.07,.06,.25], top: [.10,.07,.30], hor: [.75,.45,.70], sun: [1,.7,.85] },
+  arctic: { land: [[.80,.85,.88],[.62,.72,.78],[.45,.58,.68],[.62,.68,.75],[.40,.45,.52],[1,1,1]],
+            wS: [.30,.65,.78], wD: [.04,.20,.38], top: [.25,.45,.75], hor: [.85,.92,.98], sun: [1,.95,.9] },
 };
-const paletteSelect = byId('palette');
-let palette = palettes.alpine;
-let terrain;
-let frame = 0;
 
-function queueDraw() {
-  if (frame === 0) frame = requestAnimationFrame(draw);
-}
+const PRESETS = [
+  { seed: 4817, rough: 0.59, water: 0.30, pal: "alpine", sun: 30, height: 1.0, island: true },
+  { seed: 2026, rough: 0.52, water: 0.34, pal: "alpine", sun: 42, height: 1.0, island: true },
+  { seed: 99,   rough: 0.50, water: 0.00, pal: "desert", sun: 14, height: 1.3, island: true },
+  { seed: 31337, rough: 0.62, water: 0.45, pal: "violet", sun: 9, height: 1.2, island: true },
+  { seed: 777,  rough: 0.55, water: 0.40, pal: "arctic", sun: 24, height: 1.1, island: true },
+];
+
+/* ---------- Estado e interfaz ---------- */
+const $ = id => document.getElementById(id);
+const ui = { rough: $("rough"), height: $("height"), water: $("water"), sun: $("sun"), detail: $("detail"),
+  seed: $("seed"), island: $("island"), mesh: $("mesh"), orbit: $("orbit"), pal: $("pal"), presets: $("presets") };
+const reducedMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (reducedMotion) ui.orbit.checked = false;
+
+const DEFAULT_CAM = { yaw: 0.75, pitch: 0.38, dist: 1.85 };
+const cam = { ...DEFAULT_CAM };
+let lastTouch = -1e9;
 
 function rebuild() {
-  terrain = makeTerrain(detail.valueAsNumber, roughness.valueAsNumber, seed.valueAsNumber);
-  byId('roughValue').value = roughness.valueAsNumber.toFixed(2);
-  byId('detailValue').value = terrain.length + ' × ' + terrain.length;
-  queueDraw();
+  const r = ui.rough.valueAsNumber;
+  buildTerrain(+ui.detail.value, r, ui.seed.valueAsNumber >>> 0, ui.island.checked);
+  const side = (1 << +ui.detail.value) + 1;
+  $("sMesh").textContent = side + " × " + side + " · " + (mesh.count / 3).toLocaleString("es") + " triángulos";
+  $("vDetail").textContent = side + " × " + side;
+  $("vRough").textContent = r.toFixed(2);
+  const H = -Math.log2(r);
+  $("sH").textContent = H.toFixed(2);
+  $("sD").textContent = (3 - Math.min(H, 1)).toFixed(2);
+}
+function refreshLabels() {
+  $("vHeight").textContent = ui.height.valueAsNumber.toFixed(2) + "×";
+  $("vWater").textContent = Math.round(ui.water.valueAsNumber * 100) + " %";
+  $("vSun").textContent = ui.sun.value + "°";
 }
 
-function changeHeight() {
-  byId('heightValue').value = height.valueAsNumber.toFixed(2) + '×';
-  queueDraw();
+let pending = false;
+function scheduleRebuild() {
+  if (pending) return;
+  pending = true;
+  requestAnimationFrame(() => { pending = false; rebuild(); });
 }
 
-function color(elevation, slopeX, slopeZ) {
-  const index = Math.max(0, Math.min(palette.length - 1.001, (elevation + .47) / .94 * (palette.length - 1)));
-  const base = Math.floor(index);
-  const fraction = index - base;
-  const normalLength = Math.hypot(slopeX, 1, slopeZ);
-  const light = .65 + .42 * Math.max(0, (slopeX * .42 + .83 + slopeZ * .35) / normalLength);
-  const rgb = palette[base].map((channel, i) =>
-    Math.min(255, Math.round((channel + (palette[base + 1][i] - channel) * fraction) * light)));
-  return 'rgb(' + rgb.join(',') + ')';
-}
-
-function changePalette() {
-  palette = palettes[paletteSelect.value];
-  const stops = palette.map(rgb => 'rgb(' + rgb.join(',') + ')');
-  byId('gradient').style.background = 'linear-gradient(90deg,' + stops.join(',') + ')';
-  queueDraw();
-}
-
-function draw() {
-  frame = 0;
-  const width = canvas.clientWidth;
-  const screenHeight = canvas.clientHeight;
-  const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-  const pixelWidth = Math.round(width * pixelRatio);
-  const pixelHeight = Math.round(screenHeight * pixelRatio);
-  if (!pixelWidth || !pixelHeight) return;
-  if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
-  if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
-  ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-  const background = ctx.createRadialGradient(width * .52, screenHeight * .44, 0,
-    width * .52, screenHeight * .44, Math.max(width, screenHeight) * .65);
-  background.addColorStop(0, '#34314d');
-  background.addColorStop(1, '#121225');
-  ctx.fillStyle = background;
-  ctx.fillRect(0, 0, width, screenHeight);
-  byId('zoomValue').value = camera.zoom.toFixed(1) + '×';
-
-  const span = terrain.length - 1;
-  const relief = height.valueAsNumber;
-  const cosYaw = Math.cos(camera.yaw);
-  const sinYaw = Math.sin(camera.yaw);
-  const cosPitch = Math.cos(camera.pitch);
-  const sinPitch = Math.sin(camera.pitch);
-  const scale = Math.min(width * .65, screenHeight * .97) * camera.zoom;
-  const points = terrain.map((row, z) => Array.from(row, (elevation, x) => {
-    const worldX = x / span - .5;
-    const worldZ = z / span - .5;
-    const worldY = elevation * relief;
-    const rotatedX = worldX * cosYaw - worldZ * sinYaw;
-    const rotatedZ = worldX * sinYaw + worldZ * cosYaw;
-    return {
-      x: width * .5 + rotatedX * scale,
-      y: screenHeight * .53 + (rotatedZ * sinPitch - worldY * cosPitch) * scale,
-      depth: rotatedZ * cosPitch + worldY * sinPitch,
-      elevation
-    };
-  }));
-
-  const faces = [];
-  function triangle(a, b, c, slopeX, slopeZ) {
-    faces.push({a, b, c, slopeX, slopeZ, depth: a.depth + b.depth + c.depth});
-  }
-  for (let z = 0; z < span; z++) {
-    for (let x = 0; x < span; x++) {
-      const a = points[z][x];
-      const b = points[z][x + 1];
-      const c = points[z + 1][x];
-      const d = points[z + 1][x + 1];
-      triangle(a, b, c, (b.elevation - a.elevation) * span * relief, (c.elevation - a.elevation) * span * relief);
-      triangle(b, d, c, (d.elevation - c.elevation) * span * relief, (d.elevation - b.elevation) * span * relief);
-    }
-  }
-  faces.sort((a, b) => a.depth - b.depth);
-  ctx.lineJoin = 'round';
-  ctx.lineWidth = mesh.checked ? .65 : .55;
-  for (const {a, b, c, slopeX, slopeZ} of faces) {
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.lineTo(c.x, c.y);
-    ctx.closePath();
-    ctx.fillStyle = color((a.elevation + b.elevation + c.elevation) / 3, slopeX, slopeZ);
-    ctx.strokeStyle = mesh.checked ? 'rgba(13,27,28,.48)' : ctx.fillStyle;
-    ctx.fill();
-    ctx.stroke();
-  }
-}
-
-function limit(value, low, high) {
-  return Math.max(low, Math.min(high, value));
-}
-
-function rotate(dx, dy) {
-  camera.yaw += dx;
-  camera.pitch = limit(camera.pitch + dy, .16, 1.43);
-  queueDraw();
-}
-
-function zoom(factor) {
-  camera.zoom = limit(camera.zoom * factor, .55, 3);
-  queueDraw();
-}
-
-roughness.addEventListener('input', rebuild);
-detail.addEventListener('input', rebuild);
-height.addEventListener('input', changeHeight);
-mesh.addEventListener('change', queueDraw);
-paletteSelect.addEventListener('change', changePalette);
-byId('save').addEventListener('click', () => {
-  if (frame) {
-    cancelAnimationFrame(frame);
-    draw();
-  }
-  const link = document.createElement('a');
-  link.download = 'terreno-fractal-' + seed.value + '.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-});
-seed.addEventListener('change', () => {
-  seed.value = limit(Math.trunc(seed.valueAsNumber || 0), 0, 4294967295);
+["rough", "detail", "island"].forEach(k => ui[k].addEventListener("input", scheduleRebuild));
+ui.island.addEventListener("change", scheduleRebuild);
+["height", "water", "sun"].forEach(k => ui[k].addEventListener("input", refreshLabels));
+ui.seed.addEventListener("change", () => {
+  const v = Math.trunc(ui.seed.valueAsNumber || 0);
+  ui.seed.value = Math.min(4294967295, Math.max(0, v));
   rebuild();
 });
-byId('random').addEventListener('click', () => {
-  seed.value = Math.floor(Math.random() * 4294967296);
+$("random").addEventListener("click", () => {
+  ui.seed.value = Math.floor(Math.random() * 4294967296);
   rebuild();
 });
-byId('reset').addEventListener('click', () => {
-  Object.assign(camera, initialCamera);
-  queueDraw();
+ui.presets.addEventListener("change", () => {
+  const p = PRESETS[+ui.presets.value];
+  ui.seed.value = p.seed; ui.rough.value = p.rough; ui.water.value = p.water; ui.pal.value = p.pal;
+  ui.sun.value = p.sun; ui.height.value = p.height; ui.island.checked = p.island;
+  refreshLabels(); rebuild();
+});
+$("reset").addEventListener("click", () => { Object.assign(cam, DEFAULT_CAM); lastTouch = performance.now(); });
+$("shot").addEventListener("click", () => {
+  render(performance.now());
+  const a = document.createElement("a");
+  a.download = "terreno-fractal-" + ui.seed.value + ".png";
+  a.href = canvas.toDataURL("image/png");
+  a.click();
 });
 
-let pointer;
-canvas.addEventListener('pointerdown', event => {
-  if (event.button !== 0 || pointer) return;
-  pointer = {id: event.pointerId, x: event.clientX, y: event.clientY};
-  canvas.setPointerCapture(pointer.id);
-  canvas.focus();
+/* ---------- Cámara e interacción ---------- */
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function orbit(dx, dy) { cam.yaw += dx; cam.pitch = clamp(cam.pitch + dy, 0.10, 1.45); lastTouch = performance.now(); }
+function zoom(f) { cam.dist = clamp(cam.dist * f, 0.7, 4.5); lastTouch = performance.now(); }
+
+const pointers = new Map();
+let pinch = 0;
+canvas.addEventListener("pointerdown", e => {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  canvas.setPointerCapture(e.pointerId);
+  canvas.classList.add("dragging");
+  canvas.focus({ preventScroll: true });
+  if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); }
 });
-canvas.addEventListener('pointermove', event => {
-  if (pointer?.id !== event.pointerId) return;
-  rotate((event.clientX - pointer.x) * .009, (event.clientY - pointer.y) * .008);
-  pointer.x = event.clientX;
-  pointer.y = event.clientY;
+canvas.addEventListener("pointermove", e => {
+  const p = pointers.get(e.pointerId);
+  if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  if (pointers.size === 1) orbit(-dx * 0.008, dy * 0.006);
+  else if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (pinch > 0 && d > 0) zoom(pinch / d);
+    pinch = d;
+  }
 });
-canvas.addEventListener('lostpointercapture', event => {
-  if (pointer?.id === event.pointerId) pointer = undefined;
-});
-canvas.addEventListener('wheel', event => {
-  event.preventDefault();
-  zoom(Math.exp(-limit(event.deltaY, -120, 120) * .0016));
-}, {passive:false});
-canvas.addEventListener('keydown', event => {
-  switch (event.key) {
-    case 'ArrowLeft': rotate(-.12, 0); break;
-    case 'ArrowRight': rotate(.12, 0); break;
-    case 'ArrowUp': rotate(0, -.10); break;
-    case 'ArrowDown': rotate(0, .10); break;
-    case '+': case '=': zoom(1.14); break;
-    case '-': zoom(1 / 1.14); break;
+const endPointer = e => { pointers.delete(e.pointerId); if (!pointers.size) canvas.classList.remove("dragging"); pinch = 0; };
+canvas.addEventListener("pointerup", endPointer);
+canvas.addEventListener("pointercancel", endPointer);
+canvas.addEventListener("wheel", e => {
+  e.preventDefault();
+  zoom(Math.exp(clamp(e.deltaY, -120, 120) * 0.0015));
+}, { passive: false });
+canvas.addEventListener("keydown", e => {
+  switch (e.key) {
+    case "ArrowLeft": orbit(-0.1, 0); break;
+    case "ArrowRight": orbit(0.1, 0); break;
+    case "ArrowUp": orbit(0, 0.08); break;
+    case "ArrowDown": orbit(0, -0.08); break;
+    case "+": case "=": zoom(1 / 1.12); break;
+    case "-": zoom(1.12); break;
     default: return;
   }
-  event.preventDefault();
+  e.preventDefault();
 });
-new ResizeObserver(queueDraw).observe(canvas);
+
+/* ---------- Matrices ---------- */
+function perspective(fovy, aspect, n, f) {
+  const t = 1 / Math.tan(fovy / 2), nf = 1 / (n - f);
+  return [t / aspect, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) * nf, -1, 0, 0, 2 * f * n * nf, 0];
+}
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const norm = a => { const l = Math.hypot(...a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+function lookAt(eye, target) {
+  const f = norm(sub(target, eye)), r = norm(cross(f, [0, 1, 0])), u = cross(r, f);
+  return { f, r, u, m: [r[0], u[0], -f[0], 0, r[1], u[1], -f[1], 0, r[2], u[2], -f[2], 0,
+    -dot(r, eye), -dot(u, eye), dot(f, eye), 1] };
+}
+function mul(a, b) {
+  const o = new Array(16);
+  for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) {
+    o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3];
+  }
+  return o;
+}
+const mixv = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+
+/* ---------- Dibujo ---------- */
+const FOV = 50 * Math.PI / 180;
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
+  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+}
+
+function render(now) {
+  resize();
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  const aspect = canvas.width / canvas.height;
+  const target = [0, 0.1, 0];
+  const eye = [target[0] + cam.dist * Math.cos(cam.pitch) * Math.sin(cam.yaw),
+               target[1] + cam.dist * Math.sin(cam.pitch),
+               target[2] + cam.dist * Math.cos(cam.pitch) * Math.cos(cam.yaw)];
+  const view = lookAt(eye, target);
+  const vp = mul(perspective(FOV, aspect, 0.03, 30), view.m);
+
+  // Cielo y luz según la altura del sol
+  const pal = PALETTES[ui.pal.value];
+  const elev = +ui.sun.value * Math.PI / 180, az = -0.3;
+  const sun = [Math.cos(elev) * Math.sin(az), Math.sin(elev), Math.cos(elev) * Math.cos(az)];
+  const warm = clamp(1 - +ui.sun.value / 38, 0, 1);
+  const top = mixv(pal.top, pal.top.map(v => v * 0.4), warm * 0.6);
+  const hor = mixv(pal.hor, [1.0, 0.52, 0.30], warm * 0.4);
+  const sunCol = mixv(pal.sun, [1, 0.5, 0.25], warm * 0.6);
+  const sunI = 0.35 + 0.65 * smooth(0.03, 0.5, Math.sin(elev));
+  const setSky = U => {
+    gl.uniform3fv(U.uSun, sun); gl.uniform3fv(U.uSunCol, sunCol);
+    gl.uniform3fv(U.uSkyTop, top); gl.uniform3fv(U.uSkyHor, hor);
+  };
+
+  gl.disable(gl.DEPTH_TEST);
+  gl.useProgram(skyProg);
+  setSky(skyU);
+  gl.uniform3fv(skyU.uRight, view.r); gl.uniform3fv(skyU.uUp, view.u); gl.uniform3fv(skyU.uFwd, view.f);
+  gl.uniform1f(skyU.uTanY, Math.tan(FOV / 2)); gl.uniform1f(skyU.uAspect, aspect);
+  gl.bindBuffer(gl.ARRAY_BUFFER, skyBuf);
+  gl.enableVertexAttribArray(skyLoc);
+  gl.vertexAttribPointer(skyLoc, 2, gl.FLOAT, false, 0, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.disableVertexAttribArray(skyLoc);
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.clear(gl.DEPTH_BUFFER_BIT);
+  gl.useProgram(terProg);
+  setSky(terU);
+  gl.uniformMatrix4fv(terU.uVP, false, vp);
+  gl.uniform3fv(terU.uEye, eye);
+  gl.uniform1f(terU.uScale, 0.62 * ui.height.valueAsNumber);
+  gl.uniform1f(terU.uWater, ui.water.valueAsNumber);
+  gl.uniform1f(terU.uTime, reducedMotion ? 0 : now / 1000);
+  gl.uniform1f(terU.uMesh, ui.mesh.checked ? 1 : 0);
+  gl.uniform1f(terU.uGridN, mesh.N);
+  gl.uniform1f(terU.uFog, 0.20);
+  gl.uniform1f(terU.uSunI, sunI);
+  gl.uniform1f(terU.uEdge, ui.island.checked ? 0.58 : 0.72);
+  gl.uniform1f(terU.uSq, ui.island.checked ? 0 : 1);
+  pal.land.forEach((c, i) => gl.uniform3fv(terU["uL" + i], c));
+  gl.uniform3fv(terU.uWShallow, pal.wS); gl.uniform3fv(terU.uWDeep, pal.wD);
+  gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vbo);
+  gl.enableVertexAttribArray(aPos); gl.enableVertexAttribArray(aGrad);
+  gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 20, 0);
+  gl.vertexAttribPointer(aGrad, 2, gl.FLOAT, false, 20, 12);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ibo);
+  gl.drawElements(gl.TRIANGLES, mesh.count, uintExt ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT, 0);
+  gl.disableVertexAttribArray(aPos); gl.disableVertexAttribArray(aGrad);
+
+  $("sZoom").textContent = (DEFAULT_CAM.dist / cam.dist).toFixed(1) + "×";
+}
+
+let prev = performance.now(), frames = 0, acc = 0;
+function loop(now) {
+  const dt = Math.min((now - prev) / 1000, 0.1);
+  prev = now;
+  if (ui.orbit.checked && now - lastTouch > 2500) cam.yaw += dt * 0.07;
+  render(now);
+  frames++; acc += dt;
+  if (acc >= 0.5) { $("sFps").textContent = Math.round(frames / acc) + " fps"; frames = 0; acc = 0; }
+  requestAnimationFrame(loop);
+}
+
+refreshLabels();
 rebuild();
-changeHeight();
-changePalette();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
