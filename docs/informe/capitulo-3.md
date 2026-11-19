@@ -1,5 +1,9 @@
 # Capítulo 3. Sistemas de funciones iteradas y juego del caos
 
+::: resumen
+**Resumen del capítulo.** Un IFS dibuja un fractal aplicando al azar transformaciones afines contractivas (juego del caos). Se ilustra con el triángulo de Sierpinski y el helecho de Barnsley.
+:::
+
 > **Estado:** borrador. El módulo 2 está pendiente; el texto describe lo que se planea implementar. **Su responsable debe ajustarlo al terminar.**
 
 ## 3.1 Descripción del algoritmo
@@ -8,10 +12,7 @@ Un **sistema de funciones iteradas (IFS)** es un conjunto finito de transformaci
 
 Cada transformación afín en el plano tiene la forma:
 
-```
-x' = a·x + b·y + e
-y' = c·x + d·y + f
-```
+$$\begin{aligned} x' &= a\,x + b\,y + e \\ y' &= c\,x + d\,y + f \end{aligned}$$
 
 ### Juego del caos
 
@@ -26,7 +27,7 @@ Los puntos se aproximan al atractor y lo recubren de forma progresiva.
 
 ### Ejemplos que se implementarán
 
-- **Triángulo de Sierpinski.** Tres transformaciones que llevan el punto a la mitad de la distancia hacia cada vértice. Dimensión de similitud `ln 3 / ln 2 ≈ 1,585`.
+- **Triángulo de Sierpinski.** Tres transformaciones que llevan el punto a la mitad de la distancia hacia cada vértice. Dimensión de similitud $\ln 3 / \ln 2 \approx 1{,}585$.
 - **Helecho de Barnsley.** Cuatro transformaciones afines con probabilidades distintas (aproximadamente 1 %, 85 %, 7 % y 7 %), que modelan el tallo, las hojas sucesivas y las dos hojas laterales.
 
 Los controles previstos son: selección del fractal, número de puntos, velocidad de dibujo, reinicio y exportación a PNG.
@@ -52,4 +53,5 @@ Los IFS se han usado para **modelar vegetación y formas naturales** en gráfico
 ## 3.5 Capturas y demostración
 
 - Captura: **[pendiente — módulo 2]**
-- Demostración: `modulos/02-ifs-chaos-game/index.html`
+
+<div class="demo"><img src="img/qr-modulo-2.svg" alt="Código QR del módulo 2"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/02-ifs-chaos-game/</span></p></div>

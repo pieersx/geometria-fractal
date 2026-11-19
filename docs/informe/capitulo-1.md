@@ -1,5 +1,9 @@
 # Capítulo 1. Introducción a la geometría fractal
 
+::: resumen
+**Resumen del capítulo.** Se presentan la autosimilitud y la dimensión fraccionaria, un breve recorrido histórico y las cinco técnicas que estudia este informe.
+:::
+
 > **Estado:** borrador.
 
 ## 1.1 ¿Qué es un fractal?
@@ -14,11 +18,9 @@ Un objeto es autosimilar cuando sus partes se parecen al todo. La similitud pued
 
 Un segmento tiene dimensión 1, un cuadrado dimensión 2 y un cubo dimensión 3. En un objeto autosimilar formado por *N* copias de sí mismo reducidas por un factor *r*, la dimensión de similitud es:
 
-```
-D = ln(N) / ln(1/r)
-```
+$$D = \frac{\ln N}{\ln (1/r)}$$
 
-El triángulo de Sierpinski está formado por 3 copias reducidas a la mitad, por lo que `D = ln 3 / ln 2 ≈ 1,585`. La curva de Koch usa 4 copias a escala 1/3, con `D = ln 4 / ln 3 ≈ 1,262`. Que *D* no sea un entero indica que el objeto llena el plano más que una curva, pero menos que una superficie. Mandelbrot (1967) mostró que la longitud medida de una costa depende de la escala de medición y que esa dependencia se resume en una dimensión fraccionaria.
+El triángulo de Sierpinski está formado por 3 copias reducidas a la mitad, por lo que $D = \ln 3 / \ln 2 \approx 1{,}585$. La curva de Koch usa 4 copias a escala 1/3, con $D = \ln 4 / \ln 3 \approx 1{,}262$. Que *D* no sea un entero indica que el objeto llena el plano más que una curva, pero menos que una superficie. Mandelbrot (1967) mostró que la longitud medida de una costa depende de la escala de medición y que esa dependencia se resume en una dimensión fraccionaria.
 
 ## 1.2 Breve recorrido histórico
 
@@ -41,3 +43,5 @@ Los fractales son atractivos en gráficos por computadora porque **generan gran 
 | 4 | L-systems | Reescribir cadenas y reinterpretarlas como dibujo |
 | 5 | Terreno fractal | Sumar o subdividir ruido a varias escalas |
 | 6 | Dimensión fractal | Estimar *D* contando cajas que cubren una imagen |
+
+: Técnicas estudiadas y su idea central

@@ -1,5 +1,9 @@
 # Capítulo 5. Terreno fractal (diamond-square)
 
+::: resumen
+**Resumen del capítulo.** El módulo 4 genera terrenos con diamond-square y los dibuja en WebGL. La rugosidad $r$ controla el relieve y se relaciona con el exponente de Hurst $H$ y con la dimensión $D$.
+:::
+
 > **Estado:** ajustado al módulo 4 implementado. Base de Keyla Sihuacollo (diamond-square en Canvas 2D), rediseñada en WebGL con agua, cielo y niebla. El fBm se describe solo como método alternativo de referencia.
 
 ## 5.1 Descripción del algoritmo
@@ -8,7 +12,9 @@ Un terreno natural presenta relieve a muchas escalas: cordilleras, colinas, roca
 
 ### Movimiento browniano fraccionario (fBm)
 
-Se suman varias capas (octavas) de ruido suave. En cada octava la **frecuencia** se multiplica por un factor (la lacunaridad, normalmente 2) y la **amplitud** se reduce por otro factor (la persistencia, normalmente 0,5). El ruido de base suele ser un ruido de gradiente como el propuesto por Perlin (1985). La **rugosidad** del terreno se controla con el exponente de Hurst *H*, entre 0 y 1: valores bajos dan relieve áspero y valores altos, relieve suave. La dimensión fractal de la superficie resultante es aproximadamente `D = 3 − H`.
+Se suman varias capas (octavas) de ruido suave. En cada octava la **frecuencia** se multiplica por un factor (la lacunaridad, normalmente 2) y la **amplitud** se reduce por otro factor (la persistencia, normalmente 0,5). El ruido de base suele ser un ruido de gradiente como el propuesto por Perlin (1985). La **rugosidad** del terreno se controla con el exponente de Hurst *H*, entre 0 y 1: valores bajos dan relieve áspero y valores altos, relieve suave. La dimensión fractal de la superficie resultante es aproximadamente:
+
+$$D = 3 - H$$
 
 ### Subdivisión con desplazamiento del punto medio (diamond-square)
 
@@ -18,7 +24,11 @@ Parte de una cuadrícula cuadrada con las cuatro esquinas fijadas y repite dos p
 
 El módulo implementa **diamond-square** sobre una cuadrícula de lado 2ⁿ+1, con n entre 5 y 9 (de 33 × 33 a 513 × 513 puntos, es decir, hasta 524 288 triángulos). Las cuatro esquinas parten de valores aleatorios pequeños y la amplitud inicial del desplazamiento es 1. Al terminar cada ronda, la amplitud se multiplica por la **rugosidad** *r* (entre 0,30 y 0,90; 0,59 por defecto). En los bordes, los puntos del paso *square* promedian solo los vecinos que existen, sin envolver la malla.
 
-Multiplicar la amplitud por *r* en cada ronda equivale a un exponente de Hurst *H* = −log₂ *r* (derivación propia a partir de la relación entre ambos parámetros). Con *r* = 0,59, *H* ≈ 0,76 y *D* ≈ 2,24. Cuando *r* < 0,5 resulta *H* > 1 y la superficie es lisa, por lo que el panel muestra *D* = 2. El módulo presenta estos valores como **estimación teórica** de la superficie generada; no mide la dimensión fractal del resultado.
+Multiplicar la amplitud por *r* en cada ronda equivale a un exponente de Hurst (derivación propia a partir de la relación entre ambos parámetros):
+
+$$H = -\log_2 r$$
+
+Con *r* = 0,59, $H \approx 0{,}76$ y $D \approx 2{,}24$. Cuando $r < 0{,}5$ resulta $H > 1$ y la superficie es lisa, por lo que el panel muestra *D* = 2. El módulo presenta estos valores como **estimación teórica** de la superficie generada; no mide la dimensión fractal del resultado.
 
 Los desplazamientos salen de un generador pseudoaleatorio con **semilla** (0 a 4 294 967 295), así que una misma semilla reproduce el mismo terreno. Después de generar, las alturas se normalizan al rango 0–1, se elevan a la potencia 1,4 para marcar los picos y, si está activa la opción «Forma de isla», se atenúan hacia los bordes del mapa. Estos dos últimos pasos modifican la forma global, no la rugosidad local.
 
@@ -52,10 +62,19 @@ Los terrenos fractales son habituales en **videojuegos, simulación y cine** par
 
 ## 5.5 Capturas y demostración
 
-<div class="fig"><div class="fila uno"><img src="../presentacion/capturas/modulo4-cordillera.png" alt=""></div><p class="pie"><b>Figura 5.1.</b> Módulo 4 con el paisaje «Cordillera alpina» (semilla 4817, rugosidad 0,59, malla de 257 × 257). El panel muestra la estimación H ≈ 0,76 y D ≈ 2,24.</p></div>
+![Módulo 4 con la «Cordillera alpina»](../presentacion/capturas/modulo4-cordillera.png){width=90% nota="Captura propia. Semilla 4817, rugosidad 0,59, malla de 257 × 257. El panel muestra *H* ≈ 0,76 y *D* ≈ 2,24."}
 
-<div class="fig"><div class="fila"><img src="../presentacion/capturas/modulo4-rugosidad-040.png" alt=""><img src="../presentacion/capturas/modulo4-rugosidad-059.png" alt=""><img src="../presentacion/capturas/modulo4-rugosidad-080.png" alt=""></div><p class="pie"><b>Figura 5.2.</b> Efecto de la rugosidad con la misma semilla (4817). De izquierda a derecha: <i>r</i> = 0,40 (superficie lisa, <i>D</i> = 2), <i>r</i> = 0,59 (<i>H</i> ≈ 0,76; <i>D</i> ≈ 2,24) y <i>r</i> = 0,80 (<i>H</i> ≈ 0,32; <i>D</i> ≈ 2,68). A mayor rugosidad, relieve más áspero y dimensión mayor.</p></div>
+![Terreno con rugosidad baja](../presentacion/capturas/modulo4-rugosidad-040.png){width=78% nota="Captura propia. Semilla 4817, *r* = 0,40. Superficie lisa: *D* = 2."}
 
-<div class="fig"><div class="fila"><img src="../presentacion/capturas/modulo4-paleta-desierto.png" alt=""><img src="../presentacion/capturas/modulo4-paleta-violeta.png" alt=""><img src="../presentacion/capturas/modulo4-paleta-artico.png" alt=""></div><p class="pie"><b>Figura 5.3.</b> Tres paletas con la misma geometría (semilla 4817, <i>r</i> = 0,59). De izquierda a derecha: Desierto (agua al 10 %), Violeta y Ártico. La paleta cambia el color y la atmósfera, no la forma.</p></div>
+![Terreno con rugosidad media](../presentacion/capturas/modulo4-rugosidad-059.png){width=78% nota="Captura propia. Semilla 4817, *r* = 0,59. *H* ≈ 0,76 y *D* ≈ 2,24."}
 
-Demostración: `modulos/04-terreno-fractal/index.html`.
+![Terreno con rugosidad alta](../presentacion/capturas/modulo4-rugosidad-080.png){width=78% nota="Captura propia. Semilla 4817, *r* = 0,80. *H* ≈ 0,32 y *D* ≈ 2,68. A mayor rugosidad, relieve más áspero."}
+
+![Paleta «Desierto»](../presentacion/capturas/modulo4-paleta-desierto.png){width=78% nota="Captura propia. Semilla 4817, *r* = 0,59, agua al 10 %. La paleta cambia el color, no la forma."}
+
+![Paleta «Violeta»](../presentacion/capturas/modulo4-paleta-violeta.png){width=78% nota="Captura propia. Semilla 4817, *r* = 0,59."}
+
+![Paleta «Ártico»](../presentacion/capturas/modulo4-paleta-artico.png){width=78% nota="Captura propia. Semilla 4817, *r* = 0,59."}
+
+<div class="demo"><img src="img/qr-modulo-4.svg" alt="Código QR del módulo 4"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/04-terreno-fractal/</span></p></div>
+

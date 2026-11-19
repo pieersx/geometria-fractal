@@ -1,5 +1,7 @@
 # Estructura del informe (formato APA)
 
+> El informe oficial es el PDF generado desde los capítulos `.md` con `python3 docs/build/build-informe.py`. Los `.docx` anteriores quedaron como referencia y ya no se actualizan.
+
 Basada en lo que pide la rúbrica. Cada capítulo de módulo sigue el mismo esquema.
 
 1. Portada
@@ -11,7 +13,7 @@ Basada en lo que pide la rúbrica. Cada capítulo de módulo sigue el mismo esqu
 7. Capítulo 4. L-systems
 8. Capítulo 5. Terreno fractal (fBm / diamond-square)
 9. Capítulo 6. Dimensión fractal y box-counting
-10. Descripción de la aplicación gráfica
+10. Capítulo 7. Descripción de la aplicación gráfica
 11. Conclusión
 12. Bibliografía (mínimo 2 artículos de revista especializada)
 13. Anexo. Bitácora de uso de IA (tema, herramienta, día y hora)

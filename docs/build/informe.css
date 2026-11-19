@@ -1,32 +1,74 @@
+/* Estilo del informe (APA 7): Times New Roman 12 pt, interlineado 1,5, encabezado con número de página. */
 @page { size: A4; margin: 2.5cm 2.5cm 2.5cm 3cm;
-  @bottom-center { content: counter(page); font: 10pt "Times New Roman", serif; } }
-@page :first { @bottom-center { content: none; } }
-body { font: 12pt/1.5 "Times New Roman", "Liberation Serif", serif; max-width: none; margin: 0; padding: 0; text-align: justify; }
-h1 { font-size: 16pt; font-weight: bold; page-break-before: always; margin-top: 0; text-align: center; }
-h2 { font-size: 13pt; font-weight: bold; margin-top: 1.4em; }
-h3 { font-size: 12pt; font-weight: bold; font-style: italic; }
+  @top-left  { content: "Geometría fractal"; font: italic 10pt "Times New Roman", "Liberation Serif", serif; color: #444; }
+  @top-right { content: counter(page); font: 10pt "Times New Roman", "Liberation Serif", serif; } }
+@page :first { @top-left { content: none; } @top-right { content: none; } }
+
+body { font: 12pt/1.5 "Times New Roman", "Liberation Serif", serif; max-width: none; margin: 0; padding: 0; text-align: justify; color: #000; }
+h1 { font-size: 16pt; font-weight: bold; page-break-before: always; margin: 0 0 .8em; text-align: center; }
+h2 { font-size: 13pt; font-weight: bold; margin: 1.3em 0 .4em; page-break-after: avoid; }
+h3 { font-size: 12pt; font-weight: bold; font-style: italic; margin: 1em 0 .3em; page-break-after: avoid; }
 p { margin: 0 0 .6em; }
+ul, ol { margin: 0 0 .6em; }
 blockquote { border-left: 3px solid #999; margin: .6em 0; padding-left: .8em; font-size: 11pt; }
 code, pre { font: 10.5pt "DejaVu Sans Mono", monospace; background: #f3f3f3; }
 pre { padding: .5em .8em; white-space: pre-wrap; page-break-inside: avoid; }
-figure { margin: 1em 0; text-align: center; page-break-inside: avoid; }
-figure img { max-width: 100%; }
-figcaption { font-size: 10.5pt; font-style: italic; text-align: center; }
-table { border-collapse: collapse; margin: .8em auto; font-size: 10.5pt; page-break-inside: avoid; }
-th, td { border: 1px solid #555; padding: 3px 6px; }
-#TOC { page-break-before: always; text-align: left; }
-#TOC ul { list-style: none; padding-left: 1.2em; }
-#TOC > ul { padding-left: 0; }
-#TOC a { text-decoration: none; color: #000; }
+.tok { font-size: 2px; line-height: 0; color: #fff; }
+
+/* Portada */
 .portada { text-align: center; page-break-after: always; padding-top: 1cm; }
 .portada p { margin: .5em 0; text-align: center; }
 .portada .univ { font-size: 15pt; font-weight: bold; }
 .portada .titulo { font-size: 20pt; font-weight: bold; margin: 2.5cm 0 .5cm; }
 .portada .integrantes { margin-top: 1.5cm; }
+
+/* Índice y listas */
+.front { text-align: left; font-size: 11.5pt; line-height: 1.35; }
+.ft { font-size: 16pt; font-weight: bold; text-align: center; margin: 0 0 .8em; page-break-before: always; }
+.ft.brk { page-break-before: always; }
+.ft:not(.brk):not(:first-child) { page-break-before: auto; margin-top: 1.6em; }
+.row { display: flex; align-items: baseline; margin: .15em 0; page-break-inside: avoid; }
+.row .rt { flex: 0 1 auto; max-width: 88%; }
+.row .dots { flex: 1; border-bottom: 1px dotted #555; margin: 0 5px; min-width: 14px; transform: translateY(-3px); }
+.row .pg { flex: 0 0 auto; }
+.row.l1.b { margin-top: .55em; font-weight: bold; }
+.row.l2 { padding-left: 1.2em; }
+
+/* Resumen del capítulo */
+.resumen { background: #f1eff8; border: 1px solid #cfc9e6; border-radius: 4px; padding: .5em .9em; margin: 0 0 1.2em; font-size: 11pt; line-height: 1.4; text-align: left; page-break-inside: avoid; }
+.resumen p { margin: 0; }
+
+/* Figuras (APA 7): número en negrita, título en cursiva, imagen y nota */
+figure.apa { margin: 1.1em 0; padding: 0; text-align: left; page-break-inside: avoid; }
+figure.apa p { margin: 0; }
+.fnum { font-weight: bold; }
+.ftit { font-style: italic; margin-bottom: .35em !important; }
+figure.apa img { display: block; margin: 0 auto; max-width: 100%; max-height: 8.4cm; object-fit: contain; border: 1px solid #ddd; }
+.nota { font-size: 10.5pt; line-height: 1.35; margin-top: .35em !important; text-align: left; }
+
+/* Tablas (APA 7): solo líneas horizontales */
+.tabcap { margin: 1em 0 .3em; page-break-after: avoid; text-align: left; }
+.tabcap p { margin: 0; }
+.tnum { font-weight: bold; }
+.ttit { font-style: italic; }
+table { border-collapse: collapse; margin: 0 auto 1em; font-size: 10.5pt; line-height: 1.3; page-break-inside: avoid; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; text-align: left; }
+th { background: #ece9f6; border-bottom: 1px solid #000; padding: 4px 8px; }
+td { border: none; padding: 3px 8px; vertical-align: top; }
+tbody tr:nth-child(even) td { background: #f8f7fc; }
+
+/* Ecuaciones numeradas */
+.eq { display: grid; grid-template-columns: 1fr auto; align-items: center; margin: .5em 0; page-break-inside: avoid; }
+.eqm { text-align: center; }
+.eqm p, .eqn p { margin: 0; }
+.eqn { text-align: right; }
+math { font-family: "DejaVu Math TeX Gyre", "STIX Two Math", "Latin Modern Math", serif; font-size: .95em; }
+
+/* Demostración con código QR */
+.demo { display: flex; align-items: center; gap: 14px; border: 1px solid #cfc9e6; border-radius: 4px; padding: 8px 12px; margin: 1em 0; page-break-inside: avoid; text-align: left; }
+.demo svg, .demo img { flex: 0 0 2.6cm; width: 2.6cm; height: 2.6cm; min-width: 2.6cm; }
+.demo img { width: 2.6cm; height: 2.6cm; min-width: 2.6cm; flex: 0 0 2.6cm; border: 0 !important; max-height: none !important; }
+.demo p { margin: 0; font-size: 10.5pt; line-height: 1.4; }
+.demo .url { font-size: 9pt; font-family: "DejaVu Sans Mono", monospace; white-space: nowrap; }
+
+/* Bibliografía: sangría francesa (APA) */
 .bib p { padding-left: 1.27cm; text-indent: -1.27cm; text-align: left; }
-.indice-titulo { text-align:center; font-size:16pt; font-weight:bold; margin-bottom: .8em;}
-.fig { page-break-inside: avoid; margin: 1em 0; text-align: center; }
-.fila { display: flex; gap: 6px; justify-content: center; }
-.fila img { width: 32.5%; object-fit: cover; }
-.fila.uno img { width: 75%; }
-.pie { font-size: 10.5pt; text-align: center; text-indent: 0; }
