@@ -13,7 +13,7 @@ BUILD = pathlib.Path(__file__).resolve().parent
 INFORME = BUILD.parent / "informe"
 SALIDA = INFORME / "informe-geometria-fractal.pdf"
 CAPITULOS = ["capitulo-1", "capitulo-2", "capitulo-3", "capitulo-4", "capitulo-5", "capitulo-6",
-             "descripcion-app", "conclusion"]
+             "descripcion-app", "capitulo-8", "conclusion"]
 
 
 def sin_estado(path):
@@ -25,7 +25,11 @@ def armar_master():
     out = []
     out += ["# Presentación"] + sin_estado(INFORME / "presentacion-resumen.md")[1:]
     for c in CAPITULOS:
-        out += [""] + sin_estado(INFORME / f"{c}.md")
+        lineas = sin_estado(INFORME / f"{c}.md")
+        if any("por medir" in l or "por completar" in l for l in lineas):
+            print(f"  aviso: {c}.md tiene datos pendientes (por medir/por completar); no se incluye en el PDF")
+            continue
+        out += [""] + lineas
     out += ["", "# Bibliografía", "", "::: bib"]
     bib = (INFORME / "bibliografia.md").read_text(encoding="utf8").splitlines()
     for l in bib[1:]:

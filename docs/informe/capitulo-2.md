@@ -33,6 +33,16 @@ El cálculo se hace en el *fragment shader* de WebGL: cada píxel evalúa su pro
 - Iteraciones máximas, de 30 a 1500.
 - Cinco paletas de color y animación del color.
 - Zoom y desplazamiento con el ratón, reinicio de la vista y exportación a PNG.
+- **Construir desde cero** y **Órbita de un punto**, dos modos didácticos que explican cómo se forma cada imagen (siguiente apartado).
+
+### Cómo se forma la imagen, paso a paso
+
+La aplicación permite ver el conjunto **antes de que exista**. Con **Construir desde cero** se limita el número de iteraciones a *k*, que se aumenta de 0 a 60 con un control deslizante o con el botón de reproducción. En este modo el radio de escape es 2 y cada iteración en que un punto escapa se pinta de un color distinto, de modo que se ven **capas**. En la iteración 0 todo es negro, porque aún no se ha calculado nada. En la iteración 1 ya salen los puntos con $|c| > 2$. A medida que *k* crece, el negro que queda, formado por los puntos que todavía no han escapado, se acerca al conjunto de Mandelbrot (Figuras 2.8 a 2.11).
+
+Con **Órbita de un punto** se elige un punto con el cursor y se dibuja la sucesión $z_0, z_1, z_2, \dots$ de ese punto sobre el plano, junto con la circunferencia $|z| = 2$ y los primeros valores numéricos. Si la órbita sale de la circunferencia y no vuelve, el punto **escapa** y no pertenece al conjunto (Figura 2.13). Si permanece cerca del origen, el punto **pertenece** al conjunto (Figura 2.12). Así se ve la definición del conjunto aplicada a un punto concreto.
+
+Otros tres recursos completan la parte didáctica. La **Vista dividida** muestra, junto al plano de Mandelbrot, el conjunto de Julia del punto bajo el cursor: cada punto *c* de Mandelbrot es el parámetro de un conjunto de Julia distinto (Figura 2.14). El **Modo presentación** recorre ocho escenas, cada una con una frase explicativa, desde la pantalla en negro hasta el vínculo con Julia. **Grabar video** guarda ese recorrido como un archivo `.webm`, de modo que la propia aplicación genera el material multimedia.
+
 
 ## 2.2 Fortalezas
 
@@ -67,6 +77,20 @@ Los conjuntos de escape se emplean en **generación de texturas y arte procedura
 ![Conjunto de Julia «Conejo»](../presentacion/capturas/modulo1-julia-conejo.png){width=78% nota="Captura propia. *c* = −0,123 + 0,745*i*; 300 iteraciones."}
 
 ![Límite de precisión de 32 bits](../presentacion/capturas/modulo1-limite-precision.png){width=90% nota="Captura propia. Con un zoom de 7,5 × 10⁴ aparece la advertencia y la imagen se pixela (sección 2.3)."}
+
+![Construcción: iteración 1](../presentacion/capturas/modulo1-paso-01.png){width=88% nota="Captura propia del módulo 1, modo «Construir desde cero». Solo han escapado los puntos con $|c| > 2$; el resto sigue en negro."}
+
+![Construcción: iteración 4](../presentacion/capturas/modulo1-paso-04.png){width=88% nota="Captura propia. Cada capa de color es una iteración en que un punto escapa. El negro aún tiene forma redondeada."}
+
+![Construcción: iteración 12](../presentacion/capturas/modulo1-paso-12.png){width=88% nota="Captura propia. Aparece la silueta del conjunto de Mandelbrot y el borde empieza a mostrar detalle."}
+
+![Construcción: iteración 40](../presentacion/capturas/modulo1-paso-40.png){width=88% nota="Captura propia. El negro restante se ajusta al conjunto; más iteraciones solo afinan el borde."}
+
+![Órbita de un punto acotado](../presentacion/capturas/modulo1-orbita-acotada.png){width=88% nota="Captura propia, modo «Órbita de un punto». La sucesión de $c = -0{,}06 + 0{,}03i$ se queda cerca del origen: el punto pertenece al conjunto."}
+
+![Órbita de un punto que escapa](../presentacion/capturas/modulo1-orbita-escapa.png){width=88% nota="Captura propia. Con $c = 0{,}723 + 0{,}277i$, la órbita sale de la circunferencia $|z| = 2$ en la iteración 3: el punto escapa."}
+
+![Vista dividida: Mandelbrot y Julia](../presentacion/capturas/modulo1-dividida.png){width=88% nota="Captura propia, modo «Vista dividida». El recuadro de la derecha es el conjunto de Julia de $c = -0{,}4 + 0{,}6i$, el punto marcado con la cruz en el plano de Mandelbrot."}
 
 <div class="demo"><img src="img/qr-modulo-1.svg" alt="Código QR del módulo 1"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/01-conjuntos-escape/</span></p></div>
 

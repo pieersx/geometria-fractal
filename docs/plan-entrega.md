@@ -8,7 +8,7 @@ Documento vivo: se actualiza al cerrar cada tarea. Estado al 19/11/2026.
 | Entregable | Meta | Estado |
 |---|---|---|
 | Informe (APA) | 25–30 páginas, con capturas, 1–2 fórmulas y un diagrama por capítulo. Sin relleno. | Borrador de ~4 800 palabras, sin capturas finales ni PDF |
-| Presentación | 14–16 diapositivas, poco texto y una imagen grande por diapositiva. PDF para compartir. | PDF de avance |
+| Presentación | 14–17 diapositivas, poco texto y una imagen grande por diapositiva. PDF para compartir. | PDF de avance |
 | Aplicación | 5 módulos funcionando | Módulos 1 y 4 listos; 2, 3 y 5 aún son la plantilla |
 | Video | 1 video de 2–3 minutos con recorrido por los 5 módulos | No existe |
 | Bitácora de IA | Fecha, hora real, herramienta y tema de cada uso | Horas en `__:__` |
@@ -107,4 +107,17 @@ Una línea por persona, actualizada al cerrar cada tarea. Los commits y las rama
 | Cierre y conclusiones | Camila | 2 min |
 | Preguntas | Todos | resto |
 
-Diapositivas: 14–16, con el módulo en una diapositiva y la demo en vivo. Cada integrante debe poder explicar su algoritmo sin leer.
+Diapositivas: 14–17, con el módulo en una diapositiva y la demo en vivo. Cada integrante debe poder explicar su algoritmo sin leer.
+
+## 12. Extras opcionales: modo «paso a paso» en cada módulo
+
+El módulo 1 ya explica cómo se forma cada imagen (construcción por capas, órbita de un punto, recorrido guiado y grabación de video). Si el módulo básico ya funciona, cada responsable puede añadir **un** modo explicativo equivalente. Es opcional: no se exige si el módulo básico no llega.
+
+| Módulo | Responsable | Modo explicativo sugerido |
+|---|---|---|
+| 2 · IFS y juego del caos | Emily | Dibujar los puntos de uno en uno y despacio, resaltando el vértice elegido en cada salto; deslizador de velocidad y de número de puntos |
+| 3 · L-systems | Valeria | Mostrar la cadena y el dibujo generación por generación (0, 1, 2, 3…), con el contador de símbolos que crece como $4^n$ en Koch |
+| 4 · Terreno fractal | Keyla | Animar las rondas de diamond-square de la malla más gruesa a la más fina, mostrando cómo se añade detalle |
+| 5 · Dimensión fractal | Rodrigo | Dibujar la malla de cajas con tamaños decrecientes y la gráfica log-log creciendo punto a punto |
+
+**Criterio de hecho:** el modo se activa con un botón, se explica en una frase en pantalla y no cambia el comportamiento normal del módulo. Nadie edita la carpeta de otra persona.

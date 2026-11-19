@@ -47,7 +47,8 @@ figure.apa img { display: block; margin: 0 auto; max-width: 100%; max-height: 8.
 .nota { font-size: 10.5pt; line-height: 1.35; margin-top: .35em !important; text-align: left; }
 
 /* Tablas (APA 7): solo líneas horizontales */
-.tabcap { margin: 1em 0 .3em; page-break-after: avoid; text-align: left; }
+.tabcap { margin: 1em 0 .3em; page-break-after: avoid; break-after: avoid; page-break-inside: avoid; break-inside: avoid; text-align: left; }
+.tabcap p { break-after: avoid; break-inside: avoid; }
 .tabcap p { margin: 0; }
 .tnum { font-weight: bold; }
 .ttit { font-style: italic; }
