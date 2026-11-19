@@ -52,5 +52,10 @@ Los terrenos fractales son habituales en **videojuegos, simulación y cine** par
 
 ## 5.5 Capturas y demostración
 
-- Captura: **[pendiente: tomar con la semilla 4817 (paisaje «Cordillera alpina») para que sea reproducible]**
-- Demostración: `modulos/04-terreno-fractal/index.html`
+<div class="fig"><div class="fila uno"><img src="../presentacion/capturas/modulo4-cordillera.png" alt=""></div><p class="pie"><b>Figura 5.1.</b> Módulo 4 con el paisaje «Cordillera alpina» (semilla 4817, rugosidad 0,59, malla de 257 × 257). El panel muestra la estimación H ≈ 0,76 y D ≈ 2,24.</p></div>
+
+<div class="fig"><div class="fila"><img src="../presentacion/capturas/modulo4-rugosidad-040.png" alt=""><img src="../presentacion/capturas/modulo4-rugosidad-059.png" alt=""><img src="../presentacion/capturas/modulo4-rugosidad-080.png" alt=""></div><p class="pie"><b>Figura 5.2.</b> Efecto de la rugosidad con la misma semilla (4817). De izquierda a derecha: <i>r</i> = 0,40 (superficie lisa, <i>D</i> = 2), <i>r</i> = 0,59 (<i>H</i> ≈ 0,76; <i>D</i> ≈ 2,24) y <i>r</i> = 0,80 (<i>H</i> ≈ 0,32; <i>D</i> ≈ 2,68). A mayor rugosidad, relieve más áspero y dimensión mayor.</p></div>
+
+<div class="fig"><div class="fila"><img src="../presentacion/capturas/modulo4-paleta-desierto.png" alt=""><img src="../presentacion/capturas/modulo4-paleta-violeta.png" alt=""><img src="../presentacion/capturas/modulo4-paleta-artico.png" alt=""></div><p class="pie"><b>Figura 5.3.</b> Tres paletas con la misma geometría (semilla 4817, <i>r</i> = 0,59). De izquierda a derecha: Desierto (agua al 10 %), Violeta y Ártico. La paleta cambia el color y la atmósfera, no la forma.</p></div>
+
+Demostración: `modulos/04-terreno-fractal/index.html`.

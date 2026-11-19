@@ -54,10 +54,15 @@ Los conjuntos de escape se emplean en **generación de texturas y arte procedura
 
 ## 2.5 Capturas y demostración
 
-- Mandelbrot: `../presentacion/capturas/modulo1-mandelbrot.png`
-- Mandelbrot con zoom: `../presentacion/capturas/modulo1-mandelbrot-zoom.png`
-- Julia: `../presentacion/capturas/modulo1-julia.png`
-- Demostración: `modulos/01-conjuntos-escape/index.html`
+<div class="fig"><div class="fila uno"><img src="../presentacion/capturas/modulo1-zoom-1.png" alt=""></div><p class="pie"><b>Figura 2.1.</b> Conjunto de Mandelbrot en la vista inicial (200 iteraciones máximas, paleta «Atardecer»).</p></div>
+
+<div class="fig"><div class="fila"><img src="../presentacion/capturas/modulo1-zoom-1.png" alt=""><img src="../presentacion/capturas/modulo1-zoom-2.png" alt=""><img src="../presentacion/capturas/modulo1-zoom-3.png" alt=""></div><p class="pie"><b>Figura 2.2.</b> Autosimilitud a distintas escalas. Centro en −0,7436 + 0,1318<i>i</i>; zoom de 1×, 60× y 1 500× (200, 400 y 900 iteraciones). La estructura reaparece al ampliar.</p></div>
+
+<div class="fig"><div class="fila"><img src="../presentacion/capturas/modulo1-julia-dragon.png" alt=""><img src="../presentacion/capturas/modulo1-julia-dendrita.png" alt=""><img src="../presentacion/capturas/modulo1-julia-conejo.png" alt=""></div><p class="pie"><b>Figura 2.3.</b> Tres conjuntos de Julia (300 iteraciones). De izquierda a derecha: <i>c</i> = −0,8 + 0,156<i>i</i> («Dragón»), <i>c</i> = <i>i</i> («Dendrita») y <i>c</i> = −0,123 + 0,745<i>i</i> («Conejo»). Un cambio de <i>c</i> altera por completo la forma.</p></div>
+
+<div class="fig"><div class="fila uno"><img src="../presentacion/capturas/modulo1-limite-precision.png" alt=""></div><p class="pie"><b>Figura 2.4.</b> Límite de precisión de 32 bits: con un zoom de 7,5 × 10⁴ la aplicación muestra la advertencia y la imagen empieza a pixelarse. Es la debilidad descrita en la sección 2.3.</p></div>
+
+Demostración: `modulos/01-conjuntos-escape/index.html`.
 
 ## 2.6 Referencias del capítulo
 

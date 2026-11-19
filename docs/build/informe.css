@@ -1,0 +1,32 @@
+@page { size: A4; margin: 2.5cm 2.5cm 2.5cm 3cm;
+  @bottom-center { content: counter(page); font: 10pt "Times New Roman", serif; } }
+@page :first { @bottom-center { content: none; } }
+body { font: 12pt/1.5 "Times New Roman", "Liberation Serif", serif; max-width: none; margin: 0; padding: 0; text-align: justify; }
+h1 { font-size: 16pt; font-weight: bold; page-break-before: always; margin-top: 0; text-align: center; }
+h2 { font-size: 13pt; font-weight: bold; margin-top: 1.4em; }
+h3 { font-size: 12pt; font-weight: bold; font-style: italic; }
+p { margin: 0 0 .6em; }
+blockquote { border-left: 3px solid #999; margin: .6em 0; padding-left: .8em; font-size: 11pt; }
+code, pre { font: 10.5pt "DejaVu Sans Mono", monospace; background: #f3f3f3; }
+pre { padding: .5em .8em; white-space: pre-wrap; page-break-inside: avoid; }
+figure { margin: 1em 0; text-align: center; page-break-inside: avoid; }
+figure img { max-width: 100%; }
+figcaption { font-size: 10.5pt; font-style: italic; text-align: center; }
+table { border-collapse: collapse; margin: .8em auto; font-size: 10.5pt; page-break-inside: avoid; }
+th, td { border: 1px solid #555; padding: 3px 6px; }
+#TOC { page-break-before: always; text-align: left; }
+#TOC ul { list-style: none; padding-left: 1.2em; }
+#TOC > ul { padding-left: 0; }
+#TOC a { text-decoration: none; color: #000; }
+.portada { text-align: center; page-break-after: always; padding-top: 1cm; }
+.portada p { margin: .5em 0; text-align: center; }
+.portada .univ { font-size: 15pt; font-weight: bold; }
+.portada .titulo { font-size: 20pt; font-weight: bold; margin: 2.5cm 0 .5cm; }
+.portada .integrantes { margin-top: 1.5cm; }
+.bib p { padding-left: 1.27cm; text-indent: -1.27cm; text-align: left; }
+.indice-titulo { text-align:center; font-size:16pt; font-weight:bold; margin-bottom: .8em;}
+.fig { page-break-inside: avoid; margin: 1em 0; text-align: center; }
+.fila { display: flex; gap: 6px; justify-content: center; }
+.fila img { width: 32.5%; object-fit: cover; }
+.fila.uno img { width: 75%; }
+.pie { font-size: 10.5pt; text-align: center; text-indent: 0; }

@@ -11,3 +11,4 @@ Completa la hora exacta de cada fila (formato 24 h).
 | 18/11/2026 | __:__ | Claude (Claude Code) | Estructura inicial del repositorio | Pieers Pachas |
 | 18/11/2026 | __:__ | Claude (Claude Code) | Borrador del informe: capítulos 1 a 6, descripción de la app, conclusión, bibliografía y diagrama de arquitectura | Pieers Pachas |
 | 18/11/2026 | __:__ | Claude (Claude Code) | Revisión del módulo 4 de Keyla y rediseño en WebGL (agua, cielo, niebla, paisajes), con ajuste del capítulo 5 | Pieers Pachas |
+| 19/11/2026 | 13:00–13:25 (aprox.) | Claude (Claude Code) | Plan de entrega, estructura del informe en PDF, diapositivas en PDF y nuevas capturas de la app | Pieers Pachas |
