@@ -33,8 +33,24 @@
   #julia { display: none; }
   #ov { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   #buildBox, #orbitBox { display: none; }
-  #orbitTxt { margin: 6px 0 0; font: 11.5px/1.5 ui-monospace, "SF Mono", Menlo, monospace; color: var(--muted); white-space: pre-wrap; }
-  .learn { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+  details { margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--line); }
+  summary { cursor: pointer; color: var(--muted); font-size: 12px; list-style: none; user-select: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸ "; } details[open] > summary::before { content: "▾ "; }
+  #orbitCard { position: fixed; z-index: 5; pointer-events: none; display: none; background: #141821f2; border: 1px solid var(--line);
+    border-radius: 10px; padding: 8px 10px; font: 11.5px/1.5 ui-monospace, "SF Mono", Menlo, monospace; color: var(--text); white-space: pre; }
+  #caption { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 6; width: min(840px, calc(100% - 48px));
+    display: none; background: #0b0d12ee; border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; text-align: center; }
+  #caption .t { font-size: 19px; line-height: 1.4; }
+  #caption .n { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  #inset { position: fixed; top: auto; left: auto; right: 16px; bottom: 16px; width: 300px; height: 300px; z-index: 4; display: none; pointer-events: none;
+    border: 1px solid var(--line); border-radius: 12px; background: #000; }
+  #insetLbl { position: fixed; right: 16px; bottom: 322px; z-index: 4; display: none; pointer-events: none; font-size: 12px;
+    background: #141821ee; border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; font-variant-numeric: tabular-nums; }
+  body.pres #panel { display: none; }
+  body.pres #inset { bottom: 126px; }
+  body.pres #insetLbl { bottom: 432px; }
+  button.rec { background: #b3261e; border-color: #b3261e; color: #fff; }
   .stats { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted);
     font-size: 12px; font-variant-numeric: tabular-nums; }
   .stats b { color: var(--text); font-weight: 500; }
@@ -47,6 +63,10 @@
 <body>
 <canvas id="c"></canvas>
 <canvas id="ov"></canvas>
+<canvas id="inset" width="300" height="300"></canvas>
+<div id="insetLbl"></div>
+<div id="orbitCard"></div>
+<div id="caption"><div class="t" id="capT"></div><div class="n" id="capN"></div></div>
 <div id="nogl">Tu navegador no soporta WebGL. Prueba con Chrome, Firefox o Edge actualizados.</div>
 
 <div id="panel">
@@ -75,16 +95,26 @@
     </select>
   </div>
 
-  <div class="learn">
-    <label style="margin-top:0">Aprender cómo se forma</label>
-    <div class="row">
+  <details id="dLearn" open>
+    <summary>Aprender cómo se forma</summary>
+    <div class="row" style="margin-top:8px">
       <button id="bBuild">Construir desde cero</button>
       <button id="bOrbit">Órbita de un punto</button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button id="bPres">Modo presentación</button>
+      <button id="bSplit">Vista dividida</button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button id="bRec">Grabar video</button>
     </div>
     <div id="buildBox">
       <div class="row" style="margin-top:8px">
         <button id="bPlay">Reproducir</button>
         <button id="bRestart">Reiniciar</button>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button id="bFinal">Ver resultado final</button>
       </div>
       <label>Iteración mostrada <span class="val" id="vStep"></span></label>
       <input id="step" type="range" min="0" max="60" step="1" value="0">
@@ -92,10 +122,11 @@
     </div>
     <div id="orbitBox">
       <div class="hint">Mueve el cursor (o toca) sobre el plano: se dibuja la sucesión <i>z</i> → <i>z</i>² + <i>c</i> de ese punto. La circunferencia punteada es |<i>z</i>| = 2.</div>
-      <pre id="orbitTxt"></pre>
     </div>
-  </div>
+  </details>
 
+  <details id="dAdj" open>
+    <summary>Ajustes</summary>
   <label>Iteraciones máximas <span class="val" id="vIt"></span></label>
   <input id="it" type="range" min="30" max="1500" step="10" value="200">
 
@@ -110,6 +141,7 @@
 
   <label>Animar colores <span class="val" id="vAnim"></span></label>
   <input id="anim" type="range" min="0" max="1" step="0.01" value="0">
+  </details>
 
   <div class="row" style="margin-top:12px">
     <button id="reset">Reiniciar vista</button>
@@ -121,7 +153,7 @@
     Zoom <b id="sZoom">1×</b> · Centro <b id="sCenter"></b><br>
     <span id="sFps"></span>
   </div>
-  <div class="hint">Rueda: zoom · Arrastrar: mover · Doble clic en Mandelbrot: abrir su conjunto de Julia · «Construir desde cero» y «Órbita» explican cómo se forma cada imagen</div>
+  <div class="hint">Rueda: zoom · Arrastrar: mover · Doble clic en Mandelbrot: abrir su Julia</div>
 </div>
 
 <script>
@@ -281,6 +313,7 @@ function changed() { dirty = true; updateStats(); drawOrbit(); }
 
 function setMode(julia) {
   state.julia = julia;
+  if (julia && typeof split !== "undefined" && split.on) setSplit(false);
   $("mMandel").classList.toggle("active", !julia);
   $("mJulia").classList.toggle("active", julia);
   $("julia").style.display = julia ? "block" : "none";
@@ -353,6 +386,8 @@ $("step").oninput = e => { stopPlay(); setStep(+e.target.value); };
 
 /* ---------- Órbita de un punto ---------- */
 const ov = $("ov"), octx = ov.getContext("2d");
+const card = $("orbitCard");
+const split = { on: false, marker: null, pending: false };
 function toPx(x, y) {                         // plano complejo -> píxeles del lienzo
   return [(x - state.cx) / state.scale * canvas.height + canvas.width / 2,
           canvas.height / 2 - (y - state.cy) / state.scale * canvas.height];
@@ -360,9 +395,16 @@ function toPx(x, y) {                         // plano complejo -> píxeles del 
 function drawOrbit() {
   if (ov.width !== canvas.width || ov.height !== canvas.height) { ov.width = canvas.width; ov.height = canvas.height; }
   octx.clearRect(0, 0, ov.width, ov.height);
-  const txt = $("orbitTxt");
-  if (!orbit.on || orbit.mx == null) { txt.textContent = ""; return; }
-  const [px, py] = toComplex(orbit.mx, orbit.my);
+  const dpr = canvas.width / canvas.clientWidth;
+  if (split.on && split.marker && !state.julia) {          // marca el punto cuyo Julia se ve en el recuadro
+    const [mx, my] = toPx(split.marker[0], split.marker[1]);
+    octx.strokeStyle = "#ffffff"; octx.lineWidth = 2 * dpr;
+    octx.beginPath(); octx.arc(mx, my, 9 * dpr, 0, 6.2832); octx.stroke();
+    octx.beginPath(); octx.moveTo(mx - 15 * dpr, my); octx.lineTo(mx + 15 * dpr, my);
+    octx.moveTo(mx, my - 15 * dpr); octx.lineTo(mx, my + 15 * dpr); octx.stroke();
+  }
+  if (!orbit.on || (orbit.mx == null && !orbit.fixed)) { card.style.display = "none"; return; }
+  const [px, py] = orbit.fixed || toComplex(orbit.mx, orbit.my);
   let zx, zy, cx, cy;
   if (state.julia) { zx = px; zy = py; cx = state.cr; cy = state.ci; } else { zx = 0; zy = 0; cx = px; cy = py; }
   const pts = [[zx, zy]];
@@ -373,7 +415,6 @@ function drawOrbit() {
     if (esc < 0 && zx * zx + zy * zy > 4) esc = i;
     if (zx * zx + zy * zy > 100) break;
   }
-  const dpr = canvas.width / canvas.clientWidth;
   // circunferencia |z| = 2
   const [ox, oy] = toPx(0, 0), r2 = 2 / state.scale * canvas.height;
   octx.setLineDash([6 * dpr, 6 * dpr]); octx.strokeStyle = "rgba(255,255,255,.55)"; octx.lineWidth = 1.5 * dpr;
@@ -386,25 +427,185 @@ function drawOrbit() {
   pts.forEach(([x, y], i) => {
     if (i > 9) return;
     const [sx, sy] = toPx(x, y);
-    octx.fillStyle = i === 0 ? "#ffffff" : "#f5b942";
+    octx.fillStyle = i === 0 ? "#ffffff" : (esc === i ? "#ff6b5e" : "#f5b942");
     octx.beginPath(); octx.arc(sx, sy, (i === 0 ? 5 : 4) * dpr, 0, 6.2832); octx.fill();
     octx.fillStyle = "#ffffff"; octx.fillText("z" + i, sx + 7 * dpr, sy - 4 * dpr);
   });
-  // lectura numérica
+  // lectura numérica en una tarjeta cerca del cursor
   const f = v => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(3);
-  let out = (state.julia ? "c fijo = " + f(cx) + " " + f(cy) + "i\n" : "c = " + f(px) + " " + f(py) + "i\n");
-  pts.slice(0, 7).forEach(([x, y], i) => { out += "z" + i + " = " + f(x) + " " + f(y) + "i  |z|=" + Math.hypot(x, y).toFixed(2) + "\n"; });
-  out += esc >= 0 ? "→ |z| > 2 en la iteración " + esc + ": ESCAPA (no pertenece al conjunto)"
-                  : "→ sigue acotado tras 60 iteraciones: pertenece al conjunto";
-  txt.textContent = out;
+  let out = state.julia ? "c fijo = " + f(cx) + " " + f(cy) + "i\n" : "c = " + f(px) + " " + f(py) + "i\n";
+  pts.slice(0, 6).forEach(([x, y], i) => { out += "z" + i + " = " + f(x) + " " + f(y) + "i  |z|=" + Math.hypot(x, y).toFixed(2) + "\n"; });
+  out += esc >= 0 ? "|z| > 2 en la iteración " + esc + ": ESCAPA" : "acotado tras 60 iteraciones: PERTENECE";
+  card.textContent = out; card.style.display = "block";
+  let left, top;
+  if (orbit.fixed) { left = window.innerWidth - card.offsetWidth - 24; top = 24; }
+  else { left = orbit.mx + 18; top = orbit.my + 18;
+    if (left + card.offsetWidth > window.innerWidth - 8) left = orbit.mx - card.offsetWidth - 18;
+    if (top + card.offsetHeight > window.innerHeight - 8) top = orbit.my - card.offsetHeight - 18; }
+  card.style.left = Math.max(8, left) + "px"; card.style.top = Math.max(8, top) + "px";
 }
+orbit.fixed = null;
 function setOrbit(on) {
   orbit.on = on;
+  if (!on) orbit.fixed = null;
   $("bOrbit").classList.toggle("active", on);
   $("orbitBox").style.display = on ? "block" : "none";
   drawOrbit();
 }
 $("bOrbit").onclick = () => setOrbit(!orbit.on);
+$("bFinal").onclick = () => setBuild(false);
+
+/* ---------- Vista dividida: Julia del punto bajo el cursor ---------- */
+const inset = $("inset"), insetLbl = $("insetLbl");
+let insetGL = null;
+function initInset() {
+  const g = inset.getContext("webgl", { antialias: false, preserveDrawingBuffer: true });
+  if (!g) return null;
+  const mk = (t, src) => { const o = g.createShader(t); g.shaderSource(o, src); g.compileShader(o);
+    if (!g.getShaderParameter(o, g.COMPILE_STATUS)) throw new Error(g.getShaderInfoLog(o)); return o; };
+  const pr = g.createProgram();
+  g.attachShader(pr, mk(g.VERTEX_SHADER, VS)); g.attachShader(pr, mk(g.FRAGMENT_SHADER, FS));
+  g.linkProgram(pr); g.useProgram(pr);
+  const b = g.createBuffer(); g.bindBuffer(g.ARRAY_BUFFER, b);
+  g.bufferData(g.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), g.STATIC_DRAW);
+  const l = g.getAttribLocation(pr, "p"); g.enableVertexAttribArray(l); g.vertexAttribPointer(l, 2, g.FLOAT, false, 0, 0);
+  const u = {}; ["uRes","uCenter","uScale","uMaxIter","uJulia","uC","uTime","uR2","uDisc","pa","pb","pc","pd"]
+    .forEach(n => u[n] = g.getUniformLocation(pr, n));
+  return { g, u };
+}
+function drawInset(cr, ci) {
+  if (!insetGL) { try { insetGL = initInset(); } catch (e) { insetGL = null; } }
+  if (!insetGL) return;
+  const { g, u } = insetGL, P = PALETTES[state.pal];
+  g.viewport(0, 0, inset.width, inset.height);
+  g.uniform2f(u.uRes, inset.width, inset.height); g.uniform2f(u.uCenter, 0, 0); g.uniform1f(u.uScale, 3.2);
+  g.uniform1i(u.uMaxIter, 200); g.uniform1i(u.uJulia, 1); g.uniform2f(u.uC, cr, ci);
+  g.uniform1f(u.uTime, state.time); g.uniform1f(u.uR2, 256); g.uniform1i(u.uDisc, 0);
+  g.uniform3fv(u.pa, P.a); g.uniform3fv(u.pb, P.b); g.uniform3fv(u.pc, P.c); g.uniform3fv(u.pd, P.d);
+  g.drawArrays(g.TRIANGLE_STRIP, 0, 4);
+  insetLbl.textContent = "Julia de c = " + (cr >= 0 ? "" : "−") + Math.abs(cr).toFixed(3) + (ci >= 0 ? " + " : " − ") + Math.abs(ci).toFixed(3) + "i";
+}
+function setSplitPoint(cr, ci) { split.marker = [cr, ci]; drawInset(cr, ci); drawOrbit(); }
+function setSplit(on) {
+  split.on = on && !state.julia;
+  $("bSplit").classList.toggle("active", split.on);
+  inset.style.display = insetLbl.style.display = split.on ? "block" : "none";
+  if (split.on) setSplitPoint(split.marker ? split.marker[0] : state.cr, split.marker ? split.marker[1] : state.ci);
+  else drawOrbit();
+}
+$("bSplit").onclick = () => setSplit(!split.on);
+
+/* ---------- Recorrido guiado (modo presentación) ---------- */
+const pres = { on: false, auto: false, i: 0, timers: [], text: "" };
+function clearTimers() { pres.timers.forEach(t => { clearTimeout(t); clearInterval(t); }); pres.timers = []; }
+function setView(cx, cy, scale, it) {
+  state.cx = cx; state.cy = cy; state.scale = scale; state.maxIter = it; $("it").value = it; $("vIt").textContent = it; changed();
+}
+function animateSteps(from, to, ms) {
+  setStep(from);
+  const t = setInterval(() => { if (build.step >= to) { clearInterval(t); return; } setStep(build.step + 1); }, ms);
+  pres.timers.push(t);
+}
+function animateSplit(points, ms) {
+  let k = 0; setSplitPoint(points[0][0], points[0][1]);
+  const t = setInterval(() => { k = (k + 1) % points.length; setSplitPoint(points[k][0], points[k][1]); }, ms);
+  pres.timers.push(t);
+}
+const SCENES = [
+  { dur: 3500, text: "Empezamos sin nada: todavía no se ha calculado ningún punto.",
+    run() { setMode(false); setOrbit(false); setSplit(false); setBuild(true); setStep(0); } },
+  { dur: 4000, text: "Iteración 1: ya salen los puntos que están fuera del círculo de radio 2.",
+    run() { setMode(false); setOrbit(false); setSplit(false); setBuild(true); setStep(1); } },
+  { dur: 7500, text: "Cada iteración añade una capa de color. El negro son los puntos que todavía no han escapado.",
+    run() { setMode(false); setOrbit(false); setSplit(false); setBuild(true); animateSteps(1, 16, 450); } },
+  { dur: 5000, text: "Con más iteraciones queda el conjunto de Mandelbrot: en negro, los puntos que nunca escapan.",
+    run() { setBuild(false); setOrbit(false); setSplit(false); setMode(false); setView(HOME.cx, 0, HOME.scale, 200); } },
+  { dur: 6500, text: "La órbita de un punto de fuera sale de la circunferencia |z| = 2 y no vuelve: ese punto escapa.",
+    run() { setBuild(false); setSplit(false); setMode(false); setView(HOME.cx, 0, HOME.scale, 200); setOrbit(true); orbit.fixed = [0.723, 0.277]; drawOrbit(); } },
+  { dur: 6000, text: "El borde tiene detalle a cualquier escala: el conjunto es autosimilar.",
+    run() { setOrbit(false); setSplit(false); setBuild(false); setMode(false); setView(-0.7436, 0.1318, 0.05, 400); } },
+  { dur: 8500, text: "Cada punto de Mandelbrot es el parámetro c de un conjunto de Julia distinto.",
+    run() { setOrbit(false); setBuild(false); setMode(false); setView(HOME.cx, 0, HOME.scale, 200); setSplit(true);
+      animateSplit([[-0.8, 0.156], [-0.4, 0.6], [0.285, 0.01], [-0.123, 0.745], [0, 1]], 1500); } },
+  { dur: 5000, text: "Si fijamos c y variamos el punto de partida, queda el conjunto de Julia.",
+    run() { setOrbit(false); setSplit(false); setBuild(false); setMode(true); setC(-0.8, 0.156); } },
+];
+function goScene(i) {
+  clearTimers(); stopPlay();
+  pres.i = Math.max(0, Math.min(SCENES.length - 1, i));
+  const sc = SCENES[pres.i];
+  sc.run();
+  pres.text = sc.text;
+  $("capT").textContent = sc.text;
+  $("capN").textContent = (pres.i + 1) + " / " + SCENES.length + "  ·  ← → avanzar  ·  A automático  ·  Esc salir";
+  if (pres.auto) {
+    if (pres.i < SCENES.length - 1) pres.timers.push(setTimeout(() => goScene(pres.i + 1), sc.dur));
+    else if (rec.on) pres.timers.push(setTimeout(stopRecording, sc.dur));
+  }
+}
+function setPres(on, auto) {
+  pres.on = on; pres.auto = !!auto;
+  document.body.classList.toggle("pres", on);
+  $("caption").style.display = on ? "block" : "none";
+  $("bPres").classList.toggle("active", on);
+  if (on) goScene(0); else { clearTimers(); pres.auto = false; setBuild(false); setOrbit(false); setSplit(false); }
+}
+$("bPres").onclick = () => setPres(!pres.on, false);
+window.addEventListener("keydown", e => {
+  if (!pres.on) return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); goScene(pres.i + 1); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); goScene(pres.i - 1); }
+  else if (e.key === "Escape") { if (rec.on) stopRecording(); setPres(false); }
+  else if (e.key === "a" || e.key === "A") { pres.auto = !pres.auto; goScene(pres.i); }
+});
+
+/* ---------- Grabar video de la animación (se guarda en el equipo) ---------- */
+const rec = { on: false, mr: null, chunks: [], cv: null, ctx: null, raf: 0 };
+function wrapText(c, text, x, y, maxW, lh) {
+  const words = text.split(" "); let line = "";
+  words.forEach(w => { const t = line ? line + " " + w : w;
+    if (c.measureText(t).width > maxW && line) { c.fillText(line, x, y); line = w; y += lh; } else line = t; });
+  c.fillText(line, x, y);
+}
+function recFrame() {
+  if (!rec.on) return;
+  const c = rec.ctx, W = rec.cv.width, H = rec.cv.height, dpr = canvas.width / canvas.clientWidth;
+  c.drawImage(canvas, 0, 0, W, H);
+  if (split.on) { const bo = pres.on ? 126 : 16; c.drawImage(inset, W - 316 * dpr, H - (bo + 300) * dpr, 300 * dpr, 300 * dpr); }
+  c.drawImage(ov, 0, 0, W, H);
+  if (pres.on && pres.text) {
+    const bw = Math.min(840 * dpr, W - 48 * dpr), bx = (W - bw) / 2, bh = 78 * dpr, by = H - bh - 28 * dpr;
+    c.fillStyle = "rgba(11,13,18,.92)"; c.fillRect(bx, by, bw, bh);
+    c.fillStyle = "#e6e9f0"; c.font = (19 * dpr) + "px system-ui, sans-serif"; c.textAlign = "center"; c.textBaseline = "top";
+    wrapText(c, pres.text, W / 2, by + 14 * dpr, bw - 36 * dpr, 26 * dpr); c.textAlign = "start";
+  }
+  rec.raf = requestAnimationFrame(recFrame);
+}
+function startRecording() {
+  if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { alert("Este navegador no permite grabar video desde la página. Prueba con Chrome o Edge."); return; }
+  rec.cv = document.createElement("canvas"); rec.cv.width = canvas.width; rec.cv.height = canvas.height; rec.ctx = rec.cv.getContext("2d");
+  const mime = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find(m => MediaRecorder.isTypeSupported(m));
+  rec.mr = new MediaRecorder(rec.cv.captureStream(30), mime ? { mimeType: mime, videoBitsPerSecond: 6000000 } : undefined);
+  rec.chunks = [];
+  rec.mr.ondataavailable = e => { if (e.data && e.data.size) rec.chunks.push(e.data); };
+  rec.mr.onstop = () => {
+    const blob = new Blob(rec.chunks, { type: "video/webm" });
+    const a = document.createElement("a"); a.download = "mandelbrot-julia-como-se-forma.webm";
+    a.href = URL.createObjectURL(blob); a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    window.__lastRecordingBytes = blob.size;
+  };
+  rec.on = true; rec.mr.start(250); recFrame();
+  $("bRec").textContent = "Detener grabación"; $("bRec").classList.add("rec");
+  setPres(true, true);                       // el recorrido corre solo mientras se graba
+}
+function stopRecording() {
+  if (!rec.on) return;
+  rec.on = false; cancelAnimationFrame(rec.raf);
+  if (rec.mr && rec.mr.state !== "inactive") rec.mr.stop();
+  $("bRec").textContent = "Grabar video"; $("bRec").classList.remove("rec");
+  setPres(false);
+}
+$("bRec").onclick = () => rec.on ? stopRecording() : startRecording();
 
 /* ---------- Interacción ---------- */
 function toComplex(px, py) {
@@ -432,7 +633,11 @@ canvas.addEventListener("pointerdown", e => {
   canvas.classList.add("dragging");
 });
 canvas.addEventListener("pointermove", e => {
-  if (!drag) { orbit.mx = e.clientX; orbit.my = e.clientY; if (orbit.on) drawOrbit(); return; }
+  if (!drag) { orbit.mx = e.clientX; orbit.my = e.clientY; orbit.fixed = null;
+    if (orbit.on) drawOrbit();
+    if (split.on && !pres.on && !split.pending) { split.pending = true;
+      requestAnimationFrame(() => { split.pending = false; const [r, i] = toComplex(orbit.mx, orbit.my); setSplitPoint(r, i); }); }
+    return; }
   const dpr = canvas.width / canvas.clientWidth;
   const k = dpr * state.scale / canvas.height;
   state.cx -= (e.clientX - drag.x) * k;
