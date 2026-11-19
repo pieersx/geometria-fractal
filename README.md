@@ -3,7 +3,7 @@
 Trabajo colaborativo del curso **Computación Visual** (8.º ciclo, Ingeniería de Sistemas). Grupo 8.
 Exposición: **02/12/2026** · 20 minutos.
 
-Aplicación web interactiva (HTML + JavaScript; WebGL en el módulo 1 y Canvas 2D en los demás) que muestra los algoritmos de geometría fractal en tiempo real. No requiere instalación.
+Aplicación web interactiva (HTML + JavaScript; WebGL en los módulos 1 y 4) que muestra los algoritmos de geometría fractal en tiempo real. No requiere instalación.
 
 ## Módulos
 

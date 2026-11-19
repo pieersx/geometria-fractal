@@ -4,7 +4,7 @@
 
 ## 1. Visión general
 
-La aplicación es un conjunto de páginas web interactivas, escritas en **HTML y JavaScript**, que usan **WebGL** en el cálculo por píxel de los conjuntos de escape y **Canvas 2D** en el resto de los módulos, y que se ejecutan en el navegador sin instalar nada. Una portada (`index.html`) enlaza a cinco módulos independientes, uno por técnica estudiada en el informe.
+La aplicación es un conjunto de páginas web interactivas, escritas en **HTML y JavaScript**, que usan **WebGL** en los conjuntos de escape y en el terreno fractal, y que se ejecutan en el navegador sin instalar nada. Una portada (`index.html`) enlaza a cinco módulos independientes, uno por técnica estudiada en el informe.
 
 ## 2. Arquitectura
 
@@ -16,7 +16,7 @@ El diagrama `arquitectura-app.drawio` resume la estructura: la portada enlaza a 
 | `modulos/01-conjuntos-escape` | Mandelbrot y Julia en WebGL (implementado) |
 | `modulos/02-ifs-chaos-game` | Juego del caos: Sierpinski y helecho (pendiente) |
 | `modulos/03-l-systems` | Curva de Koch y plantas (pendiente) |
-| `modulos/04-terreno-fractal` | Terreno 3D con diamond-square, renderizado en Canvas 2D |
+| `modulos/04-terreno-fractal` | Terreno 3D con diamond-square en WebGL (implementado) |
 | `modulos/05-dimension-fractal` | Box-counting sobre una imagen cargada (pendiente) |
 | `modulos/_plantilla` | Base común: panel, lienzo, Reiniciar y Guardar PNG |
 
@@ -29,7 +29,7 @@ El diagrama `arquitectura-app.drawio` resume la estructura: la portada enlaza a 
 
 ## 4. Requisitos y ejecución
 
-- Navegador actual (Chrome, Firefox o Edge). El módulo 1 requiere además soporte de WebGL.
+- Navegador actual (Chrome, Firefox o Edge). Los módulos 1 y 4 requieren además soporte de WebGL.
 - Abrir `index.html` o el módulo deseado. Opcionalmente, servir la carpeta con `python3 -m http.server 8000` y entrar a `http://localhost:8000`.
 
 ## 5. Interacción del módulo 1
