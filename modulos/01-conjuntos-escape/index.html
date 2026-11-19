@@ -31,6 +31,10 @@
   input[type=range] { width: 100%; accent-color: var(--accent); }
   .val { float: right; color: var(--text); font-variant-numeric: tabular-nums; }
   #julia { display: none; }
+  #ov { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #buildBox, #orbitBox { display: none; }
+  #orbitTxt { margin: 6px 0 0; font: 11.5px/1.5 ui-monospace, "SF Mono", Menlo, monospace; color: var(--muted); white-space: pre-wrap; }
+  .learn { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
   .stats { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted);
     font-size: 12px; font-variant-numeric: tabular-nums; }
   .stats b { color: var(--text); font-weight: 500; }
@@ -42,6 +46,7 @@
 </head>
 <body>
 <canvas id="c"></canvas>
+<canvas id="ov"></canvas>
 <div id="nogl">Tu navegador no soporta WebGL. Prueba con Chrome, Firefox o Edge actualizados.</div>
 
 <div id="panel">
@@ -70,6 +75,27 @@
     </select>
   </div>
 
+  <div class="learn">
+    <label style="margin-top:0">Aprender cómo se forma</label>
+    <div class="row">
+      <button id="bBuild">Construir desde cero</button>
+      <button id="bOrbit">Órbita de un punto</button>
+    </div>
+    <div id="buildBox">
+      <div class="row" style="margin-top:8px">
+        <button id="bPlay">Reproducir</button>
+        <button id="bRestart">Reiniciar</button>
+      </div>
+      <label>Iteración mostrada <span class="val" id="vStep"></span></label>
+      <input id="step" type="range" min="0" max="60" step="1" value="0">
+      <div class="hint" id="stepTxt"></div>
+    </div>
+    <div id="orbitBox">
+      <div class="hint">Mueve el cursor (o toca) sobre el plano: se dibuja la sucesión <i>z</i> → <i>z</i>² + <i>c</i> de ese punto. La circunferencia punteada es |<i>z</i>| = 2.</div>
+      <pre id="orbitTxt"></pre>
+    </div>
+  </div>
+
   <label>Iteraciones máximas <span class="val" id="vIt"></span></label>
   <input id="it" type="range" min="30" max="1500" step="10" value="200">
 
@@ -95,7 +121,7 @@
     Zoom <b id="sZoom">1×</b> · Centro <b id="sCenter"></b><br>
     <span id="sFps"></span>
   </div>
-  <div class="hint">Rueda: zoom · Arrastrar: mover · Doble clic en Mandelbrot: abrir su conjunto de Julia</div>
+  <div class="hint">Rueda: zoom · Arrastrar: mover · Doble clic en Mandelbrot: abrir su conjunto de Julia · «Construir desde cero» y «Órbita» explican cómo se forma cada imagen</div>
 </div>
 
 <script>
@@ -120,6 +146,8 @@ uniform int   uMaxIter;
 uniform int   uJulia;
 uniform vec2  uC;
 uniform float uTime;
+uniform float uR2;         // radio de escape al cuadrado
+uniform int   uDisc;       // 1 = colorear por capas (modo construcción)
 uniform vec3  pa, pb, pc, pd;
 
 const int HARD_MAX = 1500;
@@ -140,12 +168,15 @@ void main() {
   for (int i = 0; i < HARD_MAX; i++) {
     if (i >= uMaxIter) break;
     z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
-    if (dot(z, z) > 256.0) { escaped = true; break; }
+    if (dot(z, z) > uR2) { escaped = true; break; }
     n += 1.0;
   }
 
   if (!escaped) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
 
+  if (uDisc == 1) {                       // cada iteración en que escapa es una capa de color
+    gl_FragColor = vec4(palette(n * 0.07 + uTime), 1.0); return;
+  }
   // Coloreado suave: elimina las bandas entre iteraciones enteras
   float mu = n + 1.0 - log2(log2(dot(z, z)) * 0.5);
   float t = log(max(mu, 1.0) + 1.0) * 0.55 + uTime;   // escala log: sin ruido cerca del borde
@@ -173,7 +204,7 @@ gl.enableVertexAttribArray(loc);
 gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
 const U = {};
-["uRes","uCenter","uScale","uMaxIter","uJulia","uC","uTime","pa","pb","pc","pd"]
+["uRes","uCenter","uScale","uMaxIter","uJulia","uC","uTime","uR2","uDisc","pa","pb","pc","pd"]
   .forEach(n => U[n] = gl.getUniformLocation(prog, n));
 
 /* ---------- Paletas (cosenoidales: a + b·cos(2π(c·t + d))) ---------- */
@@ -193,6 +224,8 @@ const state = {
   julia: false, cr: -0.8, ci: 0.156,
   maxIter: 200, pal: 0, anim: 0, time: 0,
 };
+const build = { on: false, step: 0, playing: false, timer: null };
+const orbit = { on: false, mx: null, my: null };
 let dirty = true;
 
 /* ---------- Render ---------- */
@@ -210,7 +243,9 @@ function draw() {
   gl.uniform2f(U.uRes, canvas.width, canvas.height);
   gl.uniform2f(U.uCenter, state.cx, state.cy);
   gl.uniform1f(U.uScale, state.scale);
-  gl.uniform1i(U.uMaxIter, state.maxIter);
+  gl.uniform1i(U.uMaxIter, build.on ? build.step : state.maxIter);
+  gl.uniform1f(U.uR2, build.on ? 4.0 : 256.0);
+  gl.uniform1i(U.uDisc, build.on ? 1 : 0);
   gl.uniform1i(U.uJulia, state.julia ? 1 : 0);
   gl.uniform2f(U.uC, state.cr, state.ci);
   gl.uniform1f(U.uTime, state.time);
@@ -242,7 +277,7 @@ function updateStats() {
   $("sCenter").textContent = fmt(state.cx) + " " + fmt(state.cy) + "i";
   $("warn").style.display = state.scale <= MIN_SCALE * 1.5 ? "block" : "none";
 }
-function changed() { dirty = true; updateStats(); }
+function changed() { dirty = true; updateStats(); drawOrbit(); }
 
 function setMode(julia) {
   state.julia = julia;
@@ -278,6 +313,99 @@ $("shot").onclick = () => {
   a.href = canvas.toDataURL("image/png"); a.click();
 };
 
+/* ---------- Construcción paso a paso ---------- */
+const STEP_MAX = 60;
+const STEP_TEXT = [
+  "Iteración 0: aún no se ha calculado nada, así que todo se ve negro.",
+  "Iteración 1: ya salen del conjunto los puntos con |c| > 2, fuera del círculo de radio 2.",
+];
+function setStep(n) {
+  build.step = Math.max(0, Math.min(STEP_MAX, n));
+  $("step").value = build.step;
+  $("vStep").textContent = build.step;
+  $("stepTxt").textContent = build.step < STEP_TEXT.length ? STEP_TEXT[build.step]
+    : "Iteración " + build.step + ": en negro quedan los puntos que todavía no han escapado. Cada capa de color es una iteración en que un punto escapa; el negro se acerca al conjunto.";
+  changed();
+}
+function stopPlay() {
+  build.playing = false; clearInterval(build.timer); $("bPlay").textContent = "Reproducir";
+}
+function togglePlay() {
+  if (build.playing) { stopPlay(); return; }
+  if (build.step >= STEP_MAX) setStep(0);
+  build.playing = true; $("bPlay").textContent = "Pausa";
+  build.timer = setInterval(() => {
+    if (build.step >= STEP_MAX) { stopPlay(); return; }
+    setStep(build.step + 1);
+  }, 450);
+}
+function setBuild(on) {
+  build.on = on;
+  $("bBuild").classList.toggle("active", on);
+  $("buildBox").style.display = on ? "block" : "none";
+  $("it").disabled = on;
+  if (on) setStep(0); else { stopPlay(); changed(); }
+}
+$("bBuild").onclick = () => setBuild(!build.on);
+$("bPlay").onclick = togglePlay;
+$("bRestart").onclick = () => { stopPlay(); setStep(0); };
+$("step").oninput = e => { stopPlay(); setStep(+e.target.value); };
+
+/* ---------- Órbita de un punto ---------- */
+const ov = $("ov"), octx = ov.getContext("2d");
+function toPx(x, y) {                         // plano complejo -> píxeles del lienzo
+  return [(x - state.cx) / state.scale * canvas.height + canvas.width / 2,
+          canvas.height / 2 - (y - state.cy) / state.scale * canvas.height];
+}
+function drawOrbit() {
+  if (ov.width !== canvas.width || ov.height !== canvas.height) { ov.width = canvas.width; ov.height = canvas.height; }
+  octx.clearRect(0, 0, ov.width, ov.height);
+  const txt = $("orbitTxt");
+  if (!orbit.on || orbit.mx == null) { txt.textContent = ""; return; }
+  const [px, py] = toComplex(orbit.mx, orbit.my);
+  let zx, zy, cx, cy;
+  if (state.julia) { zx = px; zy = py; cx = state.cr; cy = state.ci; } else { zx = 0; zy = 0; cx = px; cy = py; }
+  const pts = [[zx, zy]];
+  let esc = -1;
+  for (let i = 1; i <= 60; i++) {
+    const nx = zx * zx - zy * zy + cx, ny = 2 * zx * zy + cy;
+    zx = nx; zy = ny; pts.push([zx, zy]);
+    if (esc < 0 && zx * zx + zy * zy > 4) esc = i;
+    if (zx * zx + zy * zy > 100) break;
+  }
+  const dpr = canvas.width / canvas.clientWidth;
+  // circunferencia |z| = 2
+  const [ox, oy] = toPx(0, 0), r2 = 2 / state.scale * canvas.height;
+  octx.setLineDash([6 * dpr, 6 * dpr]); octx.strokeStyle = "rgba(255,255,255,.55)"; octx.lineWidth = 1.5 * dpr;
+  octx.beginPath(); octx.arc(ox, oy, r2, 0, 6.2832); octx.stroke(); octx.setLineDash([]);
+  // trayectoria
+  octx.strokeStyle = "#f5b942"; octx.lineWidth = 2 * dpr; octx.beginPath();
+  pts.forEach(([x, y], i) => { const [sx, sy] = toPx(x, y); i ? octx.lineTo(sx, sy) : octx.moveTo(sx, sy); });
+  octx.stroke();
+  octx.font = (12 * dpr) + "px system-ui, sans-serif"; octx.textBaseline = "bottom";
+  pts.forEach(([x, y], i) => {
+    if (i > 9) return;
+    const [sx, sy] = toPx(x, y);
+    octx.fillStyle = i === 0 ? "#ffffff" : "#f5b942";
+    octx.beginPath(); octx.arc(sx, sy, (i === 0 ? 5 : 4) * dpr, 0, 6.2832); octx.fill();
+    octx.fillStyle = "#ffffff"; octx.fillText("z" + i, sx + 7 * dpr, sy - 4 * dpr);
+  });
+  // lectura numérica
+  const f = v => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(3);
+  let out = (state.julia ? "c fijo = " + f(cx) + " " + f(cy) + "i\n" : "c = " + f(px) + " " + f(py) + "i\n");
+  pts.slice(0, 7).forEach(([x, y], i) => { out += "z" + i + " = " + f(x) + " " + f(y) + "i  |z|=" + Math.hypot(x, y).toFixed(2) + "\n"; });
+  out += esc >= 0 ? "→ |z| > 2 en la iteración " + esc + ": ESCAPA (no pertenece al conjunto)"
+                  : "→ sigue acotado tras 60 iteraciones: pertenece al conjunto";
+  txt.textContent = out;
+}
+function setOrbit(on) {
+  orbit.on = on;
+  $("bOrbit").classList.toggle("active", on);
+  $("orbitBox").style.display = on ? "block" : "none";
+  drawOrbit();
+}
+$("bOrbit").onclick = () => setOrbit(!orbit.on);
+
 /* ---------- Interacción ---------- */
 function toComplex(px, py) {
   const dpr = canvas.width / canvas.clientWidth;
@@ -300,10 +428,11 @@ let drag = null;
 canvas.addEventListener("pointerdown", e => {
   canvas.setPointerCapture(e.pointerId);
   drag = { x: e.clientX, y: e.clientY };
+  orbit.mx = e.clientX; orbit.my = e.clientY; if (orbit.on) drawOrbit();
   canvas.classList.add("dragging");
 });
 canvas.addEventListener("pointermove", e => {
-  if (!drag) return;
+  if (!drag) { orbit.mx = e.clientX; orbit.my = e.clientY; if (orbit.on) drawOrbit(); return; }
   const dpr = canvas.width / canvas.clientWidth;
   const k = dpr * state.scale / canvas.height;
   state.cx -= (e.clientX - drag.x) * k;
@@ -322,7 +451,7 @@ canvas.addEventListener("dblclick", e => {
   setMode(true);
 });
 
-window.addEventListener("resize", () => { dirty = true; });
+window.addEventListener("resize", () => { dirty = true; drawOrbit(); });
 
 /* ---------- Arranque ---------- */
 $("vIt").textContent = state.maxIter;
