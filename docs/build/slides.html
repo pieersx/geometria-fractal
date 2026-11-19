@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Geometría fractal</title>
+<style>
+@page { size: 1280px 720px; margin: 0; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "DejaVu Sans", Arial, sans-serif; color: #eceaf7; }
+.s { width: 1280px; height: 720px; padding: 56px 72px; background: #0f1020; page-break-after: always; position: relative; overflow: hidden; }
+.s:last-child { page-break-after: auto; }
+.light { background: #f6f4fb; color: #1d1a33; }
+h1 { font-size: 54px; margin: 0 0 18px; line-height: 1.1; }
+h2 { font-size: 42px; margin: 0 0 26px; }
+.k { color: #c9a8ff; font-weight: bold; }
+.light .k { color: #6b3fd1; }
+p, li { font-size: 26px; line-height: 1.45; }
+ul { padding-left: 28px; margin: 0; } li { margin-bottom: 10px; }
+.sub { font-size: 24px; color: #a9a6c4; }
+.light .sub { color: #5a567a; }
+.row { display: flex; gap: 40px; align-items: center; height: calc(100% - 215px); }
+.col { flex: 1.4; }
+.img { flex: 1; max-height: 100%; border-radius: 14px; box-shadow: 0 8px 30px rgba(0,0,0,.35); width: 100%; object-fit: contain; }
+.box { border: 2px dashed #7f77b8; border-radius: 14px; flex: 1.2; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; color: #a9a6c4; font-size: 24px; padding: 30px; }
+.tag { display: inline-block; font-size: 18px; background: #3b2a6e; color: #e8dcff; padding: 4px 14px; border-radius: 20px; margin-bottom: 14px; }
+.tag.pend { background: #6b4a00; color: #ffe2a0; }
+.who { position: absolute; bottom: 28px; left: 72px; font-size: 18px; color: #8a86ab; }
+code { background: rgba(127,119,184,.25); padding: 2px 8px; border-radius: 6px; font-size: 24px; }
+table { border-collapse: collapse; width: 100%; font-size: 22px; }
+th, td { padding: 10px 14px; border-bottom: 1px solid #cfc9e6; text-align: left; }
+th { color: #6b3fd1; }
+.big { font-size: 96px; font-weight: bold; color: #c9a8ff; }
+.flow { display: flex; gap: 20px; align-items: stretch; }
+.flow div { flex: 1; background: #1b1c36; border-radius: 14px; padding: 24px; font-size: 24px; }
+.flow b { color: #c9a8ff; display: block; font-size: 28px; margin-bottom: 8px; }
+.light .flow div { background: #e6e0f5; color: #1d1a33; }
+.light .flow b { color: #6b3fd1; }
+.light .flow .ar { background: none; }
+.flow .ar { flex: 0 0 auto; background: none; align-self: center; font-size: 40px; padding: 0; }
+.ref { font-size: 19px; line-height: 1.35; margin-bottom: 8px; }
+
+body { counter-reset: sl; }
+.s { counter-increment: sl; }
+.s:not(:first-child)::after { content: counter(sl); position: absolute; bottom: 26px; right: 72px; font-size: 18px; color: #8a86ab; }
+.qr { position: absolute; bottom: 24px; right: 120px; display: flex; align-items: center; gap: 10px; font-size: 16px; color: #a9a6c4; text-align: right; line-height: 1.2; }
+.qr img { width: 78px; height: 78px; background: #fff; padding: 4px; border-radius: 6px; }
+.light .qr { color: #5a567a; }
+.cap { font-size: 20px; color: #a9a6c4; text-align: center; margin-top: 8px; }
+.trio { display: flex; gap: 16px; margin-top: 10px; }
+.trio > div { flex: 1; }
+.trio img { width: 100%; height: 300px; object-fit: cover; border-radius: 12px; }
+.duo { display: flex; gap: 20px; margin-top: 8px; }
+.duo > div { flex: 1; }
+.duo img { width: 100%; height: 330px; object-fit: cover; object-position: left top; border-radius: 12px; }
+</style></head><body>
+
+<section class="s">
+  <p class="sub">Computación Visual · 8.º ciclo · Grupo 8</p>
+  <h1 style="margin-top:130px">Geometría fractal:<br>algoritmos y aplicación gráfica interactiva</h1>
+  <p class="sub" style="margin-top:40px">Universidad Nacional Mayor de San Marcos · Ingeniería de Sistemas<br>Exposición: 02/12/2026</p>
+</section>
+
+<section class="s light">
+  <h2>Qué vamos a ver</h2>
+  <ul>
+    <li><span class="k">¿Qué es un fractal?</span> y por qué importa en computación visual</li>
+    <li><span class="k">5 algoritmos</span>, cada uno con su demostración en la app</li>
+    <li><span class="k">Un hilo conductor:</span> la curva de Koch recorre tres módulos</li>
+    <li><span class="k">Demo en vivo</span> con participación del público</li>
+    <li><span class="k">Conclusiones</span> y preguntas</li>
+  </ul>
+</section>
+
+<section class="s">
+  <h2>¿Qué es un fractal?</h2>
+  <div class="flow">
+    <div><b>Autosimilitud</b>Una parte se parece al todo, a distintas escalas.</div>
+    <div><b>Dimensión fraccionaria</b>Una curva muy irregular ocupa más que una línea, pero menos que un plano.</div>
+    <div><b>Reglas simples</b>Una fórmula corta produce estructuras de enorme complejidad.</div>
+  </div>
+  <p style="margin-top:50px">Costas, nubes, montañas y ramas no son círculos ni cuadrados. La geometría fractal les da un lenguaje matemático (Mandelbrot, 1967).</p>
+</section>
+
+<section class="s">
+  <h2>Cinco técnicas, una aplicación</h2>
+  <table style="color:#eceaf7;font-size:26px">
+    <tr><th style="color:#c9a8ff">#</th><th style="color:#c9a8ff">Módulo</th><th style="color:#c9a8ff">Idea en una frase</th></tr>
+    <tr><td>1</td><td>Conjuntos de escape</td><td>Iterar z² + c y ver quién escapa</td></tr>
+    <tr><td>2</td><td>IFS y juego del caos</td><td>Saltos al azar que dibujan el atractor</td></tr>
+    <tr><td>3</td><td>L-systems</td><td>Reescribir texto y dibujarlo con una tortuga</td></tr>
+    <tr><td>4</td><td>Terreno fractal</td><td>Subdividir y desplazar para crear montañas</td></tr>
+    <tr><td>5</td><td>Dimensión fractal</td><td>Contar cajas para medir la rugosidad</td></tr>
+  </table>
+</section>
+
+<section class="s">
+  <span class="tag">Módulo 1 · Conjuntos de escape</span>
+  <h2>Mandelbrot y Julia en la GPU</h2>
+  <div class="row">
+    <div class="col">
+      <ul>
+        <li>Fórmula: <code>z → z² + c</code></li>
+        <li>Si |z| supera 2, el punto escapa; si no, es parte del conjunto</li>
+        <li>Cada píxel se calcula en paralelo (WebGL)</li>
+        <li>Límite: precisión de 32 bits al hacer zoom</li>
+      </ul>
+    </div>
+    <img class="img" src="../presentacion/capturas/modulo1-zoom-3.png" alt="Mandelbrot con zoom de 1 500 aumentos">
+  </div>
+  <p class="who">Pachas Auris, Pieers Fernando</p>
+  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-1.svg" alt="QR módulo 1"></div>
+</section>
+
+<section class="s">
+  <span class="tag">Módulo 1 · Un parámetro lo cambia todo</span>
+  <h2>Julia: un cambio pequeño de c</h2>
+  <div class="trio">
+    <div><img src="../presentacion/capturas/modulo1-julia-dragon.png"><p class="cap">c = −0,8 + 0,156i · «Dragón»</p></div>
+    <div><img src="../presentacion/capturas/modulo1-julia-dendrita.png"><p class="cap">c = i · «Dendrita»</p></div>
+    <div><img src="../presentacion/capturas/modulo1-julia-conejo.png"><p class="cap">c = −0,123 + 0,745i · «Conejo»</p></div>
+  </div>
+  <p style="margin-top:10px">Misma fórmula <code>z → z² + c</code>; solo cambia <span class="k">c</span> y la forma es otra.</p>
+</section>
+
+<section class="s">
+  <span class="tag">Módulo 1 · Aprender cómo se forma</span>
+  <h2>De cero al conjunto, capa por capa</h2>
+  <div class="duo">
+    <div><img src="../presentacion/capturas/modulo1-paso-12-limpio.png"><p class="cap">Construir desde cero: iteración 12</p></div>
+    <div><img src="../presentacion/capturas/modulo1-orbita-escapa-limpio.png"><p class="cap">Órbita de un punto que escapa</p></div>
+  </div>
+  <p style="margin-top:8px">Sin iteraciones todo es negro. Cada iteración añade una <span class="k">capa</span>; el punto escapa cuando su órbita sale de |z| = 2.</p>
+</section>
+
+<section class="s">
+  <span class="tag pend">Módulo 2 · En desarrollo</span>
+  <h2>IFS y juego del caos</h2>
+  <div class="row">
+    <div class="col">
+      <ul>
+        <li>Transformaciones afines que contraen el plano</li>
+        <li>Se elige una al azar, se aplica y se dibuja el punto</li>
+        <li>Triángulo de Sierpinski: D = ln 3 / ln 2 ≈ 1,585</li>
+        <li>Helecho de Barnsley con 4 transformaciones</li>
+      </ul>
+    </div>
+    <div class="box">Captura del módulo 2<br>(se añade al terminar)</div>
+  </div>
+  <p class="who">Cerna Aguilar, Emily Andrea</p>
+  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-2.svg" alt="QR módulo 2"></div>
+</section>
+
+<section class="s">
+  <span class="tag pend">Módulo 3 · En desarrollo</span>
+  <h2>L-systems</h2>
+  <div class="row">
+    <div class="col">
+      <ul>
+        <li>Axioma + reglas que reescriben todos los símbolos a la vez</li>
+        <li>La cadena se dibuja con una tortuga: <code>F</code> avanza, <code>+ −</code> giran, <code>[ ]</code> ramifican</li>
+        <li>Koch: <code>F → F+F−−F+F</code>, 60°</li>
+        <li>La cadena crece exponencialmente con cada generación</li>
+      </ul>
+    </div>
+    <div class="box">Captura del módulo 3<br>(se añade al terminar)</div>
+  </div>
+  <p class="who">Flores Cortez, Valeria Alexandra</p>
+  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-3.svg" alt="QR módulo 3"></div>
+</section>
+
+<section class="s">
+  <span class="tag">Módulo 4 · Terreno fractal</span>
+  <h2>Montañas con diamond-square</h2>
+  <div class="row">
+    <div class="col">
+      <ul>
+        <li>Se subdivide la malla desde las 4 esquinas</li>
+        <li>Cada paso suma un desplazamiento cada vez menor</li>
+        <li>La <b>rugosidad</b> controla qué tan áspero es el relieve</li>
+        <li>Misma semilla, mismo terreno; se dibuja en WebGL</li>
+      </ul>
+    </div>
+    <img class="img" src="../presentacion/capturas/modulo4-rugosidad-059.png" alt="Terreno fractal">
+  </div>
+  <p class="who">Sihuacollo Sierra, Keyla Noemi</p>
+  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-4.svg" alt="QR módulo 4"></div>
+</section>
+
+<section class="s">
+  <span class="tag">Módulo 4 · Un parámetro lo cambia todo</span>
+  <h2>Rugosidad: de liso a áspero</h2>
+  <div class="trio">
+    <div style="flex:1"><img src="../presentacion/capturas/modulo4-rugosidad-040.png" ><p class="cap">r = 0,40 · D = 2</p></div>
+    <div style="flex:1"><img src="../presentacion/capturas/modulo4-rugosidad-059.png" ><p class="cap">r = 0,59 · D ≈ 2,24</p></div>
+    <div style="flex:1"><img src="../presentacion/capturas/modulo4-rugosidad-080.png" ><p class="cap">r = 0,80 · D ≈ 2,68</p></div>
+  </div>
+  <p style="margin-top:10px">Misma semilla, solo cambia <span class="k">r</span>. A mayor rugosidad, mayor dimensión fractal de la superficie.</p>
+</section>
+
+<section class="s">
+  <span class="tag pend">Módulo 5 · En desarrollo</span>
+  <h2>Medir un fractal: box-counting</h2>
+  <div class="row">
+    <div class="col">
+      <ul>
+        <li>Cubrir la imagen con cajas de lado ε y contar las ocupadas, N(ε)</li>
+        <li>La pendiente de log N(ε) frente a log(1/ε) estima la dimensión D</li>
+        <li>Validación: Koch ≈ 1,262 y Sierpinski ≈ 1,585</li>
+      </ul>
+    </div>
+    <div class="box">Captura del módulo 5<br>(se añade al terminar)</div>
+  </div>
+  <p class="who">Puente Carmen, Rodrigo Joaquin</p>
+  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-5.svg" alt="QR módulo 5"></div>
+</section>
+
+<section class="s light">
+  <h2>El hilo conductor: la curva de Koch</h2>
+  <div class="flow">
+    <div><b>Módulo 3</b>La curva se genera con un L-system.</div>
+    <div class="ar">→</div>
+    <div><b>Módulo 5</b>La imagen resultante se mide con box-counting.</div>
+    <div class="ar">→</div>
+    <div><b>Resultado</b>D teórica = ln 4 / ln 3 ≈ <span class="k">1,262</span>. ¿Cuánto da la app?</div>
+  </div>
+  <p style="margin-top:50px">Así comprobamos que el cálculo es correcto y que los módulos forman un conjunto, no cinco demos sueltas.</p>
+</section>
+
+<section class="s">
+  <h2>Demostración en vivo</h2>
+  <ul>
+    <li>Alguien del público elige el <span class="k">punto de zoom</span> en Mandelbrot</li>
+    <li>Otra persona elige la <span class="k">semilla</span> del terreno</li>
+    <li>Generamos Koch y medimos su dimensión</li>
+  </ul>
+  <p class="sub" style="margin-top:40px">Plan B: video de 2–3 minutos con el recorrido por los cinco módulos.</p>
+  <div class="qr" style="bottom:60px;right:72px;font-size:20px"><span>Abre la app<br>desde tu celular</span><img src="../informe/img/qr-modulo-1.svg" alt="QR" style="width:120px;height:120px"></div>
+</section>
+
+<section class="s light">
+  <h2>Fortalezas y debilidades</h2>
+  <table>
+    <tr><th>Técnica</th><th>Fortaleza</th><th>Debilidad</th></tr>
+    <tr><td>Conjuntos de escape</td><td>Paralelismo en GPU</td><td>Precisión numérica al ampliar</td></tr>
+    <tr><td>IFS y juego del caos</td><td>Compacto, base matemática sólida</td><td>Convergencia aleatoria</td></tr>
+    <tr><td>L-systems</td><td>Modela bien la ramificación</td><td>Crecimiento exponencial</td></tr>
+    <tr><td>Terreno fractal</td><td>Paisajes con pocos parámetros</td><td>Poco realismo geológico</td></tr>
+    <tr><td>Box-counting</td><td>Mide imágenes reales</td><td>Depende de la binarización</td></tr>
+  </table>
+</section>
+
+<section class="s">
+  <h2>Conclusiones</h2>
+  <ul>
+    <li><span class="k">Reglas simples generan complejidad:</span> una fórmula, un puñado de transformaciones o unas reglas de texto bastan</li>
+    <li>Cada técnica tiene su <span class="k">perfil propio</span> de fortalezas y límites</li>
+    <li>Una aplicación web <span class="k">interactiva</span> hace visible lo que la fórmula solo describe</li>
+    <li>La dimensión fractal <span class="k">conecta</span> la teoría con imágenes reales</li>
+  </ul>
+</section>
+
+<section class="s light">
+  <h2>Referencias principales</h2>
+  <p class="ref">Barnsley, M. F., &amp; Demko, S. (1985). Iterated function systems and the global construction of fractals. <i>Proceedings of the Royal Society of London. A, 399</i>(1817), 243–275. https://doi.org/10.1098/rspa.1985.0057</p>
+  <p class="ref">Fournier, A., Fussell, D., &amp; Carpenter, L. (1982). Computer rendering of stochastic models. <i>Communications of the ACM, 25</i>(6), 371–384. https://doi.org/10.1145/358523.358553</p>
+  <p class="ref">Liebovitch, L. S., &amp; Toth, T. (1989). A fast algorithm to determine fractal dimensions by box counting. <i>Physics Letters A, 141</i>(8–9), 386–390. https://doi.org/10.1016/0375-9601(89)90854-2</p>
+  <p class="ref">Lindenmayer, A. (1968). Mathematical models for cellular interactions in development I. <i>Journal of Theoretical Biology, 18</i>(3), 280–299. https://doi.org/10.1016/0022-5193(68)90079-9</p>
+  <p class="ref">Mandelbrot, B. (1967). How long is the coast of Britain? Statistical self-similarity and fractional dimension. <i>Science, 156</i>(3775), 636–638. https://doi.org/10.1126/science.156.3775.636</p>
+  <p class="sub" style="font-size:20px">Lista completa en el informe.</p>
+</section>
+
+<section class="s">
+  <h1 style="margin-top:200px;text-align:center">¿Preguntas?</h1>
+  <p class="sub" style="text-align:center">Grupo 8 · Computación Visual</p>
+</section>
+</body></html>

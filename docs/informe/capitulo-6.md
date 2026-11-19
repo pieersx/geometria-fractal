@@ -1,5 +1,9 @@
 # Capítulo 6. Dimensión fractal y box-counting
 
+::: resumen
+**Resumen del capítulo.** El conteo de cajas estima la dimensión fractal de una imagen a partir de la pendiente de $\log N(\varepsilon)$ frente a $\log(1/\varepsilon)$. Se valida con la curva de Koch y el triángulo de Sierpinski.
+:::
+
 > **Estado:** borrador. El módulo 5 está pendiente; el texto describe lo que se planea implementar. **Su responsable debe ajustarlo al terminar.**
 
 ## 6.1 Descripción del algoritmo
@@ -12,11 +16,9 @@ El método de **conteo de cajas** (*box-counting*) la estima de forma empírica:
 2. Cubrir la imagen con una malla de cajas cuadradas de lado ε.
 3. Contar el número *N(ε)* de cajas que contienen al menos un píxel activo.
 4. Repetir con varios valores de ε (por ejemplo, potencias de 2).
-5. Representar `log N(ε)` frente a `log(1/ε)`. La **pendiente** de la recta de mejor ajuste estima la dimensión:
+5. Representar $\log N(\varepsilon)$ frente a $\log(1/\varepsilon)$. La **pendiente** de la recta de mejor ajuste estima la dimensión:
 
-```
-N(ε) ∝ ε^(−D)    →    D ≈ pendiente de log N(ε) vs log(1/ε)
-```
+$$N(\varepsilon) \propto \varepsilon^{-D} \quad\Longrightarrow\quad D \approx \text{pendiente de } \log N(\varepsilon) \text{ frente a } \log (1/\varepsilon)$$
 
 Liebovitch y Toth (1989) describen un algoritmo rápido para este cálculo, que sirve de referencia para la implementación.
 
@@ -48,4 +50,5 @@ La dimensión fractal se emplea para **caracterizar formas naturales**: líneas 
 ## 6.5 Capturas y demostración
 
 - Captura: **[pendiente — módulo 5]**
-- Demostración: `modulos/05-dimension-fractal/index.html`
+
+<div class="demo"><img src="img/qr-modulo-5.svg" alt="Código QR del módulo 5"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/05-dimension-fractal/</span></p></div>
