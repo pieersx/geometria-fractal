@@ -1,130 +1,1326 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L-systems · Geometría fractal</title>
-<link rel="icon" href="data:,">
+<title>L-Systems | Computación Visual</title>
+
 <style>
-  :root { --bg:#0b0d12; --panel:#141821ee; --line:#262c3a; --text:#e6e9f0; --muted:#8b93a7; --accent:#f5b942; }
-  * { box-sizing: border-box; }
-  html, body { margin:0; height:100%; background:var(--bg); color:var(--text);
-    font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif; overflow:hidden; }
-  canvas { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
-  #panel { position:fixed; top:16px; left:16px; width:272px; max-height:calc(100% - 32px); overflow:auto;
-    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; backdrop-filter:blur(8px); }
-  h1 { font-size:15px; margin:0 0 2px; }
-  .sub { color:var(--muted); font-size:12px; margin-bottom:12px; }
-  a.back { color:var(--muted); font-size:12px; text-decoration:none; display:inline-block; margin-bottom:8px; }
-  a.back:hover { color:var(--accent); }
-  label { display:block; color:var(--muted); font-size:12px; margin:10px 0 4px; }
-  .row { display:flex; gap:6px; }
-  button, select { font:inherit; color:var(--text); background:#1c2230; border:1px solid var(--line);
-    border-radius:8px; padding:6px 10px; cursor:pointer; }
-  button:hover, select:hover { border-color:var(--accent); }
-  .row > button { flex:1; }
-  select { width:100%; }
-  input[type=range] { width:100%; accent-color:var(--accent); }
-  .val { float:right; color:var(--text); font-variant-numeric:tabular-nums; }
-  .stats { margin-top:12px; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
-  .stats b { color:var(--text); font-weight:500; }
-  .hint { margin-top:10px; color:var(--muted); font-size:12px; }
-  @media (max-width:560px) { #panel { width:calc(100% - 32px); max-height:46%; } }
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f7f4;
+    color: #213b30;
+}
+
+header {
+    background: #164735;
+    color: white;
+    padding: 24px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+header p {
+    margin: 0;
+    color: #cfe9db;
+}
+
+.contenedor {
+    display: grid;
+    grid-template-columns: 330px 1fr;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1450px;
+    margin: auto;
+}
+
+.panel {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 12px #00000012;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 20px;
+}
+
+h3 {
+    font-size: 16px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 17px;
+}
+
+input[type="range"],
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    margin-top: 8px;
+}
+
+input[type="text"],
+textarea,
+select {
+    border: 1px solid #c8d8cd;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+}
+
+textarea {
+    height: 90px;
+    font-family: monospace;
+}
+
+input[type="range"] {
+    accent-color: #258b61;
+}
+
+button {
+    background: #23845d;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 15px;
+    color: white;
+    cursor: pointer;
+    margin-top: 9px;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #166746;
+}
+
+.ejemplo {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #eaf4ed;
+    color: #194731;
+}
+
+.ejemplo.activo {
+    background: #23845d;
+    color: white;
+}
+
+.valor {
+    float: right;
+    color: #16875a;
+}
+
+.opciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 18px;
+}
+
+.opciones label {
+    margin: 0;
+    font-weight: normal;
+}
+
+.visualizador {
+    width: 100%;
+    height: 530px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #eaf5ee;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.estadisticas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.dato {
+    padding: 15px;
+    background: #edf6ef;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.dato strong {
+    display: block;
+    font-size: 22px;
+}
+
+.dato span {
+    font-size: 12px;
+}
+
+.explicacion {
+    background: #eff7f1;
+    padding: 15px;
+    border-radius: 10px;
+    line-height: 1.6;
+}
+
+.codigo {
+    background: #e8f1ea;
+    padding: 12px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font: 12px/1.6 monospace;
+}
+
+#mensaje {
+    color: #a64b19;
+    font-weight: bold;
+    font-size: 13px;
+    margin-top: 12px;
+}
+
+small {
+    color: #6b8273;
+    display: block;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+@media (max-width: 850px) {
+    .contenedor {
+        grid-template-columns: 1fr;
+    }
+
+    .visualizador {
+        height: 400px;
+    }
+}
 </style>
 </head>
+
 <body>
-<canvas id="c"></canvas>
 
-<div id="panel">
-  <a class="back" href="../../">← Portada</a>
-  <h1>L-systems</h1>
-  <div class="sub">Módulo 3 · Curva de Koch y plantas</div>
+<header>
+    <h1>🌳 Laboratorio Visual de L-Systems</h1>
+    <p>
+        Generación de fractales y vegetación procedural
+        mediante sistemas de Lindenmayer
+    </p>
+</header>
 
-  <!-- TODO: reemplaza este control de ejemplo por los parámetros de tu algoritmo.
-       Mantén el mismo estilo (label + input) para que todos los módulos se vean igual. -->
-  <label>Parámetro de ejemplo <span class="val" id="vP"></span></label>
-  <input id="p" type="range" min="1" max="100" step="1" value="50">
+<div class="contenedor">
 
-  <div class="row" style="margin-top:12px">
-    <button id="reset">Reiniciar</button>
-    <button id="shot">Guardar PNG</button>
-  </div>
+    <aside>
 
-  <div class="stats"><span id="stats"></span></div>
-  <div class="hint">Edita el axioma y las reglas para generar tus propias figuras</div>
+        <div class="panel">
+            <h2>1. Selecciona un ejemplo</h2>
+
+            <button class="ejemplo" id="btnKoch"
+                    onclick="seleccionar('koch')">
+                ❄️ Curva de Koch
+            </button>
+
+            <button class="ejemplo" id="btnPlanta"
+                    onclick="seleccionar('planta')">
+                🌱 Planta fractal
+            </button>
+
+            <button class="ejemplo" id="btnArbol"
+                    onclick="seleccionar('arbol')">
+                🌳 Árbol en un paisaje
+            </button>
+        </div>
+
+        <div class="panel">
+            <h2>2. Configuración</h2>
+
+            <label>
+                Generaciones
+                <span class="valor" id="valorGen">5</span>
+            </label>
+            <input type="range" id="generaciones"
+                   min="0" max="8" value="5">
+
+            <label>
+                Ángulo de giro
+                <span class="valor" id="valorAngulo">25°</span>
+            </label>
+            <input type="range" id="angulo"
+                   min="0" max="90" value="25">
+
+            <label>
+                Escala visual
+                <span class="valor" id="valorEscala">100%</span>
+            </label>
+            <input type="range" id="escala"
+                   min="40" max="180" value="100">
+
+            <div id="opcionesArbol">
+
+                <label>
+                    Ramas por nivel
+                    <span class="valor" id="valorRamas">3</span>
+                </label>
+
+                <input type="range" id="ramas"
+                       min="2" max="6" value="3">
+
+                <small>
+                    Controla cuántas ramificaciones se
+                    generan desde cada punto del árbol.
+                </small>
+
+                <label>
+                    Irregularidad visual
+                    <span class="valor" id="valorIrregularidad">8°</span>
+                </label>
+
+                <input type="range" id="irregularidad"
+                       min="0" max="20" value="8">
+
+                <small>
+                    Introduce pequeñas variaciones en
+                    la inclinación de las ramas.
+                </small>
+
+            </div>
+
+            <label>Axioma</label>
+            <input type="text" id="axioma" value="X">
+
+            <label>Reglas de producción</label>
+            <textarea id="reglas"></textarea>
+
+            <small>
+                Escribe una regla por línea.
+                Ejemplo: F=F+F--F+F
+            </small>
+
+            <div class="opciones">
+
+                <label>
+                    <input type="checkbox" id="hojas" checked>
+                    Mostrar hojas
+                </label>
+
+                <label>
+                    <input type="checkbox" id="paisaje" checked>
+                    Mostrar paisaje
+                </label>
+
+            </div>
+
+            <button onclick="reiniciar()">
+                Restablecer
+            </button>
+
+            <button onclick="guardarPNG()">
+                Descargar PNG
+            </button>
+
+            <div id="mensaje"></div>
+
+        </div>
+
+    </aside>
+
+    <main>
+
+        <div class="panel">
+
+            <h2 id="titulo">Árbol procedural</h2>
+            <p id="descripcion"></p>
+
+            <div class="visualizador">
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <div class="estadisticas">
+
+                <div class="dato">
+                    <strong id="totalSegmentos">0</strong>
+                    <span>Segmentos dibujados</span>
+                </div>
+
+                <div class="dato">
+                    <strong id="totalSimbolos">0</strong>
+                    <span>Símbolos generados</span>
+                </div>
+
+                <div class="dato">
+                    <strong id="totalGeneraciones">0</strong>
+                    <span>Generaciones</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="panel">
+
+            <h2>3. ¿Cómo funciona?</h2>
+
+            <div class="explicacion">
+                <p>
+                    Un L-system parte de un axioma y aplica
+                    reglas de producción de manera paralela.
+                </p>
+
+                <p>
+                    Después, una tortuga gráfica interpreta
+                    los símbolos para dibujar segmentos,
+                    realizar giros y crear ramificaciones.
+                </p>
+
+                <strong>Reglas utilizadas:</strong>
+                <pre class="codigo" id="codigoReglas"></pre>
+            </div>
+
+            <h3>Aplicación práctica</h3>
+            <p id="aplicacion"></p>
+
+        </div>
+
+    </main>
+
 </div>
 
 <script>
-"use strict";
-/* =====================================================================
-   PLANTILLA BASE · Módulo 3: L-systems
-   Qué hacer:
-   - Implementar reescritura de cadenas (axioma + reglas) y un intérprete tipo tortuga (F, +, -, [, ]).
-   - Presets: curva de Koch, árbol/planta con ramificación y al menos una figura más.
-   - Controles: número de iteraciones, ángulo, longitud de paso y campos editables de axioma y reglas.
-   - Mostrar el largo de la cadena y el número de segmentos (crece muy rápido: limita las iteraciones).
-   Reglas: ver CONTRIBUTING.md. Este archivo debe funcionar sin instalar nada.
-   ===================================================================== */
 
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");   // Si necesitas GPU, cambia a getContext("webgl") (ver módulo 1)
+// ============================================
+// MÓDULO 03 - L-SYSTEMS
+// COMPUTACIÓN VISUAL
+// ============================================
 
-/* Estado del módulo: guarda aquí todos los parámetros */
-const DEFAULTS = { p: 50 };
-const state = { ...DEFAULTS };
+// Canvas
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-/* Ajusta el lienzo a la pantalla y a la densidad de píxeles */
-function resize() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = Math.floor(canvas.clientWidth * dpr), h = Math.floor(canvas.clientHeight * dpr);
-  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-}
+const obtener = id => document.getElementById(id);
 
-/* ---------------------------------------------------------------------
-   TODO: implementa aquí tu algoritmo. Se llama cada vez que algo cambia.
-   Dibuja en `ctx`; el tamaño real del lienzo es canvas.width × canvas.height.
-   --------------------------------------------------------------------- */
-function render() {
-  resize();
-  const W = canvas.width, H = canvas.height;
-  ctx.fillStyle = "#0b0d12"; ctx.fillRect(0, 0, W, H);
+let ejemploActual = "arbol";
 
-  // Ejemplo mínimo: una circunferencia cuyo radio depende del parámetro. Bórralo.
-  ctx.strokeStyle = "#f5b942"; ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(W * 0.6, H / 2, (state.p / 100) * Math.min(W, H) * 0.35, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.fillStyle = "#8b93a7"; ctx.font = `${Math.round(16 * (W / canvas.clientWidth))}px system-ui`;
-  ctx.textAlign = "center";
-  ctx.fillText("Módulo 3 · implementa render()", W * 0.6, H - 40);
+// Límite de seguridad de símbolos
+const LIMITE = 300000;
 
-  document.getElementById("stats").textContent = "Parámetro: " + state.p;   // TODO: muestra tus datos (iteraciones, puntos, dimensión…)
-}
 
-/* ---------- Controles (patrón común a todos los módulos) ---------- */
-const $ = id => document.getElementById(id);
+// ============================================
+// 1. CONFIGURACIONES
+// ============================================
 
-$("p").oninput = e => { state.p = +e.target.value; $("vP").textContent = state.p; render(); };
+const ejemplos = {
 
-$("reset").onclick = () => {
-  Object.assign(state, DEFAULTS);
-  $("p").value = state.p; $("vP").textContent = state.p;
-  render();
+    koch: {
+        titulo: "Curva de Koch",
+        axioma: "F",
+        reglas: "F=F+F--F+F",
+        angulo: 60,
+        generaciones: 4,
+        descripcion:
+            "Fractal matemático construido mediante " +
+            "sustituciones recursivas.",
+        aplicacion:
+            "Generación de contornos, patrones y " +
+            "diseños geométricos."
+    },
+
+    planta: {
+        titulo: "Planta fractal",
+        axioma: "F",
+        reglas: "F=FF+[+F-F-F]-[-F+F+F]",
+        angulo: 22.5,
+        generaciones: 3,
+        descripcion:
+            "Estructura vegetal generada mediante " +
+            "ramificaciones y almacenamiento de estados.",
+        aplicacion:
+            "Modelado procedural de vegetación, " +
+            "plantas y arbustos."
+    },
+
+    arbol: {
+        titulo: "Árbol procedural",
+        axioma: "X",
+        reglas: "",
+        angulo: 25,
+        generaciones: 5,
+        descripcion:
+            "Árbol generado mediante reglas L-system " +
+            "con ramificaciones configurables.",
+        aplicacion:
+            "Generación automática de vegetación " +
+            "para videojuegos, cine y simulaciones."
+    }
+
 };
 
-$("shot").onclick = () => {
-  render();
-  const a = document.createElement("a");
-  a.download = "modulo-3.png";
-  a.href = canvas.toDataURL("image/png");
-  a.click();
-};
 
-window.addEventListener("resize", render);
+// ============================================
+// 2. GENERACIÓN DE REGLAS PARA EL ÁRBOL
+// ============================================
 
-/* ---------- Arranque ---------- */
-$("vP").textContent = state.p;
-render();
+function generarReglasArbol(cantidad) {
+
+    let produccion = "F";
+
+    // Cada grupo entre corchetes es una rama.
+    for (let i = 0; i < cantidad; i++) {
+
+        const centro = (cantidad - 1) / 2;
+
+        const diferencia = i - centro;
+
+        let giro = "";
+
+        if (diferencia < 0) {
+            giro = "-".repeat(
+                Math.ceil(Math.abs(diferencia))
+            );
+        }
+
+        if (diferencia > 0) {
+            giro = "+".repeat(
+                Math.ceil(diferencia)
+            );
+        }
+
+        produccion += "[" + giro + "X]";
+
+    }
+
+    // Eje principal
+    produccion += "FX";
+
+    return "X=" + produccion + "\nF=FF";
+
+}
+
+
+// ============================================
+// 3. SELECCIÓN DE EJEMPLO
+// ============================================
+
+function seleccionar(tipo) {
+
+    ejemploActual = tipo;
+
+    const datos = ejemplos[tipo];
+
+    obtener("axioma").value = datos.axioma;
+    obtener("angulo").value = datos.angulo;
+    obtener("generaciones").value =
+        datos.generaciones;
+
+    obtener("escala").value = 100;
+
+    obtener("titulo").textContent = datos.titulo;
+    obtener("descripcion").textContent =
+        datos.descripcion;
+    obtener("aplicacion").textContent =
+        datos.aplicacion;
+
+    const esArbol = tipo === "arbol";
+
+    obtener("opcionesArbol").style.display =
+        esArbol ? "block" : "none";
+
+    obtener("hojas").checked = esArbol;
+    obtener("paisaje").checked = esArbol;
+
+    if (esArbol) {
+
+        obtener("ramas").value = 3;
+        obtener("irregularidad").value = 8;
+
+        obtener("reglas").value =
+            generarReglasArbol(3);
+
+    } else {
+
+        obtener("reglas").value =
+            datos.reglas;
+
+    }
+
+    document.querySelectorAll(".ejemplo")
+        .forEach(b => b.classList.remove("activo"));
+
+    const boton = {
+        koch: "btnKoch",
+        planta: "btnPlanta",
+        arbol: "btnArbol"
+    };
+
+    obtener(boton[tipo]).classList.add("activo");
+
+    dibujar();
+
+}
+
+
+// ============================================
+// 4. INTERPRETAR REGLAS
+// ============================================
+
+function interpretarReglas(texto) {
+
+    const reglas = {};
+
+    const lineas = texto.split("\n");
+
+    for (const linea of lineas) {
+
+        if (!linea.trim()) continue;
+
+        const indice = linea.indexOf("=");
+
+        if (indice <= 0) {
+            throw new Error(
+                "Regla incorrecta: " + linea
+            );
+        }
+
+        const simbolo =
+            linea.substring(0, indice).trim();
+
+        const reemplazo =
+            linea.substring(indice + 1).trim();
+
+        if ([...simbolo].length !== 1) {
+            throw new Error(
+                "Cada regla debe comenzar con un símbolo."
+            );
+        }
+
+        reglas[simbolo] = reemplazo;
+
+    }
+
+    return reglas;
+
+}
+
+
+// ============================================
+// 5. ALGORITMO L-SYSTEM
+// ============================================
+
+function generarLSystem(
+    axioma,
+    reglas,
+    generaciones
+) {
+
+    let cadena = axioma;
+
+    for (let i = 0; i < generaciones; i++) {
+
+        let nueva = "";
+
+        for (const simbolo of cadena) {
+
+            const reemplazo =
+                reglas[simbolo] ?? simbolo;
+
+            if (
+                nueva.length + reemplazo.length >
+                LIMITE
+            ) {
+                throw new Error(
+                    "Se superó el límite de " +
+                    LIMITE +
+                    " símbolos. Reduce las generaciones."
+                );
+            }
+
+            nueva += reemplazo;
+
+        }
+
+        cadena = nueva;
+
+    }
+
+    return cadena;
+
+}
+
+
+// ============================================
+// 6. IRREGULARIDAD DETERMINÍSTICA
+// ============================================
+
+function ruido(numero) {
+
+    const valor =
+        Math.sin(numero * 12.9898) *
+        43758.5453;
+
+    return valor - Math.floor(valor);
+
+}
+
+
+// ============================================
+// 7. TORTUGA GRÁFICA
+// ============================================
+
+function interpretarTortuga(
+    cadena,
+    anguloGrados,
+    irregularidad
+) {
+
+    let x = 0;
+    let y = 0;
+
+    // Hacia arriba
+    let direccion = -Math.PI / 2;
+
+    let nivel = 0;
+
+    const pila = [];
+    const segmentos = [];
+    const extremos = [];
+
+    let minX = 0;
+    let maxX = 0;
+    let minY = 0;
+    let maxY = 0;
+
+    const angulo =
+        anguloGrados * Math.PI / 180;
+
+    const variacion =
+        irregularidad * Math.PI / 180;
+
+    let paso = 0;
+
+    for (const simbolo of cadena) {
+
+        if (simbolo === "F" || simbolo === "G") {
+
+            let longitud = 1;
+
+            if (ejemploActual === "arbol") {
+
+                longitud *= Math.max(
+                    0.5,
+                    1 - nivel * 0.04
+                );
+
+            }
+
+            const desviacion =
+                variacion *
+                (ruido(paso + nivel * 13) - 0.5);
+
+            const direccionFinal =
+                direccion + desviacion;
+
+            const nuevoX =
+                x + Math.cos(direccionFinal) *
+                longitud;
+
+            const nuevoY =
+                y + Math.sin(direccionFinal) *
+                longitud;
+
+            segmentos.push({
+                x1: x,
+                y1: y,
+                x2: nuevoX,
+                y2: nuevoY,
+                nivel: nivel
+            });
+
+            x = nuevoX;
+            y = nuevoY;
+
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+
+            paso++;
+
+        }
+
+        else if (simbolo === "+") {
+
+            direccion += angulo;
+
+        }
+
+        else if (simbolo === "-") {
+
+            direccion -= angulo;
+
+        }
+
+        else if (simbolo === "[") {
+
+            pila.push({
+                x: x,
+                y: y,
+                direccion: direccion,
+                nivel: nivel
+            });
+
+            nivel++;
+
+        }
+
+        else if (simbolo === "]") {
+
+            extremos.push({
+                x: x,
+                y: y,
+                nivel: nivel
+            });
+
+            if (pila.length === 0) {
+                throw new Error(
+                    "Existe un ] sin un [ correspondiente."
+                );
+            }
+
+            const estado = pila.pop();
+
+            x = estado.x;
+            y = estado.y;
+            direccion = estado.direccion;
+            nivel = estado.nivel;
+
+        }
+
+    }
+
+    if (pila.length > 0) {
+        throw new Error(
+            "Existen corchetes [ sin cerrar."
+        );
+    }
+
+    extremos.push({ x, y, nivel });
+
+    return {
+        segmentos,
+        extremos,
+        minX,
+        maxX,
+        minY,
+        maxY
+    };
+
+}
+
+
+// ============================================
+// 8. DIBUJAR EL PAISAJE
+// ============================================
+
+function dibujarPaisaje(ancho, alto) {
+
+    // Cielo
+    const cielo =
+        ctx.createLinearGradient(
+            0, 0, 0, alto
+        );
+
+    cielo.addColorStop(0, "#8ec7ec");
+    cielo.addColorStop(1, "#f8ecc7");
+
+    ctx.fillStyle = cielo;
+    ctx.fillRect(0, 0, ancho, alto);
+
+    // Sol
+    ctx.fillStyle = "#fff0a6";
+    ctx.beginPath();
+
+    ctx.arc(
+        ancho * 0.82,
+        alto * 0.20,
+        35,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    // Montañas lejanas
+    ctx.fillStyle = "#b2cba8";
+    ctx.beginPath();
+
+    ctx.moveTo(0, alto * 0.78);
+
+    ctx.bezierCurveTo(
+        ancho * 0.25, alto * 0.48,
+        ancho * 0.40, alto * 0.75,
+        ancho * 0.65, alto * 0.62
+    );
+
+    ctx.lineTo(ancho, alto * 0.65);
+    ctx.lineTo(ancho, alto);
+    ctx.lineTo(0, alto);
+    ctx.fill();
+
+    // Colinas cercanas
+    ctx.fillStyle = "#85ad83";
+    ctx.beginPath();
+
+    ctx.moveTo(0, alto * 0.84);
+
+    ctx.bezierCurveTo(
+        ancho * 0.30, alto * 0.68,
+        ancho * 0.60, alto * 0.88,
+        ancho, alto * 0.75
+    );
+
+    ctx.lineTo(ancho, alto);
+    ctx.lineTo(0, alto);
+    ctx.fill();
+
+    // Suelo
+    ctx.fillStyle = "#5c8c62";
+
+    ctx.fillRect(
+        0,
+        alto * 0.84,
+        ancho,
+        alto * 0.16
+    );
+
+}
+
+
+// ============================================
+// 9. DIBUJAR HOJAS
+// ============================================
+
+function dibujarHoja(x, y, radio, indice) {
+
+    const colores = [
+        "#3b874d",
+        "#5da65c",
+        "#79b85e",
+        "#a3c96c"
+    ];
+
+    ctx.fillStyle =
+        colores[indice % colores.length];
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        radio,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+}
+
+
+// ============================================
+// 10. RENDERIZAR FIGURA
+// ============================================
+
+function renderizar(modelo) {
+
+    const ancho = canvas.clientWidth;
+    const alto = canvas.clientHeight;
+
+    const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+
+    canvas.width = Math.round(ancho * dpr);
+    canvas.height = Math.round(alto * dpr);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.clearRect(0, 0, ancho, alto);
+
+    const esArbol =
+        ejemploActual === "arbol";
+
+    const esKoch =
+        ejemploActual === "koch";
+
+    const mostrarPaisaje =
+        obtener("paisaje").checked;
+
+    const mostrarHojas =
+        obtener("hojas").checked;
+
+    if (mostrarPaisaje) {
+
+        dibujarPaisaje(ancho, alto);
+
+    } else {
+
+        ctx.fillStyle = esKoch
+            ? "#f0f7ff"
+            : "#f2faf3";
+
+        ctx.fillRect(
+            0, 0, ancho, alto
+        );
+
+    }
+
+    const lista = modelo.segmentos;
+
+    if (lista.length === 0) return;
+
+    const rangoX =
+        Math.max(modelo.maxX - modelo.minX, 1);
+
+    const rangoY =
+        Math.max(modelo.maxY - modelo.minY, 1);
+
+    const margen = 50;
+
+    const escala =
+        Number(obtener("escala").value) / 100;
+
+    const factor = Math.min(
+        (ancho - margen * 2) / rangoX,
+        (alto - margen * 2) / rangoY
+    ) * escala;
+
+    const centroX =
+        (modelo.minX + modelo.maxX) / 2;
+
+    const centroY =
+        (modelo.minY + modelo.maxY) / 2;
+
+    const origenX =
+        ancho / 2 - centroX * factor;
+
+    let origenY =
+        alto / 2 - centroY * factor;
+
+    if (mostrarPaisaje && !esKoch) {
+
+        origenY =
+            alto * 0.84 -
+            modelo.maxY * factor;
+
+    }
+
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // Dibujar segmentos
+    for (const s of lista) {
+
+        const x1 = origenX + s.x1 * factor;
+        const y1 = origenY + s.y1 * factor;
+
+        const x2 = origenX + s.x2 * factor;
+        const y2 = origenY + s.y2 * factor;
+
+        ctx.beginPath();
+
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+
+        if (esKoch) {
+
+            ctx.strokeStyle = "#2486c2";
+            ctx.lineWidth = 2;
+
+        } else if (esArbol) {
+
+            if (s.nivel <= 1) {
+                ctx.strokeStyle = "#6b472e";
+            } else if (s.nivel <= 3) {
+                ctx.strokeStyle = "#80593a";
+            } else {
+                ctx.strokeStyle = "#537c45";
+            }
+
+            ctx.lineWidth = Math.max(
+                0.7,
+                Math.min(
+                    12,
+                    factor * 0.18 *
+                    Math.pow(0.72, s.nivel)
+                )
+            );
+
+        } else {
+
+            ctx.strokeStyle = "#27855d";
+            ctx.lineWidth = 1.5;
+
+        }
+
+        ctx.stroke();
+
+    }
+
+    // Dibujar hojas
+    if (mostrarHojas && !esKoch) {
+
+        let indice = 0;
+
+        for (const extremo of modelo.extremos) {
+
+            if (esArbol && extremo.nivel < 2) {
+                continue;
+            }
+
+            const x =
+                origenX + extremo.x * factor;
+
+            const y =
+                origenY + extremo.y * factor;
+
+            if (
+                x < -20 || x > ancho + 20 ||
+                y < -20 || y > alto + 20
+            ) continue;
+
+            const radio = Math.max(
+                2,
+                Math.min(7, factor * 0.12)
+            );
+
+            dibujarHoja(
+                x, y, radio, indice
+            );
+
+            indice++;
+
+        }
+
+    }
+
+}
+
+
+// ============================================
+// 11. ACTUALIZACIÓN GENERAL
+// ============================================
+
+function dibujar() {
+
+    obtener("valorGen").textContent =
+        obtener("generaciones").value;
+
+    obtener("valorAngulo").textContent =
+        obtener("angulo").value + "°";
+
+    obtener("valorEscala").textContent =
+        obtener("escala").value + "%";
+
+    obtener("valorRamas").textContent =
+        obtener("ramas").value;
+
+    obtener("valorIrregularidad").textContent =
+        obtener("irregularidad").value + "°";
+
+    obtener("mensaje").textContent = "";
+
+    try {
+
+        const axioma =
+            obtener("axioma").value;
+
+        const reglas =
+            interpretarReglas(
+                obtener("reglas").value
+            );
+
+        const generaciones =
+            Number(obtener("generaciones").value);
+
+        const angulo =
+            Number(obtener("angulo").value);
+
+        const irregularidad =
+            ejemploActual === "arbol"
+                ? Number(
+                    obtener("irregularidad").value
+                  )
+                : 0;
+
+        const cadena =
+            generarLSystem(
+                axioma,
+                reglas,
+                generaciones
+            );
+
+        const modelo =
+            interpretarTortuga(
+                cadena,
+                angulo,
+                irregularidad
+            );
+
+        renderizar(modelo);
+
+        obtener("totalSegmentos").textContent =
+            modelo.segmentos.length
+                .toLocaleString("es-PE");
+
+        obtener("totalSimbolos").textContent =
+            cadena.length
+                .toLocaleString("es-PE");
+
+        obtener("totalGeneraciones").textContent =
+            generaciones;
+
+        obtener("codigoReglas").textContent =
+            "Axioma: " + axioma +
+            "\n\nReglas:\n" +
+            obtener("reglas").value +
+            "\n\nResultado (primeros 180 símbolos):\n" +
+            cadena.substring(0, 180) +
+            (cadena.length > 180 ? "..." : "");
+
+    } catch (error) {
+
+        obtener("mensaje").textContent =
+            error.message;
+
+        obtener("totalSegmentos").textContent = "—";
+        obtener("totalSimbolos").textContent = "—";
+
+    }
+
+}
+
+
+// ============================================
+// 12. CAMBIO DE RAMAS
+// ============================================
+
+obtener("ramas").addEventListener(
+    "input",
+    function() {
+
+        if (ejemploActual === "arbol") {
+
+            obtener("reglas").value =
+                generarReglasArbol(
+                    Number(this.value)
+                );
+
+        }
+
+        dibujar();
+
+    }
+);
+
+
+// ============================================
+// 13. CONTROLES INTERACTIVOS
+// ============================================
+
+const controles = [
+    "generaciones",
+    "angulo",
+    "escala",
+    "irregularidad",
+    "axioma",
+    "reglas",
+    "hojas",
+    "paisaje"
+];
+
+controles.forEach(id => {
+
+    obtener(id).addEventListener(
+        "input",
+        dibujar
+    );
+
+});
+
+
+// ============================================
+// 14. RESTABLECER
+// ============================================
+
+function reiniciar() {
+
+    seleccionar(ejemploActual);
+
+}
+
+
+// ============================================
+// 15. DESCARGAR IMAGEN
+// ============================================
+
+function guardarPNG() {
+
+    dibujar();
+
+    if (obtener("mensaje").textContent) {
+        return;
+    }
+
+    const enlace =
+        document.createElement("a");
+
+    enlace.download =
+        "l-system-" + ejemploActual + ".png";
+
+    enlace.href =
+        canvas.toDataURL("image/png");
+
+    enlace.click();
+
+}
+
+
+// ============================================
+// 16. REDIMENSIONAR CANVAS
+// ============================================
+
+window.addEventListener(
+    "resize",
+    dibujar
+);
+
+
+// ============================================
+// 17. INICIAR APLICACIÓN
+// ============================================
+
+seleccionar("arbol");
+
 </script>
+
 </body>
 </html>
