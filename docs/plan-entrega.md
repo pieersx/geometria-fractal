@@ -1,15 +1,15 @@
 # Plan de entrega: informe, presentación y aplicación
 
 **Curso:** Computación Visual · **Grupo 8** · **Exposición: 02/12/2026 (20 minutos)**
-Documento vivo: se actualiza al cerrar cada tarea. Estado al 26/11/2026.
+Documento vivo: se actualiza al cerrar cada tarea. Estado al 26/11/2026 (revisión final).
 
 ## 1. Metas acordadas
 
 | Entregable | Meta | Estado |
 |---|---|---|
-| Informe (APA) | 25–30 páginas, con capturas, 1–2 fórmulas y un diagrama por capítulo. Sin relleno. | Borrador de ~4 800 palabras, sin capturas finales ni PDF |
-| Presentación | 14–17 diapositivas, poco texto y una imagen grande por diapositiva. PDF para compartir. | PDF de avance |
-| Aplicación | 5 módulos funcionando | Módulos 1, 3 y 4 integrados en `main`. Módulos 2 y 5 con prototipo listo en `feat/modulo2-chaos-game` y `feat/modulo5-box-counting`, pendientes de PR y de revisión por sus responsables |
+| Informe (APA) | 25–30 páginas, con capturas, 1–2 fórmulas y un diagrama por capítulo. Sin relleno. | PDF regenerado el 26/11 (46 páginas con portada, índices y anexo de la bitácora), con capturas reales. Falta la revisión de APA y ortografía |
+| Presentación | 14–17 diapositivas, poco texto y una imagen grande por diapositiva. PDF para compartir. | PDF regenerado el 26/11 (19 diapositivas; la meta era 14–17) |
+| Aplicación | 5 módulos funcionando | Los 5 módulos están integrados en `main` y revisados (código, textos y datos del informe). Falta la prueba en el equipo de la exposición |
 | Video | 1 video de 2–3 minutos con recorrido por los 5 módulos | No existe |
 | Bitácora de IA | Fecha, hora real, herramienta y tema de cada uso | Horas en `__:__` |
 

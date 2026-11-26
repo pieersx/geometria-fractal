@@ -133,6 +133,7 @@ function fitView(p) {
 function start() {
   cancelAnimationFrame(raf);                              // evita dos bucles de dibujo sobre el mismo trabajo
   resize(); W = canvas.width; H = canvas.height;
+  if (!W || !H) return;                                  // lienzo sin tamaño (pestaña oculta): el evento resize reinicia después
   count = new Uint32Array(W * H); rr = new Float32Array(W * H); gg = new Float32Array(W * H); bb = new Float32Array(W * H);
   img = ctx.createImageData(W, H);
   const p = PRESETS[state.fig]; fitView(p);
