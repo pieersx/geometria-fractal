@@ -34,7 +34,8 @@ y entra a <http://localhost:8000>.
 index.html          portada que enlaza a los módulos
 modulos/NN-nombre/  un módulo por integrante (index.html autocontenido)
 modulos/_plantilla/ plantilla base de la que parten los módulos 2 a 5
-docs/informe/       informe-geometria-fractal.docx (documento base APA) y esquema
+docs/informe/       capítulos en .md y el informe PDF (se genera con docs/build/build-informe.py)
+docs/build/         scripts que generan el informe, la presentación y las capturas
 docs/presentacion/  diapositivas y video de respaldo
 docs/bitacora-ia.md registro de uso de IA (exigido por la rúbrica)
 ```

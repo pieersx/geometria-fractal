@@ -1,5 +1,9 @@
 # Capítulo 4. L-systems
 
+::: resumen
+**Resumen del capítulo.** Un L-system reescribe cadenas de símbolos que una tortuga gráfica interpreta como dibujo. El módulo 3 lo aplica a curvas fractales (Koch, Sierpinski, dragón y Hilbert 3D) y a vegetación procedural en 2D y 3D, con reglas editables y estocásticas.
+:::
+
 > **Estado:** ajustado al módulo 3 implementado. Base de Valeria Flores (árbol con ramas por nivel e irregularidad en Canvas 2D), rediseñada con el estilo de los módulos 1 y 4 y ampliada con más ejemplos, reglas estocásticas, animación de crecimiento, viento, un modo paso a paso y un modo 3D en WebGL.
 
 ## 4.1 Descripción del algoritmo
@@ -24,6 +28,8 @@ En cada **generación**, las reglas se aplican a **todos** los símbolos a la ve
 | `&` / `^` | Solo en 3D: inclinar hacia abajo / hacia arriba |
 | `\` / `/` | Solo en 3D: rotar sobre el propio eje |
 
+: Símbolos del intérprete de tortuga
+
 ### Ejemplo de reescritura
 
 Con axioma `F` y regla `F → F+F−−F+F` (curva de Koch):
@@ -32,7 +38,9 @@ Con axioma `F` y regla `F → F+F−−F+F` (curva de Koch):
 - Generación 1: `F+F−−F+F` (4 segmentos)
 - Generación 2: cada `F` vuelve a cambiarse por `F+F−−F+F` (16 segmentos)
 
-Cada generación multiplica por 4 el número de segmentos y divide su largo entre 3. Por eso la dimensión de la curva límite es `ln 4 / ln 3 ≈ 1,262`.
+Cada generación multiplica por 4 el número de segmentos y divide su largo entre 3. Por eso la dimensión de la curva límite es:
+
+$$D = \frac{\ln 4}{\ln 3} \approx 1{,}262$$
 
 ### L-systems estocásticos
 
@@ -66,6 +74,8 @@ Ejemplos incluidos:
 | Bosque estocástico | `X` | tres reglas para `X` (pesos 0,34 / 0,33 / 0,33) y `F → FF` | 25° | — |
 | Árbol 3D | `FFFFFFFA` | `A → FF[&FA]/[&FA]/[&FA]` | 30°, giro de 137,5° | — |
 | Curva de Hilbert 3D | `A` | cuatro reglas para `A`, `B`, `C` y `D` | 90° | 3 (llena el cubo) |
+
+: Ejemplos incluidos en el módulo 3
 
 En el árbol, el control **Ramas por nivel** (de 2 a 6) genera automáticamente la regla de `X` con ese número de corchetes. La **irregularidad** desvía un poco cada giro y cada tramo, con valores pseudoaleatorios fijados por la semilla. El grosor de las ramas, las hojas, el **viento** y el paisaje al atardecer son añadidos gráficos: no forman parte del L-system ni simulan el crecimiento biológico real.
 
@@ -103,5 +113,16 @@ Los L-systems se usan para **generar vegetación procedural** en videojuegos, ci
 
 ## 4.5 Capturas y demostración
 
-- Capturas: `docs/presentacion/capturas/modulo3-arbol.png`, `modulo3-bosque.png`, `modulo3-dragon.png`, `modulo3-paso-a-paso.png`, `modulo3-arbol3d.png` y `modulo3-hilbert3d.png`
-- Demostración: `modulos/03-l-systems/index.html`
+![Árbol en un paisaje](../presentacion/capturas/modulo3-arbol.png){width=78% nota="Captura propia del módulo 3. Axioma `X`, regla `X → F[−X][X][+X]FX`, `F → FF`; 5 generaciones, 24°, irregularidad 8°."}
+
+![Bosque estocástico](../presentacion/capturas/modulo3-bosque.png){width=78% nota="Captura propia. Tres reglas para `X` con pesos 0,34 / 0,33 / 0,33; semilla 2024 y 5 árboles. Cada árbol usa otra semilla derivada."}
+
+![Curva del dragón](../presentacion/capturas/modulo3-dragon.png){width=78% nota="Captura propia. 12 generaciones (4 096 segmentos). El color sigue el orden en que la tortuga recorre la curva."}
+
+![Modo paso a paso](../presentacion/capturas/modulo3-paso-a-paso.png){width=78% nota="Captura propia. Planta de 3 generaciones en el símbolo 120: la cadena resalta el símbolo leído y los círculos azules marcan las posiciones guardadas en la pila."}
+
+![Árbol 3D](../presentacion/capturas/modulo3-arbol3d.png){width=78% nota="Captura propia. Tortuga 3D con giro sobre el eje de 137,5°, tropismo 0,12 y 6 generaciones (1 827 segmentos), dibujado con WebGL."}
+
+![Curva de Hilbert 3D](../presentacion/capturas/modulo3-hilbert3d.png){width=78% nota="Captura propia. Generación 3: una sola curva de 511 segmentos que visita los 512 puntos de un cubo de 8 × 8 × 8."}
+
+<div class="demo"><img src="img/qr-modulo-3.svg" alt="Código QR del módulo 3"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/03-l-systems/</span></p></div>

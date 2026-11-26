@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Medición CPU frente a GPU · Mandelbrot</title>
+<style>
+ body{font:15px/1.5 system-ui,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#1d1a33}
+ button{font:inherit;padding:8px 14px;border:1px solid #888;border-radius:8px;background:#f3f1fa;cursor:pointer}
+ table{border-collapse:collapse;margin:14px 0;width:100%} th,td{border:1px solid #bbb;padding:6px 10px;text-align:left}
+ th{background:#ece9f6} pre{background:#f3f3f3;padding:10px;white-space:pre-wrap;border-radius:6px}
+ .nota{color:#555;font-size:13px}
+</style></head><body>
+<h1>Mandelbrot: CPU frente a GPU</h1>
+<p>Mide el tiempo de calcular la misma imagen (vista inicial, 200 iteraciones, radio de escape 16) con un bucle en JavaScript (64 bits) y con un <i>fragment shader</i> (WebGL). Cierra otras pestañas pesadas antes de medir y mide con el equipo enchufado.</p>
+<p><button id="go">Medir (tarda unos segundos)</button> <span id="st" class="nota"></span></p>
+<div id="out"></div>
+<script>
+"use strict";
+const MAXIT = 200, R2 = 256, RUNS = 10, SIZES = [[800,600],[1920,1080]];
+const HOME = {cx:-0.5, cy:0, scale:3.0};
+
+function cpu(w,h){
+  const out = new Uint16Array(w*h);
+  for (let y=0;y<h;y++) for (let x=0;x<w;x++){
+    const cx = HOME.cx + (x - w/2)/h*HOME.scale, cy = HOME.cy + (h/2 - y)/h*HOME.scale;
+    let zx=0, zy=0, n=0;
+    while (n<MAXIT){ const t=zx*zx-zy*zy+cx; zy=2*zx*zy+cy; zx=t; if (zx*zx+zy*zy>R2) break; n++; }
+    out[y*w+x]=n;
+  }
+  return out[(h>>1)*w+(w>>1)];
+}
+
+function makeGL(w,h){
+  const c=document.createElement("canvas"); c.width=w; c.height=h;
+  const gl=c.getContext("webgl",{preserveDrawingBuffer:true,antialias:false});
+  if(!gl) throw new Error("WebGL no disponible");
+  const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o;};
+  const p=gl.createProgram();
+  gl.attachShader(p,sh(gl.VERTEX_SHADER,"attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}"));
+  gl.attachShader(p,sh(gl.FRAGMENT_SHADER,`precision highp float;uniform vec2 uRes;
+   void main(){vec2 uv=(gl_FragCoord.xy-.5*uRes)/uRes.y;vec2 c=vec2(${HOME.cx.toFixed(1)},${HOME.cy.toFixed(1)})+uv*${HOME.scale.toFixed(1)};
+   vec2 z=vec2(0.);float n=0.;for(int i=0;i<${MAXIT};i++){z=vec2(z.x*z.x-z.y*z.y,2.*z.x*z.y)+c;if(dot(z,z)>${R2}.)break;n+=1.;}
+   gl_FragColor=vec4(vec3(n/${MAXIT}.),1.);}`));
+  gl.linkProgram(p); gl.useProgram(p);
+  const b=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  const l=gl.getAttribLocation(p,"p"); gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
+  gl.uniform2f(gl.getUniformLocation(p,"uRes"),w,h); gl.viewport(0,0,w,h);
+  const px=new Uint8Array(4);
+  return { gl, run(){ gl.drawArrays(gl.TRIANGLE_STRIP,0,4); gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px); } };
+}
+const acel=r=>r.g>0.01?(r.c/r.g).toFixed(0)+'×':'—';
+const avg=a=>a.reduce((s,v)=>s+v,0)/a.length;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function medir(){
+  const rows=[]; const st=document.getElementById("st");
+  for (const [w,h] of SIZES){
+    st.textContent=`Midiendo ${w} × ${h}…`; await sleep(50);
+    cpu(w,h); const tc=[]; for(let i=0;i<RUNS;i++){const t=performance.now(); cpu(w,h); tc.push(performance.now()-t);}
+    const g=makeGL(w,h); g.run(); const tg=[]; for(let i=0;i<RUNS;i++){const t=performance.now(); g.run(); tg.push(performance.now()-t);}
+    rows.push({res:`${w} × ${h}`, c:avg(tc), g:avg(tg)});
+  }
+  const dbg=(()=>{try{const gl=document.createElement("canvas").getContext("webgl");const e=gl.getExtension("WEBGL_debug_renderer_info");return e?gl.getParameter(e.UNMASKED_RENDERER_WEBGL):"(oculto por el navegador)";}catch(e){return "?";}})();
+  const f=v=>v>=100?v.toFixed(0):v.toFixed(1);
+  let md="| Resolución | CPU (JS), ms | GPU (WebGL), ms | Aceleración |\n|---|---|---|---|\n";
+  rows.forEach(r=>md+=`| ${r.res} | ${f(r.c)} | ${f(r.g)} | ${acel(r)} |\n`);
+  const eq=`Equipo: GPU ${dbg}; navegador ${navigator.userAgent}`;
+  document.getElementById("out").innerHTML=
+    "<table><tr><th>Resolución</th><th>CPU (JS), ms</th><th>GPU (WebGL), ms</th><th>Aceleración</th></tr>"+
+    rows.map(r=>`<tr><td>${r.res}</td><td>${f(r.c)}</td><td>${f(r.g)}</td><td>${acel(r)}</td></tr>`).join("")+"</table>"+
+    `<p class="nota">Promedio de ${RUNS} corridas tras una de calentamiento.</p><p>Copia esto en el informe:</p><pre>${md}\n${eq}</pre>`;
+  st.textContent="Listo.";
+}
+document.getElementById("go").onclick=()=>medir().catch(e=>{document.getElementById("st").textContent="Error: "+e.message;});
+</script></body></html>
