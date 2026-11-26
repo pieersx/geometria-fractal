@@ -186,7 +186,7 @@
     <span class="code" id="seq"></span>
   </details>
 
-  <div class="hint">Arrastrar: mover (en 3D, girar) · Rueda: zoom · <a href="../../">← Portada</a></div>
+  <div class="hint">Arrastrar: mover (en 3D, girar) · Rueda: zoom · <a href="../../index.html">← Portada</a></div>
 </div>
 
 <div id="stepbar" aria-live="polite">
@@ -437,7 +437,7 @@ function rebuild() {
     if (draws > LIMIT_SEGMENTS)
       throw Error(`El dibujo supera ${fmt(LIMIT_SEGMENTS)} segmentos. Baja una generación o usa menos árboles.`);
     if (i === 0) history = ex.history;
-    list.push({ c, stat: makeOut(c), live: makeOut(c), phase: hash(i + 1) * 6.28, s: 1, tx: 0, ty: 0, fade: 0, h: 1,
+    list.push({ idx: i, c, stat: makeOut(c), live: makeOut(c), phase: hash(i + 1) * 6.28, s: 1, tx: 0, ty: 0, fade: 0, h: 1,
       str: i === 0 ? ex.str : null });
   }
   instances = list;
@@ -459,8 +459,8 @@ function reinterpret() {
 const step = { active: false, playing: false, pos: 0, cursor: 0, map: null, out: null };
 const stepSpeed = () => Math.round(Math.pow(10, +$("speed").value * 3));
 const ACTION = {
-  F: "avanza un paso y dibuja", G: "avanza un paso y dibuja", A: "avanza un paso y dibuja", B: "avanza un paso y dibuja",
-  f: "avanza un paso sin dibujar", "|": "da media vuelta (180°)",
+  F: "avanza y dibuja", G: "avanza y dibuja", A: "avanza y dibuja", B: "avanza y dibuja",
+  f: "avanza sin dibujar", "|": "da media vuelta (180°)",
   "[": "guarda la posición y la dirección en la pila (empieza una rama)",
   "]": "saca de la pila la última posición guardada (vuelve al punto donde nació la rama)"
 };
@@ -532,6 +532,7 @@ function setStepMode(on) {
 }
 
 function layoutForest() {
+  instances.sort((a, b) => a.idx - b.idx);   // orden original: la posición de cada árbol no depende del orden de dibujo
   const n = instances.length, rnd = rng32(state.seed ^ 0x9E3779B9);
   const width = n * 0.5;
   instances.forEach((inst, i) => {

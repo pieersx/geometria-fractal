@@ -13,7 +13,7 @@ Para la exposición del **02/12/2026**. Expone: **Valeria Flores**. Tiempo en la
 
 | Tiempo | Acción en pantalla | Qué decir |
 |---|---|---|
-| 0:00 | **Curva de Koch**, generación 0 → subir hasta 4 | «Un L-system es una regla de texto. El axioma es `F`; la regla cambia cada `F` por `F+F−−F+F`. Cada generación reemplaza **todos** los símbolos a la vez: la cadena crece ×4 y la dimensión es ln 4 / ln 3 ≈ 1,262 (la D del panel).» |
+| 0:00 | **Curva de Koch**, generación 0 → subir hasta 4 | «Un L-system es una regla de texto. El axioma es `F`; la regla cambia cada `F` por `F+F−−F+F`. Cada generación reemplaza **todos** los símbolos a la vez: el número de segmentos `F` se multiplica por 4 y la dimensión es ln 4 / ln 3 ≈ 1,262 (la D del panel).» |
 | 0:30 | **Planta ramificada**, generación 2 → en ⚙ Opciones avanzadas, **👣 Paso a paso** → ▶ | «La tortuga lee la cadena símbolo por símbolo. Con `[` guarda su posición en una pila y con `]` vuelve a ella: así nacen las ramas.» (señalar los círculos azules; al terminar, **✕ Salir** y cerrar Opciones avanzadas) |
 | 1:10 | **Árbol en un paisaje** → **▶ Ver crecer** → «Ramas por nivel» de 3 a 5 | «El árbol se dibuja en el orden en que se lee la cadena. Al cambiar las ramas, la regla se reescribe sola.» |
 | 1:40 | **Árbol 3D** → arrastrar para girar → subir la «Gravedad» | «En 3D la tortuga tiene tres vectores (H, L, U) y gira con `& ^ \ /`. Las ramas son tubos que dibuja la GPU con WebGL. El giro de 137,5° es el ángulo áureo; la gravedad curva las ramas.» |

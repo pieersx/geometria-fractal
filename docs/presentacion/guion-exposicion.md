@@ -51,8 +51,8 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 
 - **Juego del caos (Sierpinski):** tres vértices. Se elige uno al azar y el punto salta a la **mitad** del camino. Se repite miles de veces y aparece el triángulo.
 - **Dimensión:** $D = \ln 3 / \ln 2 \approx 1{,}585$.
-- **Helecho de Barnsley:** 4 transformaciones con probabilidades distintas (≈ 1 %, 85 %, 7 %, 7 %). Una hace el tallo, otra las hojas sucesivas y dos las hojas laterales.
-- **En la app:** elegir fractal, número de puntos y velocidad de dibujo.
+- **Helecho de Barnsley:** 4 transformaciones con probabilidades distintas (≈ 1 %, 85 %, 7 %, 7 %). Una hace el tronco, otra el helecho entero reducido y subido un poco, y dos las hojas izquierda y derecha.
+- **En la app:** elegir el fractal, la razón de contracción r (triángulo y alfombra), el número de puntos y colorear según la regla que dibujó cada punto.
 
 ## Diapositivas 9–10 · Valeria (módulo 3)
 
@@ -81,7 +81,7 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 
 - **Pasos:** binarizar la imagen, cubrirla con cajas de lado ε, contar las cajas ocupadas *N(ε)* y repetir con varios ε.
 - **Por qué log-log:** si $N(\varepsilon) \propto \varepsilon^{-D}$, en escala logarítmica queda una **recta** y su **pendiente** es *D*.
-- **Validación (diap. 14):** generar Koch con el módulo 3 y medirlo con el módulo 5. Debe dar cerca de 1,262. También Sierpinski ≈ 1,585.
+- **Validación (diap. 14):** el módulo 5 dibuja Koch con la misma regla F→F+F−−F+F del módulo 3 y la mide. Debe dar cerca de 1,262. También Sierpinski ≈ 1,585.
 - **Ser honestos:** el resultado depende de la binarización y del rango de ε; un objeto real no es autosimilar hasta el infinito.
 
 ## Diapositiva 15 · Pieers (demostración en vivo)
@@ -111,7 +111,7 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 | ¿Por qué falla el zoom muy profundo? | La GPU usa números de 32 bits; al ampliar, dos píxeles vecinos dejan de distinguirse y la imagen se pixela. |
 | ¿En el juego del caos, por qué sale la figura si es aleatorio? | Cada salto contrae el punto hacia el atractor; tras unos pocos pasos queda sobre él y los siguientes lo recubren. |
 | ¿Qué diferencia hay entre IFS y L-system? | El IFS aplica transformaciones geométricas a un punto. El L-system reescribe texto y luego lo interpreta como dibujo. |
-| ¿Por qué la cadena del L-system crece tanto? | Cada símbolo se reemplaza en paralelo: con Koch se multiplica por 4 en cada generación. |
+| ¿Por qué la cadena del L-system crece tanto? | Cada símbolo se reemplaza en paralelo: con Koch el número de segmentos se multiplica por 4 en cada generación. |
 | ¿La dimensión que muestra el terreno es medida? | No. Es una estimación teórica a partir de la rugosidad ($D = 3 - H$). Medirla sería tarea del módulo 5. |
 | ¿Cómo se valida el box-counting? | Con formas de dimensión conocida: Koch ≈ 1,262 y Sierpinski ≈ 1,585. |
 | ¿Qué fuentes usaron? | Mandelbrot (1967), Lindenmayer (1968), Barnsley y Demko (1985), Fournier et al. (1982), Liebovitch y Toth (1989). Con DOI en el informe. |

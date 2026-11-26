@@ -9,11 +9,11 @@ Aplicación web interactiva (HTML + JavaScript; WebGL en los módulos 1 y 4 y en
 
 | # | Módulo | Técnica y demostración | Responsable | Estado |
 |---|--------|------------------------|-------------|--------|
-| 1 | [Conjuntos de escape](modulos/01-conjuntos-escape) | Mandelbrot y Julia con zoom interactivo | Pachas Auris, Pieers Fernando | Prototipo listo |
-| 2 | [IFS y Chaos Game](modulos/02-ifs-chaos-game) | Helecho de Barnsley, triángulo de Sierpinski | Cerna Aguilar, Emily Andrea | Pendiente |
-| 3 | [L-systems](modulos/03-l-systems) | Plantas, árboles y curvas de Koch y del dragón por reglas de reescritura | Flores Cortez, Valeria Alexandra | Prototipo listo |
-| 4 | [Terreno fractal](modulos/04-terreno-fractal) | Ruido fBm o diamond-square en 3D | Sihuacollo Sierra, Keyla Noemi | Prototipo listo |
-| 5 | [Dimensión fractal](modulos/05-dimension-fractal) | Box-counting sobre una imagen cargada por el usuario | Puente Carmen, Rodrigo Joaquin | Pendiente |
+| 1 | [Conjuntos de escape](modulos/01-conjuntos-escape) | Mandelbrot y Julia con zoom interactivo | Pachas Auris, Pieers Fernando | Integrado en `main` |
+| 2 | [IFS y Chaos Game](modulos/02-ifs-chaos-game) | Helecho de Barnsley, triángulo de Sierpinski | Cerna Aguilar, Emily Andrea | Integrado en `main` |
+| 3 | [L-systems](modulos/03-l-systems) | Plantas, árboles y curvas de Koch y del dragón por reglas de reescritura | Flores Cortez, Valeria Alexandra | Integrado en `main` |
+| 4 | [Terreno fractal](modulos/04-terreno-fractal) | Ruido fBm o diamond-square en 3D | Sihuacollo Sierra, Keyla Noemi | Integrado en `main` |
+| 5 | [Dimensión fractal](modulos/05-dimension-fractal) | Box-counting sobre una imagen cargada por el usuario | Puente Carmen, Rodrigo Joaquin | Integrado en `main` |
 
 **Integración y revisión de formato (APA, ortografía):** Bada Watanave, Camila del Rosario.
 
@@ -36,7 +36,7 @@ modulos/NN-nombre/  un módulo por integrante (index.html autocontenido)
 modulos/_plantilla/ plantilla base de la que parten los módulos 2 a 5
 docs/informe/       capítulos en .md y el informe PDF (se genera con docs/build/build-informe.py)
 docs/build/         scripts que generan el informe, la presentación y las capturas
-docs/presentacion/  diapositivas y video de respaldo
+docs/presentacion/  diapositivas (PDF), capturas y guiones de la exposición
 docs/bitacora-ia.md registro de uso de IA (exigido por la rúbrica)
 ```
 

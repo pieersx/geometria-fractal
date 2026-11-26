@@ -43,7 +43,7 @@ El coeficiente $R^2$ fue mayor que 0,999 en todos los casos. El error mayor, de 
 
 ### Costa generada
 
-La costa se construye por desplazamiento del punto medio, y su rugosidad controla cuánto decae el desplazamiento en cada nivel. Midiendo solo el contorno se obtuvo *D* ≈ 1,44 con rugosidad 0,3, ≈ 1,27 con 0,6 y ≈ 1,10 con 0,9: una costa más irregular tiene mayor dimensión, como describe Mandelbrot (1967). Este valor es una medición empírica, no tiene un teórico con el que compararlo.
+La costa se construye por desplazamiento del punto medio; el control de rugosidad es el exponente *H*, que fija cuánto decae el desplazamiento en cada nivel (*H* alto da una costa más suave). Midiendo solo el contorno con la semilla 7 se obtuvo *D* ≈ 1,50 con *H* = 0,3, ≈ 1,29 con 0,6 y ≈ 1,11 con 0,9: una costa más irregular tiene mayor dimensión, como describe Mandelbrot (1967). Este valor es una medición empírica, no tiene un teórico con el que compararlo.
 
 ## 6.2 Fortalezas
 

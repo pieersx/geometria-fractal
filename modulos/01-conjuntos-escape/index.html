@@ -160,6 +160,9 @@
 "use strict";
 const canvas = document.getElementById("c");
 const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true, antialias: false });
+let ctxLost = false;
+canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); ctxLost = true; const n = document.getElementById("nogl"); n.textContent = "Se perdió el contexto gráfico. Recarga la página."; n.style.display = "grid"; document.getElementById("panel").style.display = "none"; });
+
 if (!gl) {
   document.getElementById("nogl").style.display = "grid";
   document.getElementById("panel").style.display = "none";
@@ -288,10 +291,12 @@ function draw() {
 
 let last = performance.now(), frames = 0, acc = 0;
 function loop(now) {
+  if (ctxLost) return;                                     // contexto perdido: se detiene el bucle
   const dt = (now - last) / 1000; last = now;
   if (state.anim > 0) { state.time += dt * state.anim * 0.25; dirty = true; }
   if (dirty) {
     draw(); dirty = false;
+    if (split.on && split.marker && !state.julia) drawInset(split.marker[0], split.marker[1]);   // el recuadro sigue la paleta y la animación
     frames++; acc += dt;
     if (acc > 0.5) { fpsEl.textContent = state.anim > 0 ? Math.round(frames / acc) + " fps" : ""; frames = 0; acc = 0; }
   }
@@ -314,6 +319,7 @@ function changed() { dirty = true; updateStats(); drawOrbit(); }
 function setMode(julia) {
   state.julia = julia;
   if (julia && typeof split !== "undefined" && split.on) setSplit(false);
+  $("bSplit").disabled = julia;
   $("mMandel").classList.toggle("active", !julia);
   $("mJulia").classList.toggle("active", julia);
   $("julia").style.display = julia ? "block" : "none";
@@ -592,7 +598,6 @@ function startRecording() {
     const blob = new Blob(rec.chunks, { type: "video/webm" });
     const a = document.createElement("a"); a.download = "mandelbrot-julia-como-se-forma.webm";
     a.href = URL.createObjectURL(blob); a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-    window.__lastRecordingBytes = blob.size;
   };
   rec.on = true; rec.mr.start(250); recFrame();
   $("bRec").textContent = "Detener grabación"; $("bRec").classList.add("rec");
@@ -618,7 +623,8 @@ function toComplex(px, py) {
 canvas.addEventListener("wheel", e => {
   e.preventDefault();
   const [bx, by] = toComplex(e.clientX, e.clientY);
-  const k = Math.exp(e.deltaY * 0.0015);
+  const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1);   // Firefox envía líneas, no píxeles
+  const k = Math.exp(dy * 0.0015);
   state.scale = Math.min(Math.max(state.scale * k, MIN_SCALE), 6);
   const [ax, ay] = toComplex(e.clientX, e.clientY);       // mantener fijo el punto bajo el cursor
   state.cx += bx - ax; state.cy += by - ay;
@@ -656,7 +662,7 @@ canvas.addEventListener("dblclick", e => {
   setMode(true);
 });
 
-window.addEventListener("resize", () => { dirty = true; drawOrbit(); });
+window.addEventListener("resize", () => { resize(); dirty = true; drawOrbit(); });
 
 /* ---------- Arranque ---------- */
 $("vIt").textContent = state.maxIter;

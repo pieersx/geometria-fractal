@@ -25,11 +25,11 @@ Los puntos se aproximan al atractor y lo recubren de forma progresiva.
 
 ### Ejemplos en la aplicación
 
-- **Triángulo de Sierpinski.** Tres transformaciones que llevan el punto una fracción $r$ del camino hacia un vértice elegido al azar: $x' = r\,x + (1-r)\,v$. Con $r = 1/2$ la dimensión de similitud es $\ln 3 / \ln 2 \approx 1{,}585$.
+- **Triángulo de Sierpinski.** Tres transformaciones que acercan el punto a un vértice elegido al azar: $x' = r\,x + (1-r)\,v$, de modo que el punto queda a una fracción $r$ de su distancia anterior y recorre $1-r$ del camino. Con $r = 1/2$ la dimensión de semejanza es $\ln 3 / \ln 2 \approx 1{,}585$.
 - **Alfombra de Sierpinski.** Ocho transformaciones (las cuatro esquinas y los cuatro puntos medios de un cuadrado) con $r = 1/3$. Su dimensión es $\ln 8 / \ln 3 \approx 1{,}893$.
 - **Helecho de Barnsley.** Cuatro transformaciones afines con probabilidades de 1 %, 85 %, 7 % y 7 %. La primera dibuja el tallo, la segunda es el helecho entero reducido y desplazado, y la tercera y la cuarta son las hojas izquierda y derecha.
 
-Los controles son: el fractal, el número de puntos (de 1 000 a 5 millones), la razón de salto $r$ en los dos primeros ejemplos y una casilla que **colorea cada punto según la transformación que lo dibujó**. Esa casilla muestra que cada regla produce una copia reducida del todo. Se descartan los 20 primeros puntos y la imagen se acumula como una densidad en escala logarítmica.
+Los controles son: el fractal, el número de puntos (de 1 000 a 5 millones), la razón de contracción $r$ en los dos primeros ejemplos y una casilla que **colorea cada punto según la transformación que lo dibujó**. Esa casilla muestra que cada regla produce una copia reducida del todo. Se descartan los 20 primeros puntos y la imagen se acumula como una densidad en escala logarítmica.
 
 **Qué pasa si se cambia $r$.** La fórmula $\ln n / \ln(1/r)$ solo vale mientras las copias no se solapan, es decir, mientras $r \le 1/2$ en el triángulo y $r \le 1/3$ en la alfombra. Con un $r$ mayor las copias se superponen, el dibujo se llena y la aplicación lo avisa. El helecho no tiene una fórmula tan simple: su dimensión se puede medir con el módulo 5.
 
