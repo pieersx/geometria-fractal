@@ -675,5 +675,63 @@ setC(state.cr, state.ci);
 updateStats();
 requestAnimationFrame(loop);
 </script>
+<!-- nav-modulos:inicio · fragmento común a los cinco módulos: navegación, modo proyector (P) y panel oculto (H) -->
+<style>
+  #panel { scrollbar-width: thin; scrollbar-color: #3a4256 transparent; }
+  #navmod { position: fixed; top: 12px; right: 12px; z-index: 30; display: flex; align-items: center; gap: 3px; padding: 4px;
+    background: rgba(20,24,33,.85); border: 1px solid #262c3a; border-radius: 999px; backdrop-filter: blur(6px);
+    font: 600 13px/1 system-ui, -apple-system, "Segoe UI", sans-serif; color: #e6e9f0; opacity: .8; transition: opacity .15s; }
+  #navmod:hover, #navmod:focus-within { opacity: 1; }
+  #navmod a, #navmod button { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 8px;
+    border: 0; border-radius: 999px; background: transparent; color: inherit; font: inherit; text-decoration: none; cursor: pointer; }
+  #navmod a:hover, #navmod button:hover { background: #262c3a; }
+  #navmod a[aria-current="page"] { background: #f5b942; color: #1a1405; }
+  #navmod a[aria-disabled="true"] { opacity: .3; pointer-events: none; }
+  #navmod button[aria-pressed="true"] { background: #3dd6c6; color: #06201d; }
+  #navmod .sep { width: 1px; height: 18px; background: #262c3a; margin: 0 3px; }
+  #navmod :focus-visible { outline: 2px solid #f5b942; outline-offset: 1px; }
+  html.proy #panel { zoom: 1.25; max-height: calc((100vh - 32px) / 1.25) !important; }
+  html.proy #navmod { zoom: 1.3; }
+  html.sinpanel #panel { display: none; }
+  @media (max-width: 560px) { #navmod { top: auto; bottom: 12px; right: 50%; transform: translateX(50%); } }
+  @media (hover: none) { #navmod .tecla { display: none; } }
+</style>
+<nav id="navmod" aria-label="Navegación entre módulos"></nav>
+<script>
+(function () {
+  "use strict";
+  const M = [["01-conjuntos-escape", "Conjuntos de escape"], ["02-ifs-chaos-game", "IFS y juego del caos"], ["03-l-systems", "L-systems"],
+             ["04-terreno-fractal", "Terreno fractal"], ["05-dimension-fractal", "Dimensión fractal"]];
+  const cur = M.findIndex(m => location.pathname.indexOf(m[0]) >= 0), nav = document.getElementById("navmod");
+  if (cur < 0 || !nav) return;
+  const root = document.documentElement;
+  const get = k => { try { return sessionStorage.getItem(k) === "1"; } catch (e) { return false; } };
+  const put = (k, v) => { try { sessionStorage.setItem(k, v ? "1" : "0"); } catch (e) {} };
+  const link = (i, txt, label) => {
+    const a = document.createElement("a");
+    if (i >= 0 && i < M.length) a.href = "../" + M[i][0] + "/index.html"; else a.setAttribute("aria-disabled", "true");
+    a.textContent = txt; a.title = label; a.setAttribute("aria-label", label); return a;
+  };
+  nav.append(link(cur - 1, "‹", cur > 0 ? "Módulo anterior: " + M[cur - 1][1] : "No hay módulo anterior"));
+  M.forEach((m, i) => { const a = link(i, String(i + 1), "Módulo " + (i + 1) + ": " + m[1]); if (i === cur) a.setAttribute("aria-current", "page"); nav.append(a); });
+  nav.append(link(cur + 1, "›", cur < M.length - 1 ? "Módulo siguiente: " + M[cur + 1][1] : "No hay módulo siguiente"));
+  const sep = document.createElement("span"); sep.className = "sep"; nav.append(sep);
+  function toggle(label, cls, key, title) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.title = title; b.setAttribute("aria-label", title);
+    const set = on => { root.classList.toggle(cls, on); b.setAttribute("aria-pressed", String(on)); put(key, on); };
+    b.addEventListener("click", () => set(!root.classList.contains(cls)));
+    set(get(key)); nav.append(b); return () => set(!root.classList.contains(cls));
+  }
+  const proy = toggle("Aa", "proy", "fractal.proy", "Modo proyector: agranda el panel (tecla P)");
+  const panel = toggle("▤", "sinpanel", "fractal.sinpanel", "Ocultar o mostrar el panel (tecla H)");
+  window.addEventListener("keydown", e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const t = e.target, tag = t && t.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (t && t.isContentEditable)) return;
+    if (e.key === "p" || e.key === "P") proy(); else if (e.key === "h" || e.key === "H") panel();
+  });
+})();
+</script>
+<!-- nav-modulos:fin -->
 </body>
 </html>
