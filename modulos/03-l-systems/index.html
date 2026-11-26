@@ -459,8 +459,8 @@ function reinterpret() {
 const step = { active: false, playing: false, pos: 0, cursor: 0, map: null, out: null };
 const stepSpeed = () => Math.round(Math.pow(10, +$("speed").value * 3));
 const ACTION = {
-  F: "avanza un paso y dibuja", G: "avanza un paso y dibuja", A: "avanza un paso y dibuja", B: "avanza un paso y dibuja",
-  f: "avanza un paso sin dibujar", "|": "da media vuelta (180°)",
+  F: "avanza y dibuja", G: "avanza y dibuja", A: "avanza y dibuja", B: "avanza y dibuja",
+  f: "avanza sin dibujar", "|": "da media vuelta (180°)",
   "[": "guarda la posición y la dirección en la pila (empieza una rama)",
   "]": "saca de la pila la última posición guardada (vuelve al punto donde nació la rama)"
 };

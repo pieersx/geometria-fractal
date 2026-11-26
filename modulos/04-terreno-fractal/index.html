@@ -112,7 +112,8 @@
 "use strict";
 const canvas = document.getElementById("c");
 const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true, antialias: true });
-canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); const n = document.getElementById("nogl"); n.textContent = "Se perdió el contexto gráfico. Recarga la página."; n.style.display = "flex"; });
+let ctxLost = false;
+canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); ctxLost = true; const n = document.getElementById("nogl"); n.textContent = "Se perdió el contexto gráfico. Recarga la página."; n.style.display = "grid"; document.getElementById("panel").style.display = "none"; });
 
 if (!gl) {
   document.getElementById("nogl").style.display = "grid";
@@ -587,6 +588,7 @@ function render(now) {
 
 let prev = performance.now(), frames = 0, acc = 0;
 function loop(now) {
+  if (ctxLost) return;                                     // contexto perdido: se detiene el bucle
   const dt = Math.min((now - prev) / 1000, 0.1);
   prev = now;
   if (ui.orbit.checked && now - lastTouch > 2500) cam.yaw += dt * 0.07;

@@ -160,7 +160,8 @@
 "use strict";
 const canvas = document.getElementById("c");
 const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true, antialias: false });
-canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); const n = document.getElementById("nogl"); n.textContent = "Se perdió el contexto gráfico. Recarga la página."; n.style.display = "flex"; });
+let ctxLost = false;
+canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); ctxLost = true; const n = document.getElementById("nogl"); n.textContent = "Se perdió el contexto gráfico. Recarga la página."; n.style.display = "grid"; document.getElementById("panel").style.display = "none"; });
 
 if (!gl) {
   document.getElementById("nogl").style.display = "grid";
@@ -290,6 +291,7 @@ function draw() {
 
 let last = performance.now(), frames = 0, acc = 0;
 function loop(now) {
+  if (ctxLost) return;                                     // contexto perdido: se detiene el bucle
   const dt = (now - last) / 1000; last = now;
   if (state.anim > 0) { state.time += dt * state.anim * 0.25; dirty = true; }
   if (dirty) {
@@ -623,7 +625,7 @@ canvas.addEventListener("wheel", e => {
   const [bx, by] = toComplex(e.clientX, e.clientY);
   const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1);   // Firefox envía líneas, no píxeles
   const k = Math.exp(dy * 0.0015);
-  state.scale = Math.min(Math.max(state.scale * k, Math.max(MIN_SCALE, canvas.height * 1.5e-7)), 6);   // el límite sube si el lienzo es más alto
+  state.scale = Math.min(Math.max(state.scale * k, MIN_SCALE), 6);
   const [ax, ay] = toComplex(e.clientX, e.clientY);       // mantener fijo el punto bajo el cursor
   state.cx += bx - ax; state.cy += by - ay;
   changed();

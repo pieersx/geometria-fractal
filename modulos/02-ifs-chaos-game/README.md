@@ -6,7 +6,7 @@
 ## Qué hace
 
 - **Helecho de Barnsley:** IFS de 4 transformaciones afines con probabilidades (0,01 · 0,85 · 0,07 · 0,07).
-- **Triángulo de Sierpinski** por juego del caos: se elige al azar uno de 3 vértices y se mueve el punto a una fracción r de su posición anterior (recorre 1 − r del camino hacia él).
+- **Triángulo de Sierpinski** por juego del caos: se elige al azar uno de 3 vértices y se deja el punto a una fracción r de su distancia anterior al vértice (recorre 1 − r del camino hacia él).
 - **Alfombra de Sierpinski** con 8 vértices y r = 1/3.
 - Deslizador de **razón de contracción r**: con r mayor que el límite (1/2 en el triángulo, 1/3 en la alfombra) las copias se solapan y el fractal se llena. La app lo avisa.
 - Número de puntos de 1 000 a 5 millones; se descartan los 20 primeros y la imagen se acumula como densidad con escala logarítmica.
