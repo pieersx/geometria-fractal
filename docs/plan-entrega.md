@@ -8,7 +8,7 @@ Documento vivo: se actualiza al cerrar cada tarea. Estado al 26/11/2026 (revisi�
 | Entregable | Meta | Estado |
 |---|---|---|
 | Informe (APA) | 25–30 páginas, con capturas, 1–2 fórmulas y un diagrama por capítulo. Sin relleno. | PDF regenerado el 26/11 (46 páginas con portada, índices y anexo de la bitácora), con capturas reales. Falta la revisión de APA y ortografía |
-| Presentación | 14–17 diapositivas, poco texto y una imagen grande por diapositiva. PDF para compartir. | PDF regenerado el 26/11: 17 diapositivas para exponer (dentro de la meta de 14–17) y 14 de anexo de respaldo, 31 páginas en total. Faltan el enlace y el QR del video |
+| Presentación | 14–17 diapositivas, poco texto y una imagen grande por diapositiva. PDF para compartir. | PDF regenerado el 26/11: 18 diapositivas para exponer (una más que la meta de 14–17, por la de vocabulario) y 14 de anexo de respaldo, 32 páginas en total. Faltan el enlace y el QR del video |
 | Aplicación | 5 módulos funcionando | Los 5 módulos están integrados en `main` y revisados (código, textos y datos del informe). Falta la prueba en el equipo de la exposición |
 | Video | 1 video de 2–3 minutos con recorrido por los 5 módulos | No existe |
 | Bitácora de IA | Fecha, hora real, herramienta y tema de cada uso | Horas en `__:__` |
@@ -107,7 +107,7 @@ Una línea por persona, actualizada al cerrar cada tarea. Los commits y las rama
 | Cierre y conclusiones | Camila | 2 min |
 | Preguntas | Todos | resto |
 
-Diapositivas: 17 para exponer más un anexo de respaldo (no se expone), con el módulo en una diapositiva y la demo en vivo. Cada integrante debe poder explicar su algoritmo sin leer.
+Diapositivas: 18 para exponer más un anexo de respaldo (no se expone), con el módulo en una diapositiva y la demo en vivo. Cada integrante debe poder explicar su algoritmo sin leer.
 
 ## 12. Decisión: el modo «paso a paso» solo en el módulo 1
 

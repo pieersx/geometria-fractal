@@ -1,6 +1,6 @@
 # Guion de la exposición (20 minutos)
 
-**Presentación:** [geometria-fractal-presentacion.pdf](geometria-fractal-presentacion.pdf) · 17 diapositivas para exponer + 14 de anexo (31 páginas) · **Fecha: 02/12/2026**
+**Presentación:** [geometria-fractal-presentacion.pdf](geometria-fractal-presentacion.pdf) · 18 diapositivas para exponer + 14 de anexo (32 páginas) · **Fecha: 02/12/2026**
 
 Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea en una frase → ejemplo con números pequeños → qué se ve en la app*.
 
@@ -9,46 +9,48 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 | Diap. | Contenido | Quién | Tiempo |
 |---|---|---|---|
 | 1 | Portada y agenda | Camila | 1:00 |
-| 2 | ¿Qué es un fractal? | Camila | 1:30 |
-| 3 | Cinco técnicas, una aplicación | Camila | 1:00 |
-| 4–5 | Módulo 1: Mandelbrot y Julia | Pieers | 3:30 |
-| 6 | Módulo 2: IFS y juego del caos | Emily | 2:00 |
-| 7–8 | Módulo 3: L-systems (2D, paso a paso y 3D) | Valeria | 2:30 |
-| 9–10 | Módulo 4: terreno fractal | Keyla | 2:30 |
-| 11 | Módulo 5: box-counting | Rodrigo | 2:00 |
-| 12 | Hilo conductor: la curva de Koch | Rodrigo | 1:00 |
-| 13 | Demostración en vivo | Pieers | 1:30 |
-| 14–15 | Fortalezas, debilidades y conclusiones | Camila | 1:30 |
-| 16–17 | Referencias y preguntas | Todos | resto |
+| 2 | ¿Qué es un fractal? | Camila | 1:00 |
+| 3 | Cinco palabras que vamos a usar | Camila | 1:00 |
+| 4 | Cinco técnicas, una aplicación | Camila | 0:30 |
+| 5–6 | Módulo 1: Mandelbrot y Julia | Pieers | 3:30 |
+| 7 | Módulo 2: IFS y juego del caos | Emily | 2:00 |
+| 8–9 | Módulo 3: L-systems (2D, paso a paso y 3D) | Valeria | 2:30 |
+| 10–11 | Módulo 4: terreno fractal | Keyla | 2:30 |
+| 12 | Módulo 5: box-counting | Rodrigo | 2:00 |
+| 13 | Hilo conductor: la curva de Koch | Rodrigo | 1:00 |
+| 14 | Demostración en vivo | Pieers | 1:30 |
+| 15–16 | Fortalezas, debilidades y conclusiones | Camila | 1:30 |
+| 17–18 | Referencias y preguntas | Todos | resto |
 | | **Total** | | **≈ 20:00** |
 
-📌 Ensayar el 01/12 **con cronómetro**. Si una persona pasa de su tiempo, se recorta la diapositiva 11 o la 12, nunca la demo (13).
+📌 Ensayar el 01/12 **con cronómetro**. Si una persona pasa de su tiempo, se recorta la diapositiva 12 o la 13, nunca la demo (14).
 
-📌 **Anexo (páginas 18 a 31):** no se expone. Es para consultar si el profe pregunta («¿cómo se calcula?») y para quien lea el PDF después. Índice en la página 18.
+📌 **Anexo (páginas 19 a 32):** no se expone. Es para consultar si el profe pregunta («¿cómo se calcula?») y para quien lea el PDF después. Índice en la página 19.
 
 ---
 
-## Diapositivas 2–3 · Camila
+## Diapositivas 2–4 · Camila
 
 **Mensaje:** un fractal es una forma que se repite a escalas distintas y que sale de reglas muy cortas.
 
 - **Autosimilitud:** una parte se parece al todo (una rama, un helecho, la costa).
 - **Dimensión fraccionaria:** una curva muy irregular ocupa más que una línea (D = 1) pero menos que un plano (D = 2).
 - Mandelbrot (1967) mostró que la longitud de una costa depende de la regla con que se mide.
+- **Diapositiva 3 (vocabulario):** leer las cinco palabras con un ejemplo cada una y avisar de que vuelven en los módulos. Es lo que permite a quien escucha seguir a los demás: *autosimilitud* (una rama se parece al árbol), *iteración* (repetir la regla con el resultado anterior), *atractor* (la figura a la que llegan los puntos), *generación* (una pasada de reglas sobre el texto) y *dimensión fractal* (cuánto espacio llena una forma).
 
-## Diapositivas 4–5 · Pieers (módulo 1)
+## Diapositivas 5–6 · Pieers (módulo 1)
 
 **Mensaje:** se repite una fórmula sencilla y se pinta cada punto según si «escapa» o no.
 
 - **Fórmula:** $z \to z^2 + c$. En Mandelbrot se parte de $z = 0$ y se varía $c$. En Julia se fija $c$ y se varía el punto inicial.
 - **Ejemplo con números:** con $c = 1$: $0 \to 1 \to 2 \to 5 \to 26$ crece sin parar, así que **escapa**. Con $c = -1$: $0 \to -1 \to 0 \to -1$ se queda acotado, así que **pertenece al conjunto**.
 - **Por qué |z| > 2:** si $|z|$ supera 2 (con $|c| \le 2$), la sucesión diverge con seguridad. Es el radio de escape.
-- **En la app:** cada píxel se calcula en paralelo en la GPU (WebGL). Se puede hacer zoom y cambiar *c* en vivo (diapositiva 5).
-- **Cómo se forma (anexo A1, página 19; se muestra en vivo en la demo):** con «Construir desde cero» se parte de todo negro y cada iteración añade una capa; con «Órbita de un punto» se ve la sucesión *z*₀, *z*₁, *z*₂… salir de la circunferencia |*z*| = 2.
+- **En la app:** cada píxel se calcula en paralelo en la GPU (WebGL). Se puede hacer zoom y cambiar *c* en vivo (diapositiva 6).
+- **Cómo se forma (anexo A1, página 20; se muestra en vivo en la demo):** con «Construir desde cero» se parte de todo negro y cada iteración añade una capa; con «Órbita de un punto» se ve la sucesión *z*₀, *z*₁, *z*₂… salir de la circunferencia |*z*| = 2.
 - **Límite que mostramos:** con `float32` el zoom profundo se pixela y la app avisa (Figura 2.7 del informe).
-- **Ejemplo con números** de respaldo: anexo A2 (página 20). **CPU frente a GPU:** anexo A3 (página 21).
+- **Ejemplo con números** de respaldo: anexo A2 (página 21). **CPU frente a GPU:** anexo A3 (página 22).
 
-## Diapositiva 6 · Emily (módulo 2) — *ajustar al terminar el módulo*
+## Diapositiva 7 · Emily (módulo 2) — *ajustar al terminar el módulo*
 
 **Mensaje:** un punto que salta al azar acaba dibujando una figura exacta.
 
@@ -57,7 +59,7 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 - **Helecho de Barnsley:** 4 transformaciones con probabilidades distintas (≈ 1 %, 85 %, 7 %, 7 %). Una hace el tronco, otra el helecho entero reducido y subido un poco, y dos las hojas izquierda y derecha.
 - **En la app:** elegir el fractal, la razón de contracción r (triángulo y alfombra), el número de puntos y colorear según la regla que dibujó cada punto.
 
-## Diapositivas 7–8 · Valeria (módulo 3)
+## Diapositivas 8–9 · Valeria (módulo 3)
 
 **Mensaje:** se reescribe un texto y luego se dibuja. Detalle de la demo y preguntas probables: [guion-modulo3.md](guion-modulo3.md).
 
@@ -65,9 +67,9 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 - **Tortuga:** `F` avanza, `+` y `−` giran 60°, `[` y `]` guardan y recuperan posición (así se ramifica una planta).
 - **Dimensión de Koch:** $D = \ln 4 / \ln 3 \approx 1{,}262$.
 - **En la app:** subir las generaciones de Koch, mostrar el **paso a paso** (la pila de `[ ]`), **Ver crecer** el árbol y girar el **árbol 3D** (WebGL).
-- **Diapositiva 8:** paso a paso y curva de Hilbert 3D; cerrar con el crecimiento exponencial (4 096 → 32 768 segmentos).
+- **Diapositiva 9:** paso a paso y curva de Hilbert 3D; cerrar con el crecimiento exponencial (4 096 → 32 768 segmentos).
 
-## Diapositivas 9–10 · Keyla (módulo 4)
+## Diapositivas 10–11 · Keyla (módulo 4)
 
 **Mensaje:** un solo parámetro, la rugosidad, controla qué tan áspero es el terreno.
 
@@ -78,16 +80,16 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 - **Semilla:** la misma semilla reproduce el mismo terreno (por defecto 4817).
 - **En la app:** se dibuja en WebGL, con agua, cielo y niebla.
 
-## Diapositivas 11–12 · Rodrigo (módulo 5) — *ajustar al terminar el módulo*
+## Diapositivas 12–13 · Rodrigo (módulo 5) — *ajustar al terminar el módulo*
 
 **Mensaje:** se puede medir qué tan fractal es una imagen contando cajas.
 
 - **Pasos:** binarizar la imagen, cubrirla con cajas de lado ε, contar las cajas ocupadas *N(ε)* y repetir con varios ε.
 - **Por qué log-log:** si $N(\varepsilon) \propto \varepsilon^{-D}$, en escala logarítmica queda una **recta** y su **pendiente** es *D*.
-- **Validación (diap. 12; detalle en el anexo A9 y A10, páginas 27 y 28):** el módulo 5 dibuja Koch con la misma regla F→F+F−−F+F del módulo 3 y la mide. Debe dar cerca de 1,262. También Sierpinski ≈ 1,585.
+- **Validación (diap. 13; detalle en el anexo A9 y A10, páginas 28 y 29):** el módulo 5 dibuja Koch con la misma regla F→F+F−−F+F del módulo 3 y la mide. Debe dar cerca de 1,262. También Sierpinski ≈ 1,585.
 - **Ser honestos:** el resultado depende de la binarización y del rango de ε; un objeto real no es autosimilar hasta el infinito.
 
-## Diapositiva 13 · Pieers (demostración en vivo)
+## Diapositiva 14 · Pieers (demostración en vivo)
 
 1. Pulsar **Modo presentación** en el módulo 1 y avanzar con las flechas (8 escenas: de todo negro al conjunto, la órbita que escapa, el zoom y el vínculo con Julia).
 2. Con **Vista dividida**, una persona del público elige el punto de Mandelbrot y se ve su Julia al instante.
@@ -96,10 +98,10 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 
 ⚠️ **Plan B:** si falla el proyector o el internet, reproducir el video. El propio módulo 1 lo genera con **Grabar video** (archivo `.webm` con el recorrido completo). La app también funciona sin internet abriendo `index.html`.
 
-## Diapositivas 14–15 · Camila (cierre)
+## Diapositivas 15–16 · Camila (cierre)
 
 - Reglas simples producen estructuras complejas.
-- Cada técnica tiene fortalezas y límites propios (diap. 14).
+- Cada técnica tiene fortalezas y límites propios (diap. 15).
 - La aplicación interactiva hace visible lo que la fórmula solo describe.
 - La dimensión fractal conecta la teoría con imágenes reales.
 

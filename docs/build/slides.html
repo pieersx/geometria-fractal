@@ -42,6 +42,7 @@ a { color: #c9a8ff; }
 .tag.ann { background: #1f4a5e; color: #d6f1ff; }
 .agenda { display: flex; gap: 12px; margin-top: 54px; }
 .agenda div { flex: 1; background: #1b1c36; border-radius: 12px; padding: 14px 16px; font-size: 20px; line-height: 1.3; }
+.agenda .resp { display: block; margin-top: 8px; font-size: 16px; color: #a9a6c4; }
 .agenda b { color: #c9a8ff; display: block; font-size: 20px; margin-bottom: 4px; }
 .idx { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
 .idx div { background: #1b1c36; border-radius: 12px; padding: 14px 18px; font-size: 21px; line-height: 1.35; }
@@ -68,11 +69,11 @@ body { counter-reset: sl; }
   <h1 style="margin-top:70px">Geometría fractal:<br>algoritmos y aplicación gráfica interactiva</h1>
   <p class="sub" style="margin-top:26px">Universidad Nacional Mayor de San Marcos · Ingeniería de Sistemas<br>Exposición: 02/12/2026</p>
   <div class="agenda">
-    <div><b>1 · Concepto</b>¿Qué es un fractal?</div>
-    <div><b>2 · Algoritmos</b>Cinco técnicas, cada una con su demo</div>
-    <div><b>3 · Hilo conductor</b>La curva de Koch, de la regla a la medida</div>
-    <div><b>4 · En vivo</b>Demostración con el público</div>
-    <div><b>5 · Cierre</b>Conclusiones y preguntas</div>
+    <div><b>1 · Concepto</b>¿Qué es un fractal? y vocabulario<span class="resp">Camila</span></div>
+    <div><b>2 · Algoritmos</b>Cinco técnicas, cada una con su demo<span class="resp">Pieers · Emily · Valeria · Keyla · Rodrigo</span></div>
+    <div><b>3 · Hilo conductor</b>La curva de Koch, de la regla a la medida<span class="resp">Rodrigo</span></div>
+    <div><b>4 · En vivo</b>Demostración con el público<span class="resp">Pieers</span></div>
+    <div><b>5 · Cierre</b>Conclusiones y preguntas<span class="resp">Camila</span></div>
   </div>
 </section>
 
@@ -84,6 +85,18 @@ body { counter-reset: sl; }
     <div><b>Reglas simples</b>Una fórmula corta produce estructuras de enorme complejidad.</div>
   </div>
   <p style="margin-top:50px">Costas, nubes, montañas y ramas no son círculos ni cuadrados. La geometría fractal les da un lenguaje matemático (Mandelbrot, 1967).</p>
+</section>
+
+<section class="s light">
+  <h2>Cinco palabras que vamos a usar</h2>
+  <div class="flow" style="flex-wrap:wrap">
+    <div style="flex:1 1 30%"><b>Autosimilitud</b>Una parte se parece al todo.</div>
+    <div style="flex:1 1 30%"><b>Iteración</b>Repetir la misma regla usando el resultado anterior.</div>
+    <div style="flex:1 1 30%"><b>Atractor</b>La figura a la que llegan los puntos, sea cual sea el punto de partida.</div>
+    <div style="flex:1 1 30%"><b>Generación</b>Una pasada de las reglas sobre toda la cadena de texto (L-systems).</div>
+    <div style="flex:1 1 30%"><b>Dimensión fractal</b>Cuánto espacio llena una forma: una curva rugosa está entre 1 y 2.</div>
+  </div>
+  <p class="sub" style="margin-top:34px">Cada una vuelve a aparecer en los módulos y se define en los capítulos del informe.</p>
 </section>
 
 <section class="s">
