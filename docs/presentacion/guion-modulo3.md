@@ -1,6 +1,6 @@
 # Guion y guía del módulo 3 · L-systems
 
-Para la exposición del **02/12/2026**. Expone: **Valeria Flores**. Duración de la demo: **3 minutos y medio**.
+Para la exposición del **02/12/2026**. Expone: **Valeria Flores**. Tiempo en la exposición: **2 minutos y medio** (diapositivas 9 y 10 del [guion general](guion-exposicion.md)).
 
 ## 1. Antes de empezar
 
@@ -9,19 +9,17 @@ Para la exposición del **02/12/2026**. Expone: **Valeria Flores**. Duración de
 - Si algo se desordena, el botón **Reiniciar** vuelve al ejemplo original.
 - El panel muestra solo lo esencial. El axioma, las reglas, el paso a paso y la cadena de cada generación están en **⚙ Opciones avanzadas**, que se abre con un clic. Ábrelo solo cuando el guion lo indique y vuelve a cerrarlo.
 
-## 2. Guion de la demostración (3 minutos y medio)
+## 2. Guion de la demostración (2 minutos y medio)
 
 | Tiempo | Acción en pantalla | Qué decir |
 |---|---|---|
-| 0:00 | **Curva de Koch**, generación 0 → subir hasta 4 | «Un L-system es una regla de texto. El axioma es `F`; la regla cambia cada `F` por `F+F−−F+F`. Cada generación reemplaza **todos** los símbolos a la vez.» |
-| 0:30 | Abrir **⚙ Opciones avanzadas** y bajar hasta «Cadena en cada generación» | «Aquí se ve la cadena de cada generación: crece ×4. Por eso la dimensión es ln 4 / ln 3 ≈ 1,262, que aparece en el panel como D.» |
-| 0:50 | En Opciones avanzadas, cambiar el axioma a `F--F--F` | «Solo cambié el punto de partida: ahora son tres curvas sobre un triángulo, el copo de nieve. Perímetro infinito, área finita.» |
-| 1:10 | **Planta ramificada**, generación 2 → en Opciones avanzadas, **👣 Paso a paso** → ▶ | «La tortuga lee la cadena símbolo por símbolo. Con `[` guarda su posición en una pila y con `]` vuelve a ella: así nacen las ramas.» (señalar los círculos azules de la pila; al terminar, pulsar **✕ Salir** y cerrar Opciones avanzadas) |
-| 1:45 | **Árbol en un paisaje** → **▶ Ver crecer** | «El árbol se dibuja en el mismo orden en que se lee la cadena. Con “Ramas por nivel” cambia la regla automáticamente.» (mover el control de 3 a 5) |
-| 2:15 | **Bosque estocástico** → **🎲 Otro** dos veces | «Con reglas estocásticas cada `X` elige al azar entre tres producciones. La semilla hace que el bosque sea reproducible: así se genera vegetación en videojuegos.» |
-| 2:30 | **Árbol 3D** → arrastrar para girar → subir la «Gravedad» | «La misma idea en 3D: la tortuga tiene tres vectores (H, L, U) y gira con `& ^ \ /`. Las ramas son tubos de triángulos que dibuja la GPU con WebGL, como los módulos 1 y 4. El giro de 137,5° es el ángulo áureo; la gravedad curva las ramas.» |
-| 2:50 | **Curva de Hilbert 3D**, generación 3 | «Una sola curva que pasa por los 512 puntos de un cubo sin cruzarse: un fractal que llena el espacio.» |
-| 3:10 | Cierre | «Pocas reglas, mucha estructura: esa es la fuerza de los L-systems. Su debilidad es el crecimiento exponencial; por eso cada ejemplo limita las generaciones.» |
+| 0:00 | **Curva de Koch**, generación 0 → subir hasta 4 | «Un L-system es una regla de texto. El axioma es `F`; la regla cambia cada `F` por `F+F−−F+F`. Cada generación reemplaza **todos** los símbolos a la vez: la cadena crece ×4 y la dimensión es ln 4 / ln 3 ≈ 1,262 (la D del panel).» |
+| 0:30 | **Planta ramificada**, generación 2 → en ⚙ Opciones avanzadas, **👣 Paso a paso** → ▶ | «La tortuga lee la cadena símbolo por símbolo. Con `[` guarda su posición en una pila y con `]` vuelve a ella: así nacen las ramas.» (señalar los círculos azules; al terminar, **✕ Salir** y cerrar Opciones avanzadas) |
+| 1:10 | **Árbol en un paisaje** → **▶ Ver crecer** → «Ramas por nivel» de 3 a 5 | «El árbol se dibuja en el orden en que se lee la cadena. Al cambiar las ramas, la regla se reescribe sola.» |
+| 1:40 | **Árbol 3D** → arrastrar para girar → subir la «Gravedad» | «En 3D la tortuga tiene tres vectores (H, L, U) y gira con `& ^ \ /`. Las ramas son tubos que dibuja la GPU con WebGL. El giro de 137,5° es el ángulo áureo; la gravedad curva las ramas.» |
+| 2:10 | Cierre | «Pocas reglas, mucha estructura: esa es la fuerza de los L-systems. Su debilidad es el crecimiento exponencial: la planta pasa de 4 096 a 32 768 segmentos en una generación.» |
+
+**Si sobra tiempo o en las preguntas:** cambiar el axioma de Koch a `F--F--F` (copo de nieve), **Bosque estocástico** → **🎲 Otro** (vegetación procedural reproducible con la semilla) y **Curva de Hilbert 3D** (una curva que pasa por los 512 puntos de un cubo).
 
 ## 3. Cómo funciona el código (para explicarlo con tus palabras)
 

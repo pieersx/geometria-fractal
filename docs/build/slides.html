@@ -98,7 +98,7 @@ body { counter-reset: sl; }
       <ul>
         <li>Fórmula: <code>z → z² + c</code></li>
         <li>Si |z| supera 2, el punto escapa; si no, es parte del conjunto</li>
-        <li>Cada píxel se calcula en paralelo (WebGL)</li>
+        <li>Cada píxel se calcula en paralelo (WebGL): <b>≈ 40× más rápido</b> que en la CPU a 1080p</li>
         <li>Límite: precisión de 32 bits al hacer zoom</li>
       </ul>
     </div>
@@ -148,21 +148,31 @@ body { counter-reset: sl; }
 </section>
 
 <section class="s">
-  <span class="tag pend">Módulo 3 · En desarrollo</span>
-  <h2>L-systems</h2>
+  <span class="tag">Módulo 3 · L-systems</span>
+  <h2>Reglas de texto que crecen como plantas</h2>
   <div class="row">
     <div class="col">
       <ul>
-        <li>Axioma + reglas que reescriben todos los símbolos a la vez</li>
-        <li>La cadena se dibuja con una tortuga: <code>F</code> avanza, <code>+ −</code> giran, <code>[ ]</code> ramifican</li>
-        <li>Koch: <code>F → F+F−−F+F</code>, 60°</li>
-        <li>La cadena crece exponencialmente con cada generación</li>
+        <li>Axioma + reglas que reescriben <b>todos</b> los símbolos a la vez</li>
+        <li>Una tortuga lee la cadena: <code>F</code> avanza, <code>+ −</code> giran, <code>[ ]</code> ramifican</li>
+        <li>En 3D, <code>&amp; ^ \ /</code> inclinan y rotan la rama (WebGL)</li>
+        <li>Reglas estocásticas: mismas reglas, árboles distintos</li>
       </ul>
     </div>
-    <div class="box">Captura del módulo 3<br>(se añade al terminar)</div>
+    <img class="img" src="../presentacion/capturas/modulo3-arbol3d-limpio.png" alt="Árbol 3D generado con un L-system">
   </div>
   <p class="who">Flores Cortez, Valeria Alexandra</p>
   <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-3.svg" alt="QR módulo 3"></div>
+</section>
+
+<section class="s">
+  <span class="tag">Módulo 3 · Cómo lo lee la tortuga</span>
+  <h2>De la cadena al dibujo, símbolo por símbolo</h2>
+  <div class="duo">
+    <div><img src="../presentacion/capturas/modulo3-paso-a-paso-limpio.png"><p class="cap">Paso a paso: <code>[</code> guarda la posición en una pila y <code>]</code> vuelve a ella</p></div>
+    <div><img src="../presentacion/capturas/modulo3-hilbert3d-limpio.png"><p class="cap">Curva de Hilbert 3D: una sola curva por los 512 puntos del cubo</p></div>
+  </div>
+  <p style="margin-top:8px">La cadena crece <span class="k">exponencialmente</span>: la planta pasa de 4 096 a 32 768 segmentos en una sola generación.</p>
 </section>
 
 <section class="s">

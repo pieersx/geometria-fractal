@@ -7,7 +7,7 @@ Compila en varias pasadas: genera el PDF con números de página provisionales, 
 cada encabezado, figura y tabla (fichas invisibles QQTnQQ) y vuelve a generar con el índice y las listas
 de figuras y tablas ya numerados, hasta que no cambien.
 """
-import html, os, pathlib, re, subprocess, sys, tempfile
+import html, os, pathlib, re, shutil, subprocess, sys, tempfile
 
 BUILD = pathlib.Path(__file__).resolve().parent
 INFORME = BUILD.parent / "informe"
@@ -81,7 +81,8 @@ def paginas_del_pdf(pdf, tmp):
     carpeta.mkdir(exist_ok=True)
     for f in carpeta.glob("*.txt"):
         f.unlink()
-    subprocess.run(["gs", "-q", "-dNOPAUSE", "-dBATCH", "-sDEVICE=txtwrite",
+    gs = shutil.which("gs") or shutil.which("gswin64c") or "gs"
+    subprocess.run([gs, "-q", "-dNOPAUSE", "-dBATCH", "-sDEVICE=txtwrite",
                     f"-sOutputFile={carpeta}/p%03d.txt", str(pdf)], check=True)
     paginas = {}
     for f in sorted(carpeta.glob("p*.txt")):
@@ -91,9 +92,21 @@ def paginas_del_pdf(pdf, tmp):
     return paginas
 
 
+def chrome():
+    """Ruta de Chrome en Linux, macOS o Windows (o la variable de entorno CHROME)."""
+    candidatos = [os.environ.get("CHROME"), shutil.which("google-chrome"), shutil.which("chrome"),
+                  r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                  r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+                  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"]
+    for c in candidatos:
+        if c and pathlib.Path(c).exists():
+            return c
+    sys.exit("No se encontró Google Chrome; define la variable CHROME con su ruta.")
+
+
 def imprimir(html_path, pdf):
-    subprocess.run(["google-chrome", "--headless=new", "--no-sandbox", "--disable-gpu", "--no-pdf-header-footer",
-                    f"--print-to-pdf={pdf}", f"file://{html_path}"], check=True,
+    subprocess.run([chrome(), "--headless=new", "--no-sandbox", "--disable-gpu", "--no-pdf-header-footer",
+                    f"--print-to-pdf={pdf}", pathlib.Path(html_path).as_uri()], check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
