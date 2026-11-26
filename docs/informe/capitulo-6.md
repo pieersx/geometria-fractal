@@ -4,8 +4,6 @@
 **Resumen del capítulo.** El conteo de cajas estima la dimensión fractal de una imagen a partir de la pendiente de $\log N(\varepsilon)$ frente a $\log(1/\varepsilon)$. Se valida con la curva de Koch y el triángulo de Sierpinski.
 :::
 
-> **Estado:** borrador. El módulo 5 está pendiente; el texto describe lo que se planea implementar. **Su responsable debe ajustarlo al terminar.**
-
 ## 6.1 Descripción del algoritmo
 
 La **dimensión fractal** cuantifica cuánto espacio ocupa una forma a distintas escalas. Mandelbrot (1967) usó esta idea para describir la rugosidad de las costas: cuanto más irregular es el contorno, mayor es su dimensión, entre 1 (una curva suave) y 2 (una curva que llena el plano).
@@ -24,11 +22,28 @@ Liebovitch y Toth (1989) describen un algoritmo rápido para este cálculo, que 
 
 ### En la aplicación
 
-El usuario carga una imagen propia; la aplicación la binariza con un umbral ajustable, aplica el conteo de cajas, dibuja la gráfica log-log con la recta de ajuste y muestra el valor estimado de *D*.
+La aplicación trabaja con una imagen de 1 024 × 1 024 píxeles. Puede **generar** una figura de prueba (línea, cuadrado, curva de Koch, triángulo de Sierpinski o una costa) o **cargar una imagen propia**. En una imagen propia el umbral de binarización se calcula con el método de Otsu y se puede mover; una casilla indica si el objeto es oscuro sobre fondo claro y otra permite medir solo el contorno.
+
+Para cada tamaño de caja $s = 2^k$ píxeles se cuentan las cajas que tocan la figura. La aplicación dibuja esas cajas sobre la figura, muestra la gráfica log-log con la recta de ajuste y escribe el valor de *D*, el coeficiente $R^2$ y, en las figuras de prueba, el error respecto a la teoría. El ajuste usa solo $s = 8 \ldots 64$ px: con cajas menores se mide el grosor del trazo, y con cajas mayores la figura cabe en pocas cajas.
+
+La curva de Koch se genera con la misma regla `F → F+F−−F+F` del módulo 3, por lo que la medición cierra el ciclo entre ambos módulos.
 
 ### Validación
 
-Para comprobar el módulo se pueden usar formas de dimensión conocida: una línea recta (*D* ≈ 1), un cuadrado relleno (*D* ≈ 2), la curva de Koch (≈ 1,262) y el triángulo de Sierpinski (≈ 1,585), generadas con los otros módulos.
+Se midieron figuras de dimensión conocida (escalas de 8 a 64 px, imagen de 1 024 px):
+
+| Figura | *D* teórica | *D* medida | Error |
+|---|---|---|---|
+| Línea recta | 1,000 | 0,988 | 1,2 % |
+| Curva de Koch | 1,262 | 1,264 | 0,2 % |
+| Triángulo de Sierpinski | 1,585 | 1,535 | 3,2 % |
+| Cuadrado relleno | 2,000 | 1,936 | 3,2 % |
+
+El coeficiente $R^2$ fue mayor que 0,999 en todos los casos. El error mayor, de 3,2 %, aparece en el triángulo y en el cuadrado. Se debe a que en las cajas grandes la figura ocupa pocas cajas y a que el resultado depende de la posición de la malla.
+
+### Costa generada
+
+La costa se construye por desplazamiento del punto medio, y su rugosidad controla cuánto decae el desplazamiento en cada nivel. Midiendo solo el contorno se obtuvo *D* ≈ 1,44 con rugosidad 0,3, ≈ 1,27 con 0,6 y ≈ 1,10 con 0,9: una costa más irregular tiene mayor dimensión, como describe Mandelbrot (1967). Este valor es una medición empírica, no tiene un teórico con el que compararlo.
 
 ## 6.2 Fortalezas
 
@@ -45,10 +60,14 @@ Para comprobar el módulo se pueden usar formas de dimensión conocida: una lín
 
 ## 6.4 Caso práctico de aplicación
 
-La dimensión fractal se emplea para **caracterizar formas naturales**: líneas de costa, redes de ramificación, texturas de tejidos o de superficies. El caso clásico es la medición de costas (Mandelbrot, 1967). En la aplicación se podrá cargar, por ejemplo, la silueta de un mapa o de una hoja y comparar su dimensión con la de una figura geométrica simple.
+La dimensión fractal se emplea para **caracterizar formas naturales**: líneas de costa, redes de ramificación, texturas de tejidos o de superficies. El caso clásico es la medición de costas (Mandelbrot, 1967). En la aplicación se puede cargar, por ejemplo, la silueta de un mapa o de una hoja, medir solo su contorno y comparar su dimensión con la de una figura geométrica simple.
 
 ## 6.5 Capturas y demostración
 
-- Captura: **[pendiente — módulo 5]**
+![Curva de Koch](../presentacion/capturas/modulo5-koch.png){width=62% nota="Captura propia del módulo 5. Caja de 32 px; D = 1,264 frente al valor teórico 1,262 (error 0,19 %), con R² = 0,9995."}
+
+![Triángulo de Sierpinski](../presentacion/capturas/modulo5-sierpinski.png){width=62% nota="Captura propia. Las cajas turquesa son las que tocan la figura; los puntos naranja son los usados en el ajuste."}
+
+![Costa generada](../presentacion/capturas/modulo5-costa.png){width=62% nota="Captura propia. Contorno de una isla por desplazamiento del punto medio, con rugosidad 0,6."}
 
 <div class="demo"><img src="img/qr-modulo-5.svg" alt="Código QR del módulo 5"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/05-dimension-fractal/</span></p></div>

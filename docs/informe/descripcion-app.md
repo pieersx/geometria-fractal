@@ -18,10 +18,10 @@ El diagrama `arquitectura-app.drawio` resume la estructura: la portada enlaza a 
 |---|---|
 | `index.html` | Portada con enlaces a los módulos |
 | `modulos/01-conjuntos-escape` | Mandelbrot y Julia en WebGL (implementado) |
-| `modulos/02-ifs-chaos-game` | Juego del caos: Sierpinski y helecho (pendiente) |
+| `modulos/02-ifs-chaos-game` | Juego del caos y IFS en Canvas 2D: triángulo y alfombra de Sierpinski y helecho de Barnsley (implementado) |
 | `modulos/03-l-systems` | L-systems en Canvas 2D (Koch, Sierpinski, dragón, plantas, bosque) y en WebGL (árbol y curva de Hilbert 3D) (implementado) |
 | `modulos/04-terreno-fractal` | Terreno 3D con diamond-square en WebGL (implementado) |
-| `modulos/05-dimension-fractal` | Box-counting sobre una imagen cargada (pendiente) |
+| `modulos/05-dimension-fractal` | Box-counting en Canvas 2D sobre figuras de dimensión conocida, una costa generada o una imagen cargada (implementado) |
 | `modulos/_plantilla` | Base común: panel, lienzo, Reiniciar y Guardar PNG |
 
 : Componentes de la aplicación
