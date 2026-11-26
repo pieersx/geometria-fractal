@@ -1,7 +1,7 @@
 # Plan de entrega: informe, presentación y aplicación
 
 **Curso:** Computación Visual · **Grupo 8** · **Exposición: 02/12/2026 (20 minutos)**
-Documento vivo: se actualiza al cerrar cada tarea. Estado al 19/11/2026.
+Documento vivo: se actualiza al cerrar cada tarea. Estado al 26/11/2026.
 
 ## 1. Metas acordadas
 
@@ -9,7 +9,7 @@ Documento vivo: se actualiza al cerrar cada tarea. Estado al 19/11/2026.
 |---|---|---|
 | Informe (APA) | 25–30 páginas, con capturas, 1–2 fórmulas y un diagrama por capítulo. Sin relleno. | Borrador de ~4 800 palabras, sin capturas finales ni PDF |
 | Presentación | 14–17 diapositivas, poco texto y una imagen grande por diapositiva. PDF para compartir. | PDF de avance |
-| Aplicación | 5 módulos funcionando | Módulos 1 y 4 listos; 2, 3 y 5 aún son la plantilla |
+| Aplicación | 5 módulos funcionando | Módulos 1, 3 y 4 integrados en `main`. Módulos 2 y 5 con prototipo listo en `feat/modulo2-chaos-game` y `feat/modulo5-box-counting`, pendientes de PR y de revisión por sus responsables |
 | Video | 1 video de 2–3 minutos con recorrido por los 5 módulos | No existe |
 | Bitácora de IA | Fecha, hora real, herramienta y tema de cada uso | Horas en `__:__` |
 
@@ -48,10 +48,10 @@ Documento vivo: se actualiza al cerrar cada tarea. Estado al 19/11/2026.
 | Persona | Módulo y tareas |
 |---|---|
 | Pachas Auris, Pieers Fernando | Módulo 1 (listo). Capítulo 2. Video demo, PDF de la PPT, bitácora de las sesiones del 18/11. |
-| Cerna Aguilar, Emily Andrea | Módulo 2 (IFS y Chaos Game): helecho de Barnsley y triángulo de Sierpinski. Capítulo 3. |
-| Flores Cortez, Valeria Alexandra | Módulo 3 (L-systems): plantas y curva de Koch. Capítulo 4. |
+| Cerna Aguilar, Emily Andrea | Módulo 2 (IFS y Chaos Game): prototipo listo; **revisarlo, probarlo y explicarlo sin leer**. Capítulo 3 ya ajustado: revisar el texto. |
+| Flores Cortez, Valeria Alexandra | Módulo 3 (L-systems): listo, con modo 3D y paso a paso. Capítulo 4. |
 | Sihuacollo Sierra, Keyla Noemi | Módulo 4 (listo). Capítulo 5. Demo participativa (semilla del terreno). |
-| Puente Carmen, Rodrigo Joaquin | Módulo 5 (box-counting) con validación en fractales de dimensión conocida. Capítulo 6. |
+| Puente Carmen, Rodrigo Joaquin | Módulo 5 (box-counting): prototipo listo y validado; **revisarlo, probarlo con una imagen real y explicarlo sin leer**. Capítulos 6 y 8.2 ya ajustados: revisar el texto. |
 | Bada Watanave, Camila del Rosario | Integración y formato APA/ortografía. Verificación de DOI. Impresión. Abre y cierra la exposición. |
 
 📌 Nadie edita la carpeta de otra persona (ver `CONTRIBUTING.md`).
@@ -109,15 +109,16 @@ Una línea por persona, actualizada al cerrar cada tarea. Los commits y las rama
 
 Diapositivas: 14–17, con el módulo en una diapositiva y la demo en vivo. Cada integrante debe poder explicar su algoritmo sin leer.
 
-## 12. Extras opcionales: modo «paso a paso» en cada módulo
+## 12. Decisión: el modo «paso a paso» solo en el módulo 1
 
-El módulo 1 ya explica cómo se forma cada imagen (construcción por capas, órbita de un punto, recorrido guiado y grabación de video). Si el módulo básico ya funciona, cada responsable puede añadir **un** modo explicativo equivalente. Es opcional: no se exige si el módulo básico no llega.
+Se acordó el 26/11 que el modo explicativo («construir desde cero», órbita de un punto, vista dividida, recorrido guiado y grabación de video) **queda solo en el módulo 1**. Los módulos 2, 4 y 5 se mantienen con pocos controles. El módulo 3 conserva su paso a paso y su modo 3D porque ya estaban terminados y documentados. No se pide nada parecido a los demás módulos.
 
-| Módulo | Responsable | Modo explicativo sugerido |
-|---|---|---|
-| 2 · IFS y juego del caos | Emily | Dibujar los puntos de uno en uno y despacio, resaltando el vértice elegido en cada salto; deslizador de velocidad y de número de puntos |
-| 3 · L-systems | Valeria | Mostrar la cadena y el dibujo generación por generación (0, 1, 2, 3…), con el contador de símbolos que crece como $4^n$ en Koch |
-| 4 · Terreno fractal | Keyla | Animar las rondas de diamond-square de la malla más gruesa a la más fina, mostrando cómo se añade detalle |
-| 5 · Dimensión fractal | Rodrigo | Dibujar la malla de cajas con tamaños decrecientes y la gráfica log-log creciendo punto a punto |
+## 13. Pendientes al 26/11
 
-**Criterio de hecho:** el modo se activa con un botón, se explica en una frase en pantalla y no cambia el comportamiento normal del módulo. Nadie edita la carpeta de otra persona.
+| Tarea | Responsable |
+|---|---|
+| Revisar los prototipos de los módulos 2 y 5, abrir sus PR y fusionarlos en `main` | Emily y Rodrigo, con Pieers |
+| Probar toda la app en el equipo con el que se expone (la app necesita WebGL en los módulos 1, 3 y 4) | Pieers |
+| Regenerar los PDF del informe y de la presentación con los capítulos 3, 6 y 8 ajustados | Pieers y Camila |
+| Completar la bitácora de IA de las sesiones del 26/11 | Pieers |
+| Encuadre más cercano de la isla en el módulo 4 | Keyla |

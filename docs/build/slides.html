@@ -130,7 +130,7 @@ body { counter-reset: sl; }
 </section>
 
 <section class="s">
-  <span class="tag pend">Módulo 2 · En desarrollo</span>
+  <span class="tag">Módulo 2 · IFS y juego del caos</span>
   <h2>IFS y juego del caos</h2>
   <div class="row">
     <div class="col">
@@ -139,9 +139,10 @@ body { counter-reset: sl; }
         <li>Se elige una al azar, se aplica y se dibuja el punto</li>
         <li>Triángulo de Sierpinski: D = ln 3 / ln 2 ≈ 1,585</li>
         <li>Helecho de Barnsley con 4 transformaciones</li>
+        <li>Si la razón de salto r pasa de 1/2, las copias se solapan</li>
       </ul>
     </div>
-    <div class="box">Captura del módulo 2<br>(se añade al terminar)</div>
+    <img class="img" src="../presentacion/capturas/modulo2-helecho.png" alt="Helecho de Barnsley con juego del caos">
   </div>
   <p class="who">Cerna Aguilar, Emily Andrea</p>
   <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-2.svg" alt="QR módulo 2"></div>
@@ -205,17 +206,17 @@ body { counter-reset: sl; }
 </section>
 
 <section class="s">
-  <span class="tag pend">Módulo 5 · En desarrollo</span>
+  <span class="tag">Módulo 5 · Dimensión fractal</span>
   <h2>Medir un fractal: box-counting</h2>
   <div class="row">
     <div class="col">
       <ul>
         <li>Cubrir la imagen con cajas de lado ε y contar las ocupadas, N(ε)</li>
         <li>La pendiente de log N(ε) frente a log(1/ε) estima la dimensión D</li>
-        <li>Validación: Koch ≈ 1,262 y Sierpinski ≈ 1,585</li>
+        <li>Validación: Koch 1,264 (teórica 1,262) y Sierpinski 1,535 (teórica 1,585)</li>
       </ul>
     </div>
-    <div class="box">Captura del módulo 5<br>(se añade al terminar)</div>
+    <img class="img" src="../presentacion/capturas/modulo5-koch.png" alt="Box-counting sobre la curva de Koch">
   </div>
   <p class="who">Puente Carmen, Rodrigo Joaquin</p>
   <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-5.svg" alt="QR módulo 5"></div>
@@ -226,9 +227,9 @@ body { counter-reset: sl; }
   <div class="flow">
     <div><b>Módulo 3</b>La curva se genera con un L-system.</div>
     <div class="ar">→</div>
-    <div><b>Módulo 5</b>La imagen resultante se mide con box-counting.</div>
+    <div><b>Módulo 5</b>La misma regla dibuja la curva y se mide con box-counting.</div>
     <div class="ar">→</div>
-    <div><b>Resultado</b>D teórica = ln 4 / ln 3 ≈ <span class="k">1,262</span>. ¿Cuánto da la app?</div>
+    <div><b>Resultado</b>Teórica ln 4 / ln 3 ≈ 1,262. La app mide <span class="k">1,264</span>: error de 0,2 %.</div>
   </div>
   <p style="margin-top:50px">Así comprobamos que el cálculo es correcto y que los módulos forman un conjunto, no cinco demos sueltas.</p>
 </section>

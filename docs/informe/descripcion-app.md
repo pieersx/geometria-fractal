@@ -4,11 +4,9 @@
 **Resumen del capítulo.** La aplicación es un conjunto de páginas web autocontenidas, una por técnica, con un panel de controles y un lienzo. Cada módulo se puede abrir desde el navegador, sin instalar nada.
 :::
 
-> **Estado:** borrador. Los módulos 1, 3 y 4 están implementados; los módulos 2 y 5 se describen según el diseño acordado.
-
 ## 7.1 Visión general
 
-La aplicación es un conjunto de páginas web interactivas, escritas en **HTML y JavaScript**, que usan **WebGL** en los conjuntos de escape y en el terreno fractal, y que se ejecutan en el navegador sin instalar nada. Una portada (`index.html`) enlaza a cinco módulos independientes, uno por técnica estudiada en el informe.
+La aplicación es un conjunto de páginas web interactivas, escritas en **HTML y JavaScript**, que usan **WebGL** en los conjuntos de escape, en el terreno fractal y en el modo 3D de los L-systems, y que se ejecutan en el navegador sin instalar nada. Una portada (`index.html`) enlaza a cinco módulos independientes, uno por técnica estudiada en el informe.
 
 ## 7.2 Arquitectura
 
@@ -18,10 +16,10 @@ El diagrama `arquitectura-app.drawio` resume la estructura: la portada enlaza a 
 |---|---|
 | `index.html` | Portada con enlaces a los módulos |
 | `modulos/01-conjuntos-escape` | Mandelbrot y Julia en WebGL (implementado) |
-| `modulos/02-ifs-chaos-game` | Juego del caos: Sierpinski y helecho (pendiente) |
+| `modulos/02-ifs-chaos-game` | Juego del caos y IFS en Canvas 2D: triángulo y alfombra de Sierpinski y helecho de Barnsley (implementado) |
 | `modulos/03-l-systems` | L-systems en Canvas 2D (Koch, Sierpinski, dragón, plantas, bosque) y en WebGL (árbol y curva de Hilbert 3D) (implementado) |
 | `modulos/04-terreno-fractal` | Terreno 3D con diamond-square en WebGL (implementado) |
-| `modulos/05-dimension-fractal` | Box-counting sobre una imagen cargada (pendiente) |
+| `modulos/05-dimension-fractal` | Box-counting en Canvas 2D sobre figuras de dimensión conocida, una costa generada o una imagen cargada (implementado) |
 | `modulos/_plantilla` | Base común: panel, lienzo, Reiniciar y Guardar PNG |
 
 : Componentes de la aplicación

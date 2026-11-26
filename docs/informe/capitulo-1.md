@@ -4,8 +4,6 @@
 **Resumen del capítulo.** Se presentan la autosimilitud y la dimensión fraccionaria, un breve recorrido histórico y las cinco técnicas que estudia este informe.
 :::
 
-> **Estado:** borrador.
-
 ## 1.1 ¿Qué es un fractal?
 
 La geometría euclidiana describe bien las formas regulares (rectas, círculos, poliedros), pero resulta insuficiente para modelar costas, nubes, montañas o ramificaciones vegetales. La geometría fractal ofrece un lenguaje matemático para esas formas irregulares. Aunque no existe una definición única y completa, un fractal se reconoce por dos rasgos: **autosimilitud** y **dimensión fraccionaria**.
