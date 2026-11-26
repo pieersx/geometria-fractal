@@ -37,7 +37,7 @@
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
+<canvas id="c" role="img" aria-label="Imagen analizada y gráfico del conteo de cajas"></canvas>
 
 <div id="panel">
   <a class="back" href="../../">← Portada</a>
@@ -55,7 +55,7 @@
   </select>
 
   <div id="costaCtl" class="hidden">
-    <label>Rugosidad <span class="val" id="vRug"></span></label>
+    <label for="rug">Rugosidad H (más alto = más suave) <span class="val" id="vRug"></span></label>
     <input id="rug" type="range" min="0.3" max="0.9" step="0.01" value="0.6">
   </div>
 
@@ -65,15 +65,15 @@
   </div>
   <input id="file" type="file" accept="image/*" class="hidden">
 
-  <label>Umbral de binarización <span class="val" id="vThr"></span></label>
+  <label for="thr">Umbral de binarización <span class="val" id="vThr"></span></label>
   <input id="thr" type="range" min="1" max="254" step="1" value="128">
   <label class="chk"><input id="inv" type="checkbox"> Objeto oscuro sobre fondo claro</label>
   <label class="chk"><input id="edge" type="checkbox"> Medir solo el contorno</label>
 
-  <label>Tamaño de caja ε <span class="val" id="vK"></span></label>
+  <label for="k">Tamaño de caja ε <span class="val" id="vK"></span></label>
   <input id="k" type="range" min="2" max="8" step="1" value="5">
 
-  <div class="stats"><span id="stats"></span></div>
+  <div class="stats"><span id="stats" aria-live="polite"></span></div>
 
   <div class="row" style="margin-top:12px">
     <button id="reset">Reiniciar</button>
@@ -198,7 +198,7 @@ function otsu() {
     const mB = sB / wB, mF = (sum - sB) / wF, v = wB * wF * (mB - mF) * (mB - mF);
     if (v > best) { best = v; thr = t; }
   }
-  return Math.min(254, Math.max(1, thr));
+  return Math.min(254, Math.max(1, thr + 1)); // t es el último nivel del fondo: la figura empieza en t + 1
 }
 
 function loadImage(img) {
@@ -252,7 +252,7 @@ function countBoxes() {
 function fitLine() {
   const xs = [], ys = [];
   for (let k = FIT_K0; k <= FIT_K1; k++) if (counts[k] > 0) { xs.push(Math.log(N / (1 << k))); ys.push(Math.log(counts[k])); }
-  if (xs.length < 3) return null;
+  if (xs.length < 3 || counts[FIT_K1] < 4) return null; // figura diminuta: N(s) saturado, la pendiente no tiene sentido
   const n = xs.length, mx = xs.reduce((a, b) => a + b) / n, my = ys.reduce((a, b) => a + b) / n;
   let sxy = 0, sxx = 0, syy = 0;
   for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; syy += (ys[i] - my) ** 2; }
@@ -351,7 +351,7 @@ function render() {
   let html;
   if (!fit) html = "<b>No hay suficiente figura para medir.</b> Ajusta el umbral o marca/desmarca «Objeto oscuro».";
   else {
-    html = `<span class="big">D ≈ ${fmt(fit.D)}</span>R² = ${fmt(fit.r2, 4)} · pendiente de ${FIT_K1 - FIT_K0 + 1} escalas<br>` +
+    html = `<span class="big">D ≈ ${fmt(fit.D)}</span>R² = ${fmt(fit.r2, 4)} · escalas s = ${1 << FIT_K0}…${1 << FIT_K1} px<br>` +
            `N(${s} px) = <b>${counts[k].toLocaleString("es")}</b> cajas<br>`;
     html += th ? `Valor teórico <b>${fmt(th)}</b> · error <b>${fmt(Math.abs(fit.D - th) / th * 100, 2)} %</b>` : "Sin valor teórico: es una medición empírica.";
   }

@@ -51,8 +51,8 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 
 - **Juego del caos (Sierpinski):** tres vértices. Se elige uno al azar y el punto salta a la **mitad** del camino. Se repite miles de veces y aparece el triángulo.
 - **Dimensión:** $D = \ln 3 / \ln 2 \approx 1{,}585$.
-- **Helecho de Barnsley:** 4 transformaciones con probabilidades distintas (≈ 1 %, 85 %, 7 %, 7 %). Una hace el tallo, otra las hojas sucesivas y dos las hojas laterales.
-- **En la app:** elegir fractal, número de puntos y velocidad de dibujo.
+- **Helecho de Barnsley:** 4 transformaciones con probabilidades distintas (≈ 1 %, 85 %, 7 %, 7 %). Una hace el tronco, otra el helecho entero reducido y subido un poco, y dos las hojas izquierda y derecha.
+- **En la app:** elegir el fractal, la razón de contracción r (triángulo y alfombra), el número de puntos y colorear según la regla que dibujó cada punto.
 
 ## Diapositivas 9–10 · Valeria (módulo 3)
 
@@ -81,7 +81,7 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 
 - **Pasos:** binarizar la imagen, cubrirla con cajas de lado ε, contar las cajas ocupadas *N(ε)* y repetir con varios ε.
 - **Por qué log-log:** si $N(\varepsilon) \propto \varepsilon^{-D}$, en escala logarítmica queda una **recta** y su **pendiente** es *D*.
-- **Validación (diap. 14):** generar Koch con el módulo 3 y medirlo con el módulo 5. Debe dar cerca de 1,262. También Sierpinski ≈ 1,585.
+- **Validación (diap. 14):** el módulo 5 dibuja Koch con la misma regla F→F+F−−F+F del módulo 3 y la mide. Debe dar cerca de 1,262. También Sierpinski ≈ 1,585.
 - **Ser honestos:** el resultado depende de la binarización y del rango de ε; un objeto real no es autosimilar hasta el infinito.
 
 ## Diapositiva 15 · Pieers (demostración en vivo)

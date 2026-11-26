@@ -20,7 +20,7 @@ Términos que usamos con un solo significado en la aplicación y en el informe.
 - **IFS (sistema de funciones iteradas):** conjunto finito de transformaciones contractivas cuyo atractor es el fractal.
 - **Atractor:** conjunto al que se aproximan los puntos al aplicar el IFS una y otra vez, sea cual sea el punto inicial.
 - **Juego del caos:** algoritmo que dibuja el atractor eligiendo al azar una transformación en cada paso y aplicándola al punto actual.
-- **Razón de salto (r):** fracción del camino que recorre el punto hacia el vértice elegido en el juego del caos de un polígono.
+- **Razón de contracción (r):** fracción de su posición anterior en la que queda el punto tras cada paso, medida desde el vértice elegido: x' = r·x + (1 − r)·v. El punto recorre 1 − r del camino hacia el vértice.
 - **Solape:** situación en que las copias reducidas del fractal se superponen porque r es demasiado grande; la dimensión de semejanza deja de valer.
 - **Dimensión de semejanza:** ln n / ln(1/r), con n copias reducidas por la razón r y sin solape. Es el caso de la dimensión teórica en fractales autosemejantes.
 
