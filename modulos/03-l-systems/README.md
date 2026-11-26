@@ -12,7 +12,7 @@ Base de Valeria (árbol con ramas por nivel e irregularidad), rediseñada con el
 - Nueve ejemplos: curva y copo de Koch, triángulo de Sierpinski, curva del dragón, planta, árbol en un paisaje, bosque estocástico, **árbol 3D** y **curva de Hilbert 3D**.
 - **Modo 3D (WebGL):** tortuga con vectores H, L, U (`& ^` inclinan, `\ /` rotan sobre el eje), ramas como tubos iluminados, tropismo, hojas, viento en el *vertex shader* y cámara orbital.
 - **Paso a paso:** lee la cadena símbolo por símbolo, explica cada acción y muestra la pila.
-- Controles: generaciones, ángulo, ramas por nivel, número de árboles, irregularidad, viento, semilla, hojas y paisaje.
+- Panel mínimo: ejemplo, generaciones, ángulo y un control propio de cada ejemplo (ramas por nivel, otro bosque o gravedad). El resto (axioma, reglas, irregularidad, viento, semilla, hojas, paisaje, giro sobre el eje, paso a paso y cadena por generación) está en **⚙ Opciones avanzadas**, plegado por defecto.
 - **Ver crecer:** anima la tortuga en el orden en que lee la cadena.
 - Zoom y arrastre con ratón, gestos táctiles o teclado (flechas, + / − y 0); exportación a PNG.
 - Muestra símbolos, segmentos, hojas, la cadena de cada generación y la dimensión teórica de los fractales geométricos.

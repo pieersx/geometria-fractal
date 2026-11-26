@@ -40,7 +40,8 @@
   .val { float: right; color: var(--text); font-variant-numeric: tabular-nums; }
   .check { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; color: var(--text); cursor: pointer; }
   .check input { accent-color: var(--accent); margin: 0; }
-  .desc { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+  .ctx { display: none; }
+  details#adv label:first-of-type { margin-top: 10px; }
   .sym { color: var(--muted); font-size: 11.5px; margin-top: 6px; line-height: 1.5; }
   .sym code, .code { font-family: ui-monospace, Consolas, monospace; color: var(--text); }
   #warn { color: var(--accent); display: none; margin-top: 8px; font-size: 12px; }
@@ -54,12 +55,10 @@
   .code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; background: #0f131b; border: 1px solid var(--line);
     border-radius: 8px; padding: 8px; font-size: 11.5px; line-height: 1.55; margin-top: 6px; }
   .hint { margin-top: 10px; color: var(--muted); font-size: 12px; }
-  .veg, .geo, .d3 { display: none !important; }
-  body.is-veg .veg, body.is-geo .geo, body.is-3d .d3 { display: block !important; }
-  body.is-veg label.check.veg { display: flex !important; }
-  body.is-3d span.d3 { display: inline !important; }
-  body.is-3d .d3 label.check { display: flex; }
-  #treeOnly, #forestOnly { display: none; }
+  .veg, .d3 { display: none; }
+  body.is-veg .veg, body.is-3d .d3 { display: block; }
+  body.is-3d span.d3 { display: inline; }
+  #forestOnly { display: none; }
   #stepbar { position: fixed; left: 304px; right: 16px; bottom: 16px; background: var(--panel); border: 1px solid var(--line);
     border-radius: 12px; padding: 10px 14px; backdrop-filter: blur(8px); display: none; }
   #stepbar.show { display: block; }
@@ -87,7 +86,7 @@
 
 <div id="panel">
   <h1>Geometría fractal</h1>
-  <div class="sub">Módulo 3 · L-systems (reescritura y tortuga gráfica)</div>
+  <div class="sub">Módulo 3 · L-systems</div>
 
   <label for="preset">Ejemplo</label>
   <select id="preset">
@@ -107,7 +106,6 @@
       <option value="hilbert3d">Curva de Hilbert 3D</option>
     </optgroup>
   </select>
-  <p class="desc" id="desc"></p>
 
   <label for="gen">Generaciones <span class="val" id="vGen"></span></label>
   <input autocomplete="off" id="gen" type="range" min="0" max="7" step="1" value="5">
@@ -115,53 +113,19 @@
   <label for="angle">Ángulo de giro <span class="val" id="vAngle"></span></label>
   <input autocomplete="off" id="angle" type="range" min="0" max="120" step="0.5" value="24">
 
-  <div class="d3">
-    <label for="roll">Giro sobre su eje ( / \ ) <span class="val" id="vRoll"></span></label>
-    <input autocomplete="off" id="roll" type="range" min="0" max="180" step="0.5" value="137.5">
-    <div id="tropBox">
-      <label for="trop">Gravedad (tropismo) <span class="val" id="vTrop"></span></label>
-      <input autocomplete="off" id="trop" type="range" min="-0.3" max="0.4" step="0.01" value="0.12">
-    </div>
-    <label class="check"><input autocomplete="off" id="orbit" type="checkbox" checked> Órbita automática</label>
+  <!-- Un solo control propio de cada ejemplo -->
+  <div id="ctxTree" class="ctx">
+    <label for="branches">Ramas por nivel <span class="val" id="vBranches"></span></label>
+    <input autocomplete="off" id="branches" type="range" min="2" max="6" step="1" value="3">
+  </div>
+  <div id="ctxTrop" class="ctx">
+    <label for="trop">Gravedad <span class="val" id="vTrop"></span></label>
+    <input autocomplete="off" id="trop" type="range" min="-0.3" max="0.4" step="0.01" value="0.12">
   </div>
 
-  <div class="veg">
-    <div id="treeOnly">
-      <label for="branches">Ramas por nivel <span class="val" id="vBranches"></span></label>
-      <input autocomplete="off" id="branches" type="range" min="2" max="6" step="1" value="3">
-    </div>
-    <div id="forestOnly">
-      <label for="trees">Árboles en el bosque <span class="val" id="vTrees"></span></label>
-      <input autocomplete="off" id="trees" type="range" min="2" max="9" step="1" value="5">
-    </div>
-    <label for="irr">Irregularidad <span class="val" id="vIrr"></span></label>
-    <input autocomplete="off" id="irr" type="range" min="0" max="20" step="1" value="8">
-    <label for="wind">Viento <span class="val" id="vWind"></span></label>
-    <input autocomplete="off" id="wind" type="range" min="0" max="1" step="0.05" value="0.35">
-    <label for="seed">Semilla</label>
-    <div class="row">
-      <input autocomplete="off" id="seed" type="number" min="0" max="4294967295" step="1" value="2024">
-      <button id="dice" title="Otra semilla" aria-label="Otra semilla" style="flex:0 0 auto">🎲</button>
-    </div>
-    <label class="check veg"><input autocomplete="off" id="leaves" type="checkbox" checked> Mostrar hojas</label>
-    <label class="check veg"><input autocomplete="off" id="scene" type="checkbox" checked> Mostrar paisaje</label>
-  </div>
-
-  <label for="axiom">Axioma</label>
-  <input autocomplete="off" id="axiom" type="text" value="X" spellcheck="false">
-  <label for="rules">Reglas (una por línea: símbolo=producción)</label>
-  <textarea autocomplete="off" id="rules" spellcheck="false"></textarea>
-  <div class="sym">
-    <code>F G A B</code> avanzar dibujando · <code>f</code> avanzar sin dibujar ·
-    <code>+ −</code> girar · <code>|</code> media vuelta · <code>[ ]</code> guardar / recuperar posición ·
-    otras letras (<code>X</code>, <code>Y</code>) solo se reescriben.
-    Regla estocástica: <code>X(0.5)=F[+X]</code>.
-    <span class="d3" style="display:inline">En 3D: <code>&amp; ^</code> inclinar · <code>\ /</code> rotar sobre su eje · <code>A B C D</code> no dibujan.</span>
-  </div>
-
-  <div class="row" style="margin-top:12px">
+  <div class="row" style="margin-top:14px">
     <button id="grow" class="primary">▶ Ver crecer</button>
-    <button id="step" title="Lee la cadena símbolo por símbolo">👣 Paso a paso</button>
+    <button id="dice" class="ctx" title="Genera otro bosque con una semilla nueva" style="flex:0 0 auto">🎲 Otro</button>
   </div>
   <div class="row" style="margin-top:6px">
     <button id="reset">Reiniciar</button>
@@ -170,24 +134,59 @@
   <div id="warn" role="alert"></div>
 
   <div class="stats">
-    Generación <b id="sGen"></b> · Símbolos <b id="sSym"></b><br>
-    Segmentos <b id="sSeg"></b><span id="sLeafWrap"> · Hojas <b id="sLeaf"></b></span><span id="sTriWrap"> · Triángulos <b id="sTri"></b></span><br>
-    <span id="sDimWrap">Dimensión <b id="sDim"></b> <span id="sDimTxt"></span><br></span>
-    Zoom <b id="sZoom">1×</b> · <span id="sFps"></span>
+    Generación <b id="sGen"></b> · <b id="sSeg"></b> segmentos<span id="sDimWrap"> · D = <b id="sDim"></b></span>
+    <span id="sFps"></span>
   </div>
 
-  <details id="howBox">
-    <summary>¿Cómo funciona?</summary>
-    <p>Se parte del axioma. En cada generación, <b>todas</b> las letras que tienen regla se reemplazan a la vez. Luego una «tortuga» lee la cadena símbolo por símbolo y dibuja.</p>
+  <details id="adv">
+    <summary>⚙ Opciones avanzadas</summary>
+
+    <label for="axiom">Axioma</label>
+    <input autocomplete="off" id="axiom" type="text" value="X" spellcheck="false">
+    <label for="rules">Reglas (una por línea: símbolo=producción)</label>
+    <textarea autocomplete="off" id="rules" spellcheck="false"></textarea>
+    <div class="sym">
+      <code>F G A B</code> avanzar dibujando · <code>f</code> avanzar sin dibujar ·
+      <code>+ −</code> girar · <code>|</code> media vuelta · <code>[ ]</code> guardar / recuperar posición ·
+      otras letras (<code>X</code>, <code>Y</code>) solo se reescriben.
+      Regla estocástica: <code>X(0.5)=F[+X]</code>.
+      <span class="d3">En 3D: <code>&amp; ^</code> inclinar · <code>\ /</code> rotar sobre su eje · <code>A B C D</code> no dibujan.</span>
+    </div>
+
+    <div class="d3">
+      <label for="roll">Giro sobre su eje ( / \ ) <span class="val" id="vRoll"></span></label>
+      <input autocomplete="off" id="roll" type="range" min="0" max="180" step="0.5" value="137.5">
+      <label class="check"><input autocomplete="off" id="orbit" type="checkbox" checked> Órbita automática</label>
+    </div>
+
+    <div class="veg">
+      <div id="forestOnly">
+        <label for="trees">Árboles en el bosque <span class="val" id="vTrees"></span></label>
+        <input autocomplete="off" id="trees" type="range" min="2" max="9" step="1" value="5">
+      </div>
+      <label for="irr">Irregularidad <span class="val" id="vIrr"></span></label>
+      <input autocomplete="off" id="irr" type="range" min="0" max="20" step="1" value="8">
+      <label for="wind">Viento <span class="val" id="vWind"></span></label>
+      <input autocomplete="off" id="wind" type="range" min="0" max="1" step="0.05" value="0.35">
+      <label for="seed">Semilla</label>
+      <input autocomplete="off" id="seed" type="number" min="0" max="4294967295" step="1" value="2024">
+      <label class="check"><input autocomplete="off" id="leaves" type="checkbox" checked> Mostrar hojas</label>
+      <label class="check"><input autocomplete="off" id="scene" type="checkbox" checked> Mostrar paisaje</label>
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <button id="step" title="Lee la cadena símbolo por símbolo">👣 Paso a paso</button>
+    </div>
+
+    <div class="stats">
+      Símbolos <b id="sSym"></b><span id="sLeafWrap"> · Hojas <b id="sLeaf"></b></span><span id="sTriWrap"> · Triángulos <b id="sTri"></b></span><br>
+      Zoom <b id="sZoom">1×</b> <span id="sDimTxt"></span>
+    </div>
+    <div class="sym" style="margin-top:8px">Cadena en cada generación:</div>
     <span class="code" id="seq"></span>
   </details>
-  <details>
-    <summary>¿Para qué sirve?</summary>
-    <p id="use"></p>
-    <p>Referencia: Lindenmayer (1968). Las hojas, el grosor y el paisaje son añadidos gráficos, no simulación biológica.</p>
-  </details>
 
-  <div class="hint">Arrastrar: mover · Rueda o pellizco: zoom · Teclas: flechas, + / − y 0 · <a href="../../">← Portada</a></div>
+  <div class="hint">Arrastrar: mover (en 3D, girar) · Rueda: zoom · <a href="../../">← Portada</a></div>
 </div>
 
 <div id="stepbar" aria-live="polite">
@@ -241,42 +240,33 @@ const LN = Math.log;
 const PRESETS = {
   koch: { veg: false, axiom: "F", rules: "F=F+F--F+F", angle: 60, gen: 4, maxGen: 7, heading: 0,
     dim: [LN(4) / LN(3), "(ln 4 / ln 3)"],
-    desc: "Cada segmento se cambia por cuatro de un tercio de su largo. Es autosimilar.",
-    use: "Ejemplo clásico de autosimilitud: su longitud crece ×4/3 en cada generación y tiende a infinito, aunque ocupa una región acotada. Se usa para explicar la dimensión fractal y para generar contornos y motivos geométricos." },
+    desc: "Cada segmento se cambia por cuatro de un tercio de su largo. Es autosimilar." },
   copo: { veg: false, axiom: "F--F--F", rules: "F=F+F--F+F", angle: 60, gen: 4, maxGen: 6, heading: 0,
     dim: [LN(4) / LN(3), "(ln 4 / ln 3)"],
-    desc: "Tres curvas de Koch sobre un triángulo: perímetro infinito, área finita.",
-    use: "El axioma cambia (un triángulo) pero la regla es la misma que la curva de Koch: basta modificar el punto de partida para obtener otra figura. Su área converge a 8/5 del triángulo inicial." },
+    desc: "Tres curvas de Koch sobre un triángulo: perímetro infinito, área finita." },
   sierpinski: { veg: false, axiom: "A", rules: "A=B-A-B\nB=A+B+A", angle: 60, gen: 6, maxGen: 10, heading: 0,
     dim: [LN(3) / LN(2), "(ln 3 / ln 2)"],
-    desc: "Una sola curva continua que se acerca al triángulo de Sierpinski (punta de flecha).",
-    use: "El mismo fractal del módulo 2 (IFS) obtenido aquí por reescritura de cadenas: dos métodos distintos llegan al mismo conjunto límite." },
+    desc: "Una sola curva continua que se acerca al triángulo de Sierpinski (punta de flecha)." },
   dragon: { veg: false, axiom: "FX", rules: "X=X+YF+\nY=-FX-Y", angle: 90, gen: 12, maxGen: 16, heading: 0,
     dim: [2, "(llena una región del plano)"],
-    desc: "Equivale a doblar una tira de papel por la mitad una y otra vez y abrirla en ángulos rectos.",
-    use: "Muestra que las letras sin dibujo (X, Y) sirven como «memoria» de la gramática. La curva nunca se cruza a sí misma y sus copias encajan como baldosas." },
+    desc: "Equivale a doblar una tira de papel por la mitad una y otra vez y abrirla en ángulos rectos." },
   planta: { veg: true, style: "plant", axiom: "F", rules: "F=FF+[+F-F-F]-[-F+F+F]", angle: 22.5, gen: 4, maxGen: 6, heading: 90,
     irr: 2, wind: 0.2, leaves: false, scene: false, leafDepth: 2,
-    desc: "Los corchetes guardan y recuperan la posición: así nacen las ramas.",
-    use: "Con una sola regla se obtiene la silueta de un arbusto. Es la base de la vegetación procedural: pocas reglas, mucha variedad." },
+    desc: "Los corchetes guardan y recuperan la posición: así nacen las ramas." },
   arbol: { veg: true, style: "bark", axiom: "X", rules: null, angle: 24, gen: 5, maxGen: 7, heading: 90,
     irr: 8, wind: 0.35, leaves: true, scene: true, branches: 3, leafDepth: 2,
-    desc: "Elige cuántas ramas nacen en cada nivel. La irregularidad le quita rigidez.",
-    use: "Vegetación para videojuegos y cine: el L-system construye el esqueleto ramificado; el grosor, las hojas, el viento y el paisaje son mejoras gráficas, no una simulación del crecimiento real." },
+    desc: "Elige cuántas ramas nacen en cada nivel. La irregularidad le quita rigidez." },
   bosque: { veg: true, style: "bark", axiom: "X",
     rules: "X(0.34)=F[+X][-X]FX\nX(0.33)=F[+X]F[-X]+X\nX(0.33)=F[-X]F[+X]-X\nF=FF",
     angle: 25, gen: 5, maxGen: 6, heading: 90, irr: 10, wind: 0.35, leaves: true, scene: true, trees: 5, leafDepth: 2,
-    desc: "Reglas estocásticas: cada X elige al azar una de tres producciones. Cada árbol usa otra semilla.",
-    use: "Así se pueblan escenarios enteros: las mismas reglas dan árboles distintos pero de la misma «especie». La semilla hace que el bosque sea reproducible." },
+    desc: "Reglas estocásticas: cada X elige al azar una de tres producciones. Cada árbol usa otra semilla." },
   arbol3d: { veg: true, d3: true, style: "bark", axiom: "FFFFFFFA", rules: "A=FF[&FA]/[&FA]/[&FA]",
     angle: 30, roll: 137.5, trop: 0.12, gen: 6, maxGen: 8, heading: 90, irr: 6, wind: 0.35, leaves: true, scene: true, leafDepth: 4,
-    desc: "Tortuga 3D: & ^ inclinan la rama y / \\ la rotan sobre su eje. Dibujado en la GPU con WebGL.",
-    use: "La misma reescritura, ahora con orientación 3D (vectores H, L, U). El giro de 137,5° (ángulo áureo) reparte las ramas alrededor del tronco, como en la filotaxis de muchas plantas. La gravedad (tropismo) curva las ramas hacia abajo." },
+    desc: "Tortuga 3D: & ^ inclinan la rama y / \\ la rotan sobre su eje. Dibujado en la GPU con WebGL." },
   hilbert3d: { veg: false, d3: true, axiom: "A",
     rules: "A=B-F+CFC+F-D&F^D-F+&&CFC+F+B//\nB=A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//\nC=|D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//\nD=|CFB-F+B|FA&F^A&&FB-F+B|FC//",
     angle: 90, roll: 90, trop: 0, gen: 3, maxGen: 4, heading: 90, dim: [3, "(llena el cubo)"],
-    desc: "Una sola curva que recorre las 8ⁿ celdas de un cubo sin cruzarse nunca.",
-    use: "Curva que llena el espacio: en la generación n visita los 8ⁿ puntos de una cuadrícula cúbica una sola vez. Su versión 2D se usa para ordenar datos espaciales (índices en bases de datos y caché de texturas)." }
+    desc: "Una sola curva que recorre las 8ⁿ celdas de un cubo sin cruzarse nunca." }
 };
 const has3d = !!document.createElement("canvas").getContext("webgl");
 
@@ -788,10 +778,8 @@ function updateStats() {
   $("sTriWrap").style.display = "none";
   const p = P(), showDim = p.dim && !state.edited;
   $("sDimWrap").style.display = showDim ? "inline" : "none";
-  if (showDim) {
-    $("sDim").textContent = p.dim[0] === 2 ? "2" : p.dim[0].toFixed(3).replace(".", ",");
-    $("sDimTxt").textContent = p.dim[1];
-  }
+  if (showDim) $("sDim").textContent = p.dim[0] === 2 ? "2" : p.dim[0].toFixed(3).replace(".", ",");
+  $("sDimTxt").textContent = showDim ? "· D " + p.dim[1] : "";
   $("sZoom").textContent = (view.zoom < 10 ? view.zoom.toFixed(1) : Math.round(view.zoom)) + "×";
 }
 
@@ -1269,7 +1257,8 @@ function updateStats3(limit) {
   $("sTri").textContent = fmt(g3.tris);
   const p = P(), showDim = p.dim && !state.edited;
   $("sDimWrap").style.display = showDim ? "inline" : "none";
-  if (showDim) { $("sDim").textContent = String(p.dim[0]); $("sDimTxt").textContent = p.dim[1]; }
+  if (showDim) $("sDim").textContent = String(p.dim[0]);
+  $("sDimTxt").textContent = showDim ? "· D " + p.dim[1] : "";
   $("sZoom").textContent = view3.zoom.toFixed(1) + "×";
 }
 
@@ -1288,15 +1277,16 @@ function choose(name) {
   $("gen").max = p.maxGen;
   for (const id of ["gen", "angle", "axiom", "rules", "branches", "trees", "irr", "wind", "roll", "trop"]) $(id).value = state[id];
   $("leaves").checked = state.leaves; $("scene").checked = state.scene; $("orbit").checked = state.orbit;
-  $("desc").textContent = p.desc; $("use").textContent = p.use;
+  $("preset").title = p.desc;
   document.body.classList.toggle("is-veg", p.veg);
   document.body.classList.toggle("is-geo", !p.veg);
   document.body.classList.toggle("is-3d", !!p.d3);
   canvas.style.display = p.d3 ? "none" : "block";
   glc.style.display = p.d3 ? "block" : "none";
-  $("treeOnly").style.display = name === "arbol" ? "block" : "none";
+  $("ctxTree").style.display = name === "arbol" ? "block" : "none";
+  $("ctxTrop").style.display = name === "arbol3d" ? "block" : "none";
+  $("dice").style.display = name === "bosque" ? "block" : "none";
   $("forestOnly").style.display = name === "bosque" ? "block" : "none";
-  $("tropBox").style.display = p.veg ? "block" : "none";
   stopGrow();
   setStepMode(false);
   const noStep = name === "bosque" || !!p.d3;
@@ -1436,6 +1426,7 @@ if (!has3d) for (const v of ["arbol3d", "hilbert3d"]) {
 }
 
 window.addEventListener("resize", requestDraw);
+$("adv").addEventListener("toggle", requestDraw);   // en el celular el panel cambia de alto
 document.addEventListener("visibilitychange", () => { if (!document.hidden) requestDraw(); });
 
 /* ---------- Arranque ---------- */
