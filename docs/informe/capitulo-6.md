@@ -85,4 +85,4 @@ La dimensión fractal se emplea para **caracterizar formas naturales**: líneas 
 
 ![Costa generada](../presentacion/capturas/modulo5-costa.png){width=62% nota="Captura propia. Contorno de una isla por desplazamiento del punto medio, con rugosidad 0,6."}
 
-<div class="demo"><img src="img/qr-modulo-5.svg" alt="Código QR del módulo 5"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/05-dimension-fractal/</span></p></div>
+<div class="demo"><img src="img/qr-modulo-5.svg" alt="Código QR del módulo 5"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url"><a href="https://pieersx.github.io/geometria-fractal/modulos/05-dimension-fractal/">https://pieersx.github.io/geometria-fractal/modulos/05-dimension-fractal/</a></span></p></div>

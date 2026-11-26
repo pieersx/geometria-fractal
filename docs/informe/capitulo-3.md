@@ -81,4 +81,4 @@ Los IFS se han usado para **modelar vegetación y formas naturales** en gráfico
 
 ![Helecho coloreado por transformación](../presentacion/capturas/modulo2-helecho-color.png){width=62% nota="Captura propia. Cada color indica la transformación que dibujó el punto."}
 
-<div class="demo"><img src="img/qr-modulo-2.svg" alt="Código QR del módulo 2"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/02-ifs-chaos-game/</span></p></div>
+<div class="demo"><img src="img/qr-modulo-2.svg" alt="Código QR del módulo 2"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url"><a href="https://pieersx.github.io/geometria-fractal/modulos/02-ifs-chaos-game/">https://pieersx.github.io/geometria-fractal/modulos/02-ifs-chaos-game/</a></span></p></div>

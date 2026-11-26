@@ -17,7 +17,7 @@ end
 
 local function next_token()
   tok = tok + 1
-  return tok, '<span class="tok">QQT' .. tok .. 'QQ</span>'
+  return tok, '<span class="tok" id="t' .. tok .. '">QQT' .. tok .. 'QQ</span>'
 end
 
 local function numlabel(counter)
