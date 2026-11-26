@@ -4,53 +4,227 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Geometría fractal · Grupo 8</title>
+<meta name="description" content="Aplicación gráfica interactiva con cinco algoritmos de geometría fractal: Mandelbrot y Julia, IFS, L-systems, terreno fractal y box-counting.">
 <link rel="icon" href="data:,">
 <style>
-  :root { --bg:#0e1018; --card:#171b26; --line:#2a3144; --text:#e8eaf2; --muted:#9aa3b8; --gold:#f5b942; --cyan:#3dd6c6; }
+  :root { --bg:#0b0d14; --bg2:#10131d; --card:#151926; --line:#262d42; --text:#e8eaf2; --muted:#9aa3b8; --gold:#f5b942; --cyan:#3dd6c6; --violet:#a98bff; }
   * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
-  main { max-width: 880px; margin: 0 auto; padding: 48px 20px; }
-  .eyebrow { color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-  h1 { font-family: Cambria, Georgia, serif; font-size: clamp(32px, 6vw, 48px); margin: 6px 0 8px; }
-  p.lead { color: var(--muted); margin: 0 0 32px; }
-  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
-  a.card { display:block; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; color:inherit; text-decoration:none; }
-  a.card:hover { border-color: var(--gold); }
-  a.card.off { opacity: .55; pointer-events: none; }
-  .n { color: var(--gold); font-weight: 700; font-size: 13px; }
-  h2 { font-size: 18px; margin: 4px 0 6px; }
-  .d { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
-  .tag { font-size: 12px; color: var(--muted); }
-  .tag.ok { color: var(--cyan); }
+  html { scroll-behavior: smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+
+  /* Cabecera con el fractal animado */
+  .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); background: radial-gradient(1200px 500px at 85% -10%, #1b2140 0%, transparent 60%), var(--bg); }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 34px; align-items: center; padding-top: 56px; padding-bottom: 56px; }
+  .eyebrow { color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  h1 { font-family: Cambria, Georgia, "Times New Roman", serif; font-size: clamp(36px, 6.4vw, 60px); line-height: 1.04; margin: 10px 0 14px; letter-spacing: -.01em; }
+  h1 em { font-style: normal; background: linear-gradient(90deg, var(--gold), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { color: var(--muted); font-size: 18px; max-width: 34em; margin: 0 0 24px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); text-decoration: none; font-weight: 600; font-size: 15px; transition: border-color .15s, transform .15s, background .15s; }
+  .btn:hover { border-color: var(--gold); transform: translateY(-1px); }
+  .btn.primary { background: var(--gold); color: #1a1405; border-color: var(--gold); }
+  .btn.primary:hover { background: #ffc75c; }
+  .stage { position: relative; aspect-ratio: 8 / 5; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 20px 60px rgba(0,0,0,.5); background: #0b0d14; }
+  .stage canvas { width: 100%; height: 100%; display: block; }
+  .stage .cap { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: #cfd5e6; background: rgba(11,13,20,.72); padding: 3px 9px; border-radius: 20px; font-variant-numeric: tabular-nums; }
+
+  /* Cifras */
+  .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 28px 0 8px; }
+  .fact { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--bg2); }
+  .fact b { display: block; font-size: 22px; color: var(--gold); line-height: 1.2; }
+  .fact span { color: var(--muted); font-size: 13px; }
+
+  /* Módulos */
+  section.mods { padding: 38px 0 12px; }
+  h2 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 16px; font-weight: 700; }
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); }
+  a.card { display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; text-decoration: none; transition: transform .18s, border-color .18s, box-shadow .18s; }
+  a.card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 14px 36px rgba(0,0,0,.45); }
+  a.card .shot { aspect-ratio: 8 / 5; width: 100%; object-fit: cover; display: block; background: #0b0d14; border-bottom: 1px solid var(--line); }
+  a.card .body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .n { color: var(--gold); font-weight: 800; font-size: 12px; letter-spacing: .08em; }
+  .chip { font-size: 11px; color: var(--cyan); border: 1px solid #1f5a57; border-radius: 20px; padding: 1px 9px; white-space: nowrap; }
+  a.card h3 { font-size: 20px; margin: 2px 0 0; line-height: 1.25; }
+  .d { color: var(--muted); font-size: 14.5px; margin: 0; flex: 1; }
+  .who { color: #7d869c; font-size: 12.5px; margin-top: 6px; }
+  .go { color: var(--gold); font-weight: 700; font-size: 14px; margin-top: 8px; }
+  a.card:hover .go span { display: inline-block; transform: translateX(4px); }
+  .go span { transition: transform .15s; }
+
+  /* Pie */
+  .docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 36px 0 12px; }
+  .doc { display: block; text-decoration: none; border: 1px solid var(--line); background: var(--bg2); border-radius: 14px; padding: 16px 18px; transition: border-color .15s, transform .15s; }
+  .doc:hover { border-color: var(--violet); transform: translateY(-2px); }
+  .doc b { display: block; margin-bottom: 2px; }
+  .doc span { color: var(--muted); font-size: 14px; }
+  footer { border-top: 1px solid var(--line); margin-top: 38px; padding: 22px 0 40px; color: var(--muted); font-size: 13.5px; }
+  footer p { margin: 4px 0; }
+  .kbd { font-family: ui-monospace, Consolas, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 0 6px; background: var(--bg2); color: var(--text); font-size: 12.5px; }
+
+  @media (max-width: 820px) {
+    .hero .wrap { grid-template-columns: 1fr; padding-top: 34px; padding-bottom: 36px; }
+    .facts { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    a.card, .btn, .doc { transition: none; }
+    a.card:hover, .btn:hover, .doc:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <div class="eyebrow">Computación Visual · 8.º ciclo</div>
-  <h1>Geometría fractal</h1>
-  <p class="lead">Grupo 8 · Aplicación gráfica interactiva con los algoritmos del trabajo.</p>
-  <div class="grid">
-    <a class="card" href="modulos/01-conjuntos-escape/index.html">
-      <div class="n">MÓDULO 1</div><h2>Conjuntos de escape</h2>
-      <p class="d">Mandelbrot y Julia con zoom interactivo.</p><span class="tag ok">Disponible</span>
-    </a>
-    <a class="card" href="modulos/02-ifs-chaos-game/index.html">
-      <div class="n">MÓDULO 2</div><h2>IFS y Chaos Game</h2>
-      <p class="d">Helecho de Barnsley y triángulo de Sierpinski.</p><span class="tag ok">Disponible</span>
-    </a>
-    <a class="card" href="modulos/03-l-systems/index.html">
-      <div class="n">MÓDULO 3</div><h2>L-systems</h2>
-      <p class="d">Plantas, bosques y curvas fractales por reglas de reescritura.</p><span class="tag ok">Disponible</span>
-    </a>
-    <a class="card" href="modulos/04-terreno-fractal/index.html">
-      <div class="n">MÓDULO 4</div><h2>Terreno fractal</h2>
-      <p class="d">Paisaje 3D con diamond-square, rugosidad y semilla.</p><span class="tag ok">Disponible</span>
-    </a>
-    <a class="card" href="modulos/05-dimension-fractal/index.html">
-      <div class="n">MÓDULO 5</div><h2>Dimensión fractal</h2>
-      <p class="d">Box-counting sobre figuras de dimensión conocida o una imagen propia.</p><span class="tag ok">Disponible</span>
-    </a>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Computación Visual · 8.º ciclo · Grupo 8</div>
+      <h1>Geometría <em>fractal</em></h1>
+      <p class="lead">Cinco algoritmos que convierten reglas muy cortas en imágenes de detalle infinito, calculados en tu navegador y en tiempo real. No hay nada que instalar.</p>
+      <div class="cta">
+        <a class="btn primary" href="modulos/01-conjuntos-escape/index.html">▶ Empezar el recorrido</a>
+        <a class="btn" href="#modulos">Ver los cinco módulos</a>
+      </div>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <canvas id="julia" width="480" height="300"></canvas>
+      <div class="cap" id="cap">Conjunto de Julia · c = …</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="facts" aria-label="Resumen del trabajo">
+    <div class="fact"><b>5</b><span>algoritmos fractales</span></div>
+    <div class="fact"><b>3</b><span>módulos con WebGL (GPU)</span></div>
+    <div class="fact"><b>≈ 40×</b><span>más rápido en GPU que en CPU (1080p)</span></div>
+    <div class="fact"><b>0</b><span>dependencias: abre y funciona</span></div>
+  </div>
+
+  <section class="mods" id="modulos">
+    <h2>Los cinco módulos</h2>
+    <div class="grid">
+
+      <a class="card" href="modulos/01-conjuntos-escape/index.html">
+        <img class="shot" src="assets/miniaturas/modulo1.jpg" alt="Conjunto de Mandelbrot ampliado" loading="lazy" width="640" height="400">
+        <div class="body">
+          <div class="top"><span class="n">MÓDULO 1</span><span class="chip">WebGL</span></div>
+          <h3>Conjuntos de escape</h3>
+          <p class="d">Mandelbrot y Julia con zoom interactivo, construcción capa por capa y vista dividida.</p>
+          <div class="who">Pachas Auris, Pieers Fernando</div>
+          <div class="go">Abrir <span>→</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="modulos/02-ifs-chaos-game/index.html">
+        <img class="shot" src="assets/miniaturas/modulo2.jpg" alt="Helecho de Barnsley dibujado con el juego del caos" loading="lazy" width="640" height="400">
+        <div class="body">
+          <div class="top"><span class="n">MÓDULO 2</span><span class="chip">Canvas 2D</span></div>
+          <h3>IFS y juego del caos</h3>
+          <p class="d">Un punto, un dado y unas pocas reglas dibujan el helecho de Barnsley y el triángulo de Sierpinski.</p>
+          <div class="who">Cerna Aguilar, Emily Andrea</div>
+          <div class="go">Abrir <span>→</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="modulos/03-l-systems/index.html">
+        <img class="shot" src="assets/miniaturas/modulo3.jpg" alt="Árbol tridimensional generado con un L-system" loading="lazy" width="640" height="400">
+        <div class="body">
+          <div class="top"><span class="n">MÓDULO 3</span><span class="chip">Canvas 2D + WebGL</span></div>
+          <h3>L-systems</h3>
+          <p class="d">Plantas, bosques y curvas por reglas de reescritura, con modo paso a paso y vista 3D.</p>
+          <div class="who">Flores Cortez, Valeria Alexandra</div>
+          <div class="go">Abrir <span>→</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="modulos/04-terreno-fractal/index.html">
+        <img class="shot" src="assets/miniaturas/modulo4.jpg" alt="Terreno fractal en 3D con agua y montañas" loading="lazy" width="640" height="400">
+        <div class="body">
+          <div class="top"><span class="n">MÓDULO 4</span><span class="chip">WebGL</span></div>
+          <h3>Terreno fractal</h3>
+          <p class="d">Paisajes 3D con diamond-square: rugosidad, agua, sol y semilla en vivo.</p>
+          <div class="who">Sihuacollo Sierra, Keyla Noemi</div>
+          <div class="go">Abrir <span>→</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="modulos/05-dimension-fractal/index.html">
+        <img class="shot" src="assets/miniaturas/modulo5.jpg" alt="Conteo de cajas sobre la curva de Koch" loading="lazy" width="640" height="400">
+        <div class="body">
+          <div class="top"><span class="n">MÓDULO 5</span><span class="chip">Canvas 2D</span></div>
+          <h3>Dimensión fractal</h3>
+          <p class="d">Box-counting sobre figuras de dimensión conocida o sobre una imagen propia.</p>
+          <div class="who">Puente Carmen, Rodrigo Joaquin</div>
+          <div class="go">Abrir <span>→</span></div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <h2 style="margin-top:40px">Documentos</h2>
+  <div class="docs">
+    <a class="doc" href="docs/informe/informe-geometria-fractal.pdf"><b>📄 Informe (PDF)</b><span>Algoritmos, fortalezas, debilidades, casos prácticos y resultados medidos.</span></a>
+    <a class="doc" href="docs/presentacion/geometria-fractal-presentacion.pdf"><b>🎞️ Presentación (PDF)</b><span>Diapositivas de la exposición y anexo de respaldo para leer.</span></a>
+    <a class="doc" href="https://github.com/pieersx/geometria-fractal"><b>💻 Código fuente</b><span>Repositorio con los cinco módulos, el informe y los guiones.</span></a>
   </div>
 </main>
+
+<footer>
+  <div class="wrap">
+    <p>Funciona en Chrome, Firefox o Edge actualizados. Los módulos 1 y 4 y la vista 3D del módulo 3 necesitan WebGL.</p>
+    <p>Integración y revisión de formato: Bada Watanave, Camila del Rosario · Universidad Nacional Mayor de San Marcos · Exposición: 02/12/2026</p>
+  </div>
+</footer>
+
+<script>
+"use strict";
+/* Fractal de cabecera: conjunto de Julia con c recorriendo una circunferencia.
+   Se calcula en la CPU con un lienzo pequeño que el navegador escala; se detiene si la pestaña
+   está oculta y, con «reducir movimiento», se muestra una sola imagen fija. */
+(function () {
+  const cv = document.getElementById("julia"), cap = document.getElementById("cap");
+  if (!cv || !cv.getContext) return;
+  const ctx = cv.getContext("2d"), W = 240, H = 150, MAX = 56;
+  cv.width = W; cv.height = H;
+  const img = ctx.createImageData(W, H), px = new Uint32Array(img.data.buffer);
+  const pal = new Uint32Array(MAX + 1);
+  for (let n = 0; n <= MAX; n++) {
+    const v = n / MAX;
+    const r = Math.round(14 + 236 * Math.pow(v, 0.75)), g = Math.round(18 + 150 * Math.pow(v, 1.15) + 40 * Math.pow(v, 4)),
+          b = Math.round(40 + 125 * Math.sin(Math.PI * Math.pow(v, 0.55)));
+    pal[n] = (255 << 24) | (b << 16) | (g << 8) | r;
+  }
+  pal[MAX] = (255 << 24) | (20 << 16) | (14 << 8) | 11;   // interior del conjunto
+  const fmt = v => (v < 0 ? "−" : "") + Math.abs(v).toFixed(3).replace(".", ",");
+  function draw(a) {
+    const cr = 0.7885 * Math.cos(a), ci = 0.7885 * Math.sin(a), s = 2.7 / H;
+    let k = 0;
+    for (let y = 0; y < H; y++) {
+      const y0 = (y - H / 2) * s;
+      for (let x = 0; x < W; x++) {
+        let zx = (x - W / 2) * s, zy = y0, n = 0;
+        while (n < MAX && zx * zx + zy * zy < 16) { const t = zx * zx - zy * zy + cr; zy = 2 * zx * zy + ci; zx = t; n++; }
+        px[k++] = pal[n];
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    cap.textContent = "Conjunto de Julia · c = " + fmt(cr) + (ci < 0 ? " − " : " + ") + fmt(Math.abs(ci)).replace("−", "") + "i";
+  }
+  const still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  draw(2.2);
+  if (still) return;
+  let last = 0;
+  function loop(t) {
+    if (t - last > 45) { last = t; draw(2.2 + t * 0.00022); }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
 </body>
 </html>
