@@ -18,6 +18,7 @@
   a.back { color:var(--muted); font-size:12px; text-decoration:none; display:inline-block; margin-bottom:8px; }
   a.back:hover { color:var(--accent); }
   label { display:block; color:var(--muted); font-size:12px; margin:10px 0 4px; }
+  label.chk { display:flex; align-items:center; gap:6px; margin:8px 0 0; cursor:pointer; }
   .row { display:flex; gap:6px; }
   button, select { font:inherit; color:var(--text); background:#1c2230; border:1px solid var(--line);
     border-radius:8px; padding:6px 10px; cursor:pointer; }
@@ -25,10 +26,13 @@
   .row > button { flex:1; }
   select { width:100%; }
   input[type=range] { width:100%; accent-color:var(--accent); }
+  input[type=checkbox] { accent-color:var(--accent); }
   .val { float:right; color:var(--text); font-variant-numeric:tabular-nums; }
   .stats { margin-top:12px; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
   .stats b { color:var(--text); font-weight:500; }
+  .stats .big { font-size:22px; color:var(--accent); font-weight:600; display:block; line-height:1.2; }
   .hint { margin-top:10px; color:var(--muted); font-size:12px; }
+  .hidden { display:none; }
   @media (max-width:560px) { #panel { width:calc(100% - 32px); max-height:46%; } }
 </style>
 </head>
@@ -38,79 +42,348 @@
 <div id="panel">
   <a class="back" href="../../">← Portada</a>
   <h1>Dimensión fractal</h1>
-  <div class="sub">Módulo 5 · Box-counting sobre una imagen</div>
+  <div class="sub">Módulo 5 · Conteo de cajas (box-counting)</div>
 
-  <!-- TODO: reemplaza este control de ejemplo por los parámetros de tu algoritmo.
-       Mantén el mismo estilo (label + input) para que todos los módulos se vean igual. -->
-  <label>Parámetro de ejemplo <span class="val" id="vP"></span></label>
-  <input id="p" type="range" min="1" max="100" step="1" value="50">
+  <label for="fig">Figura a medir</label>
+  <select id="fig">
+    <option value="linea">Línea recta (D = 1)</option>
+    <option value="cuadrado">Cuadrado relleno (D = 2)</option>
+    <option value="koch" selected>Curva de Koch (D ≈ 1,262)</option>
+    <option value="sierpinski">Triángulo de Sierpinski (D ≈ 1,585)</option>
+    <option value="costa">Costa generada (contorno)</option>
+    <option value="imagen" disabled>Imagen propia</option>
+  </select>
+
+  <div id="costaCtl" class="hidden">
+    <label>Rugosidad <span class="val" id="vRug"></span></label>
+    <input id="rug" type="range" min="0.3" max="0.9" step="0.01" value="0.6">
+  </div>
+
+  <div class="row" style="margin-top:10px">
+    <button id="bFile">Cargar imagen…</button>
+    <button id="bCoast" class="hidden">Otra costa</button>
+  </div>
+  <input id="file" type="file" accept="image/*" class="hidden">
+
+  <label>Umbral de binarización <span class="val" id="vThr"></span></label>
+  <input id="thr" type="range" min="1" max="254" step="1" value="128">
+  <label class="chk"><input id="inv" type="checkbox"> Objeto oscuro sobre fondo claro</label>
+  <label class="chk"><input id="edge" type="checkbox"> Medir solo el contorno</label>
+
+  <label>Tamaño de caja ε <span class="val" id="vK"></span></label>
+  <input id="k" type="range" min="2" max="8" step="1" value="5">
+
+  <div class="stats"><span id="stats"></span></div>
 
   <div class="row" style="margin-top:12px">
     <button id="reset">Reiniciar</button>
     <button id="shot">Guardar PNG</button>
   </div>
-
-  <div class="stats"><span id="stats"></span></div>
-  <div class="hint">Carga una imagen con el botón; se umbraliza y se cuentan las cajas</div>
+  <div class="hint">Las cajas turquesa son las que tocan la figura. La Koch usa la misma regla F→F+F−−F+F del módulo 3.</div>
 </div>
 
 <script>
 "use strict";
 /* =====================================================================
-   PLANTILLA BASE · Módulo 5: Dimensión fractal
-   Qué hacer:
-   - Cargar una imagen del usuario (input type=file), convertirla a blanco y negro con un umbral.
-   - Contar cuántas cajas de lado s contienen píxeles del objeto, para varios s (potencias de 2).
-   - Graficar log N(s) contra log(1/s) y ajustar una recta: la pendiente es la dimensión fractal D.
-   - Incluir imágenes de ejemplo (costa, hoja, relámpago) y mostrar D en el panel. Es el caso práctico del informe.
-   Reglas: ver CONTRIBUTING.md. Este archivo debe funcionar sin instalar nada.
+   Módulo 5 · Dimensión fractal por conteo de cajas
+   1. Se genera (o se carga) una imagen de N×N píxeles y se binariza con un umbral.
+   2. Para cada tamaño de caja s = 2^k se cuenta cuántas cajas de la malla tocan la figura: N(s).
+   3. Se ajusta una recta por mínimos cuadrados a ln N(s) frente a ln(N/s): la pendiente es D.
+   El ajuste usa solo s = 8 … 64 px: con cajas menores se mide el grosor del trazo y con
+   cajas mayores la figura cabe en pocas cajas y el borde de la malla pesa demasiado.
    ===================================================================== */
 
 const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");   // Si necesitas GPU, cambia a getContext("webgl") (ver módulo 1)
+const ctx = canvas.getContext("2d");
+const $ = id => document.getElementById(id);
 
-/* Estado del módulo: guarda aquí todos los parámetros */
-const DEFAULTS = { p: 50 };
+const N = 1024;              // lado de la imagen de trabajo (potencia de 2)
+const KMAX = 9;              // mayor k con malla: 2^9 = 512 → rejilla de 2×2
+const FIT_K0 = 3, FIT_K1 = 6; // ajuste con s = 8 … 64
+
+/* Lienzos auxiliares: uno para generar/cargar la figura y otro para mostrarla */
+const off = document.createElement("canvas"); off.width = off.height = N;
+const octx = off.getContext("2d", { willReadFrequently: true });
+const dispC = document.createElement("canvas"); dispC.width = dispC.height = N;
+const dctx = dispC.getContext("2d");
+
+const THEORY = { linea: 1, cuadrado: 2, koch: Math.log(4) / Math.log(3), sierpinski: Math.log(3) / Math.log(2) };
+const NAMES = { linea: "Línea recta", cuadrado: "Cuadrado relleno", koch: "Curva de Koch",
+                sierpinski: "Triángulo de Sierpinski", costa: "Costa generada", imagen: "Imagen propia" };
+
+const DEFAULTS = { fig: "koch", thr: 128, inv: false, edge: false, k: 5, rug: 0.6, seed: 7 };
 const state = { ...DEFAULTS };
 
-/* Ajusta el lienzo a la pantalla y a la densidad de píxeles */
+let lum = new Uint8Array(N * N);   // luminancia de la imagen de trabajo
+let valid = null;                  // máscara de píxeles de la imagen cargada (null = todos válidos)
+let act = new Uint8Array(N * N);   // píxeles de la figura tras binarizar
+let grids = [];                    // grids[k]: ocupación de las cajas de lado 2^k
+let counts = [];                   // counts[k]: N(2^k)
+let fit = null;                    // { D, r2, b }
+
+/* ---------- Generación de figuras ---------- */
+function clearOff() { octx.fillStyle = "#000"; octx.fillRect(0, 0, N, N); octx.fillStyle = "#fff"; octx.strokeStyle = "#fff"; octx.lineWidth = 2; }
+
+function kochString(gen) { let s = "F"; for (let i = 0; i < gen; i++) s = s.replace(/F/g, "F+F--F+F"); return s; }
+
+function drawKoch() {
+  const gen = 6, s = kochString(gen), len = 0.84 * N / Math.pow(3, gen);
+  let x = 0.08 * N, y = 0.7 * N, h = 0;
+  octx.beginPath(); octx.moveTo(x, y);
+  for (const c of s) {
+    if (c === "F") { x += len * Math.cos(h); y -= len * Math.sin(h); octx.lineTo(x, y); }
+    else if (c === "+") h += Math.PI / 3;
+    else if (c === "-") h -= Math.PI / 3;
+  }
+  octx.stroke();
+}
+
+function drawSierpinski() {
+  const A = [0.06 * N, 0.9 * N], B = [0.94 * N, 0.9 * N], C = [0.5 * N, 0.9 * N - 0.88 * N * 0.866];
+  octx.beginPath();
+  (function tri(a, b, c, d) {
+    if (d === 0) { octx.moveTo(a[0], a[1]); octx.lineTo(b[0], b[1]); octx.lineTo(c[0], c[1]); octx.closePath(); return; }
+    const ab = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], bc = [(b[0] + c[0]) / 2, (b[1] + c[1]) / 2], ca = [(c[0] + a[0]) / 2, (c[1] + a[1]) / 2];
+    tri(a, ab, ca, d - 1); tri(ab, b, bc, d - 1); tri(ca, bc, c, d - 1);
+  })(A, B, C, 9);
+  octx.fill();
+}
+
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* Isla por desplazamiento del punto medio: la rugosidad H controla cuánto decae el desplazamiento por nivel */
+function drawCoast() {
+  const rnd = mulberry32(state.seed), n0 = 8;
+  let pts = [];
+  for (let i = 0; i < n0; i++) {
+    const a = 2 * Math.PI * i / n0, r = 0.3 * N * (0.85 + 0.3 * rnd());
+    pts.push([0.5 * N + r * Math.cos(a), 0.5 * N + r * Math.sin(a)]);
+  }
+  const ratio = Math.pow(2, -state.rug);
+  let amp = 0.1 * N;
+  for (let lv = 0; lv < 8; lv++) {
+    const next = [];
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i], q = pts[(i + 1) % pts.length];
+      const dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy) || 1, d = (rnd() * 2 - 1) * amp;
+      next.push(p, [(p[0] + q[0]) / 2 - dy / l * d, (p[1] + q[1]) / 2 + dx / l * d]);
+    }
+    pts = next; amp *= ratio;
+  }
+  octx.beginPath(); pts.forEach((p, i) => i ? octx.lineTo(p[0], p[1]) : octx.moveTo(p[0], p[1])); octx.closePath(); octx.fill();
+}
+
+function generate(fig) {
+  clearOff(); valid = null;
+  if (fig === "linea") { octx.beginPath(); octx.moveTo(0.1 * N, 0.9 * N); octx.lineTo(0.9 * N, 0.1 * N); octx.stroke(); }
+  else if (fig === "cuadrado") octx.fillRect(0.1 * N, 0.1 * N, 0.8 * N, 0.8 * N);
+  else if (fig === "koch") drawKoch();
+  else if (fig === "sierpinski") drawSierpinski();
+  else if (fig === "costa") drawCoast();
+  const d = octx.getImageData(0, 0, N, N).data;
+  for (let i = 0; i < N * N; i++) lum[i] = d[4 * i];
+}
+
+/* ---------- Imagen propia ---------- */
+function otsu() {
+  const hist = new Float64Array(256); let total = 0;
+  for (let i = 0; i < N * N; i++) if (!valid || valid[i]) { hist[lum[i]]++; total++; }
+  let sum = 0; for (let t = 0; t < 256; t++) sum += t * hist[t];
+  let wB = 0, sB = 0, best = 0, thr = 128;
+  for (let t = 0; t < 256; t++) {
+    wB += hist[t]; if (!wB) continue;
+    const wF = total - wB; if (!wF) break;
+    sB += t * hist[t];
+    const mB = sB / wB, mF = (sum - sB) / wF, v = wB * wF * (mB - mF) * (mB - mF);
+    if (v > best) { best = v; thr = t; }
+  }
+  return Math.min(254, Math.max(1, thr));
+}
+
+function loadImage(img) {
+  octx.fillStyle = "#000"; octx.fillRect(0, 0, N, N);
+  const sc = Math.min(N / img.width, N / img.height), w = img.width * sc, h = img.height * sc, x0 = (N - w) / 2, y0 = (N - h) / 2;
+  octx.fillStyle = "#fff"; octx.fillRect(x0, y0, w, h);       // la transparencia se compone sobre blanco
+  octx.drawImage(img, x0, y0, w, h);
+  const d = octx.getImageData(0, 0, N, N).data;
+  valid = new Uint8Array(N * N);
+  const xa = Math.ceil(x0), xb = Math.floor(x0 + w), ya = Math.ceil(y0), yb = Math.floor(y0 + h);
+  for (let y = ya; y < yb; y++) for (let x = xa; x < xb; x++) valid[y * N + x] = 1;
+  let mean = 0, cnt = 0;
+  for (let i = 0; i < N * N; i++) { lum[i] = (0.299 * d[4 * i] + 0.587 * d[4 * i + 1] + 0.114 * d[4 * i + 2]) | 0; if (valid[i]) { mean += lum[i]; cnt++; } }
+  state.fig = "imagen"; state.inv = mean / cnt > 128; state.edge = false;
+  state.thr = otsu();
+  $("fig").querySelector('option[value="imagen"]').disabled = false;
+  syncControls(); analyze();
+}
+
+/* ---------- Conteo de cajas ---------- */
+function binarize() {
+  const { thr, inv, edge } = state;
+  for (let i = 0; i < N * N; i++) {
+    if (valid && !valid[i]) { act[i] = 0; continue; }
+    act[i] = (inv ? lum[i] < thr : lum[i] >= thr) ? 1 : 0;
+  }
+  if (!edge) return;
+  const src = act.slice();
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const i = y * N + x;
+    if (!src[i]) continue;
+    const border = x === 0 || y === 0 || x === N - 1 || y === N - 1 || !src[i - 1] || !src[i + 1] || !src[i - N] || !src[i + N];
+    act[i] = border ? 1 : 0;
+  }
+}
+
+function countBoxes() {
+  grids = [act]; counts = [0];
+  for (let i = 0; i < N * N; i++) counts[0] += act[i];
+  for (let k = 1; k <= KMAX; k++) {
+    const n = N >> k, m = N >> (k - 1), p = grids[k - 1], g = new Uint8Array(n * n); let c = 0;
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+      const a = (2 * y) * m + 2 * x, v = p[a] | p[a + 1] | p[a + m] | p[a + m + 1];
+      g[y * n + x] = v; c += v;
+    }
+    grids.push(g); counts.push(c);
+  }
+}
+
+function fitLine() {
+  const xs = [], ys = [];
+  for (let k = FIT_K0; k <= FIT_K1; k++) if (counts[k] > 0) { xs.push(Math.log(N / (1 << k))); ys.push(Math.log(counts[k])); }
+  if (xs.length < 3) return null;
+  const n = xs.length, mx = xs.reduce((a, b) => a + b) / n, my = ys.reduce((a, b) => a + b) / n;
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; syy += (ys[i] - my) ** 2; }
+  const D = sxy / sxx, b = my - D * mx;
+  return { D, b, r2: syy ? sxy * sxy / (sxx * syy) : 1 };
+}
+
+function paintBitmap() {
+  const img = dctx.createImageData(N, N), u32 = new Uint32Array(img.data.buffer);
+  const on = 0xFF42B9F5, off1 = 0xFF1B1710, out = 0xFF120D0B;   // ABGR: ámbar, panel, fuera de la imagen
+  for (let i = 0; i < N * N; i++) u32[i] = act[i] ? on : (valid && !valid[i] ? out : off1);
+  dctx.putImageData(img, 0, 0);
+}
+
+function analyze() { binarize(); countBoxes(); fit = fitLine(); paintBitmap(); render(); }
+
+/* ---------- Dibujo ---------- */
+const fmt = (v, d = 3) => v.toLocaleString("es", { minimumFractionDigits: d, maximumFractionDigits: d });
+
 function resize() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const w = Math.floor(canvas.clientWidth * dpr), h = Math.floor(canvas.clientHeight * dpr);
   if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
 }
 
-/* ---------------------------------------------------------------------
-   TODO: implementa aquí tu algoritmo. Se llama cada vez que algo cambia.
-   Dibuja en `ctx`; el tamaño real del lienzo es canvas.width × canvas.height.
-   --------------------------------------------------------------------- */
-function render() {
-  resize();
-  const W = canvas.width, H = canvas.height;
-  ctx.fillStyle = "#0b0d12"; ctx.fillRect(0, 0, W, H);
-
-  // Ejemplo mínimo: una circunferencia cuyo radio depende del parámetro. Bórralo.
-  ctx.strokeStyle = "#f5b942"; ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(W * 0.6, H / 2, (state.p / 100) * Math.min(W, H) * 0.35, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.fillStyle = "#8b93a7"; ctx.font = `${Math.round(16 * (W / canvas.clientWidth))}px system-ui`;
-  ctx.textAlign = "center";
-  ctx.fillText("Módulo 5 · implementa render()", W * 0.6, H - 40);
-
-  document.getElementById("stats").textContent = "Parámetro: " + state.p;   // TODO: muestra tus datos (iteraciones, puntos, dimensión…)
+function drawPlot(x, y, w, h, u) {
+  ctx.fillStyle = "#10141c"; ctx.strokeStyle = "#262c3a"; ctx.lineWidth = u;
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, 10 * u); ctx.fill(); ctx.stroke();
+  const L = 54 * u, R = 20 * u, T = 44 * u, B = 46 * u, px = x + L, py = y + T, pw = w - L - R, ph = h - T - B;
+  ctx.fillStyle = "#e6e9f0"; ctx.font = `600 ${13 * u}px system-ui`; ctx.textAlign = "left";
+  ctx.fillText("Gráfica log–log", x + 16 * u, y + 26 * u);
+  const ks = []; for (let k = 1; k <= 8; k++) if (counts[k] > 0) ks.push(k);
+  if (ks.length < 2) return;
+  const xmin = Math.log(N / 256) - 0.1, xmax = Math.log(N / 2) + 0.1;
+  const ymax = Math.log(counts[1]) + 0.3, ymin = Math.max(0, Math.log(Math.max(1, counts[8])) - 0.3);
+  const X = v => px + (v - xmin) / (xmax - xmin) * pw, Y = v => py + ph - (v - ymin) / (ymax - ymin) * ph;
+  ctx.font = `${11 * u}px system-ui`; ctx.fillStyle = "#8b93a7"; ctx.strokeStyle = "#1d2330"; ctx.textAlign = "center";
+  for (let v = Math.ceil(xmin); v <= xmax; v++) { ctx.beginPath(); ctx.moveTo(X(v), py); ctx.lineTo(X(v), py + ph); ctx.stroke(); ctx.fillText(v, X(v), py + ph + 15 * u); }
+  ctx.textAlign = "right";
+  for (let v = Math.ceil(ymin); v <= ymax; v++) { ctx.beginPath(); ctx.moveTo(px, Y(v)); ctx.lineTo(px + pw, Y(v)); ctx.stroke(); ctx.fillText(v, px - 6 * u, Y(v) + 4 * u); }
+  ctx.textAlign = "center"; ctx.fillText("ln(1/ε)   (ε = tamaño de caja relativo)", px + pw / 2, y + h - 10 * u);
+  ctx.save(); ctx.translate(x + 14 * u, py + ph / 2); ctx.rotate(-Math.PI / 2); ctx.fillText("ln N(ε)", 0, 0); ctx.restore();
+  if (fit) {
+    ctx.strokeStyle = "#f5b942"; ctx.lineWidth = 2 * u; ctx.setLineDash([6 * u, 4 * u]);
+    const a = Math.log(N / (1 << FIT_K1)) - 0.25, b = Math.log(N / (1 << FIT_K0)) + 0.25;
+    ctx.beginPath(); ctx.moveTo(X(a), Y(fit.b + fit.D * a)); ctx.lineTo(X(b), Y(fit.b + fit.D * b)); ctx.stroke(); ctx.setLineDash([]);
+  }
+  for (const k of ks) {
+    const inFit = k >= FIT_K0 && k <= FIT_K1, cur = k === state.k, cx = X(Math.log(N / (1 << k))), cy = Y(Math.log(counts[k]));
+    ctx.beginPath(); ctx.arc(cx, cy, (cur ? 7 : 4.5) * u, 0, 7);
+    if (inFit) { ctx.fillStyle = cur ? "#4fd1c5" : "#f5b942"; ctx.fill(); } else { ctx.strokeStyle = "#8b93a7"; ctx.lineWidth = 1.5 * u; ctx.stroke(); }
+    if (cur) { ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5 * u; ctx.stroke(); }
+  }
 }
 
-/* ---------- Controles (patrón común a todos los módulos) ---------- */
-const $ = id => document.getElementById(id);
+function render() {
+  resize();
+  const W = canvas.width, H = canvas.height, u = W / canvas.clientWidth, cw = canvas.clientWidth;
+  ctx.fillStyle = "#0b0d12"; ctx.fillRect(0, 0, W, H);
 
-$("p").oninput = e => { state.p = +e.target.value; $("vP").textContent = state.p; render(); };
+  /* Disposición: figura a la izquierda y gráfica a la derecha; apiladas si no cabe */
+  const pw = cw > 560 ? 304 * u : 0, narrow = cw <= 560;
+  const top = narrow ? H * 0.48 : 24 * u, areaW = W - pw - 24 * u, areaH = H - top - 24 * u;
+  let S, sx, sy, gx, gy, gw, gh;
+  if (areaW >= areaH * 1.45) {
+    S = Math.min(areaH, areaW * 0.5); sx = pw + 12 * u; sy = top + (areaH - S) / 2;
+    gx = sx + S + 24 * u; gw = W - gx - 24 * u; gh = Math.min(areaH, gw * 0.85); gy = top + (areaH - gh) / 2;
+  } else {
+    S = Math.min(areaW, areaH * 0.56); sx = pw + 12 * u + (areaW - S) / 2; sy = top;
+    gw = Math.min(areaW, S * 1.5); gx = pw + 12 * u + (areaW - gw) / 2; gy = sy + S + 14 * u; gh = Math.max(120 * u, H - gy - 16 * u);
+  }
 
-$("reset").onclick = () => {
-  Object.assign(state, DEFAULTS);
-  $("p").value = state.p; $("vP").textContent = state.p;
-  render();
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(dispC, sx, sy, S, S);
+  ctx.strokeStyle = "#262c3a"; ctx.lineWidth = u; ctx.strokeRect(sx, sy, S, S);
+
+  /* Cajas que tocan la figura con el ε elegido */
+  const k = state.k, n = N >> k, g = grids[k], cell = S / n;
+  ctx.fillStyle = "rgba(79,209,197,0.30)";
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (g[y * n + x]) ctx.fillRect(sx + x * cell, sy + y * cell, cell, cell);
+  if (cell >= 5 * u) {
+    ctx.strokeStyle = "rgba(79,209,197,0.45)"; ctx.lineWidth = 0.6 * u; ctx.beginPath();
+    for (let i = 1; i < n; i++) { ctx.moveTo(sx + i * cell, sy); ctx.lineTo(sx + i * cell, sy + S); ctx.moveTo(sx, sy + i * cell); ctx.lineTo(sx + S, sy + i * cell); }
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#8b93a7"; ctx.font = `${12 * u}px system-ui`; ctx.textAlign = "left";
+  ctx.fillText(`${NAMES[state.fig]} · caja de ${1 << k} px sobre ${N} px`, sx, sy - 8 * u);
+
+  drawPlot(gx, gy, gw, gh, u);
+
+  /* Panel de datos */
+  const s = 1 << k, th = THEORY[state.fig];
+  $("vK").textContent = `${s} px`; $("vThr").textContent = state.thr; $("vRug").textContent = fmt(state.rug, 2);
+  let html;
+  if (!fit) html = "<b>No hay suficiente figura para medir.</b> Ajusta el umbral o marca/desmarca «Objeto oscuro».";
+  else {
+    html = `<span class="big">D ≈ ${fmt(fit.D)}</span>R² = ${fmt(fit.r2, 4)} · pendiente de ${FIT_K1 - FIT_K0 + 1} escalas<br>` +
+           `N(${s} px) = <b>${counts[k].toLocaleString("es")}</b> cajas<br>`;
+    html += th ? `Valor teórico <b>${fmt(th)}</b> · error <b>${fmt(Math.abs(fit.D - th) / th * 100, 2)} %</b>` : "Sin valor teórico: es una medición empírica.";
+  }
+  $("stats").innerHTML = html;
+}
+
+/* ---------- Controles ---------- */
+function syncControls() {
+  $("fig").value = state.fig; $("thr").value = state.thr; $("inv").checked = state.inv; $("edge").checked = state.edge;
+  $("k").value = state.k; $("rug").value = state.rug;
+  $("costaCtl").classList.toggle("hidden", state.fig !== "costa");
+  $("bCoast").classList.toggle("hidden", state.fig !== "costa");
+}
+
+function selectFigure(fig) {
+  Object.assign(state, { fig, thr: 128, inv: false, edge: fig === "costa" });
+  generate(fig); syncControls(); analyze();
+}
+
+$("fig").onchange = e => selectFigure(e.target.value);
+$("rug").oninput = e => { state.rug = +e.target.value; generate("costa"); analyze(); };
+$("bCoast").onclick = () => { state.seed = (state.seed * 7919 + 13) % 100000; generate("costa"); analyze(); };
+$("thr").oninput = e => { state.thr = +e.target.value; analyze(); };
+$("inv").onchange = e => { state.inv = e.target.checked; analyze(); };
+$("edge").onchange = e => { state.edge = e.target.checked; analyze(); };
+$("k").oninput = e => { state.k = +e.target.value; render(); };
+$("bFile").onclick = () => $("file").click();
+$("file").onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const url = URL.createObjectURL(f), img = new Image();
+  img.onload = () => { loadImage(img); URL.revokeObjectURL(url); };
+  img.onerror = () => { URL.revokeObjectURL(url); $("stats").textContent = "No se pudo leer esa imagen."; };
+  img.src = url; e.target.value = "";
 };
+
+$("reset").onclick = () => { Object.assign(state, DEFAULTS); generate(state.fig); syncControls(); analyze(); };
 
 $("shot").onclick = () => {
   render();
@@ -123,8 +396,7 @@ $("shot").onclick = () => {
 window.addEventListener("resize", render);
 
 /* ---------- Arranque ---------- */
-$("vP").textContent = state.p;
-render();
+generate(state.fig); syncControls(); analyze();
 </script>
 </body>
 </html>
