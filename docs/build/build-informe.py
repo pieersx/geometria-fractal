@@ -124,6 +124,9 @@ def main():
                     "--resource-path", str(INFORME), "-o", str(base_html)], check=True, env=env, cwd=INFORME)
     entradas = leer_entradas(tsv)
     base = base_html.read_text(encoding="utf8")
+    # Logo opcional de la portada: si existe docs/build/logo-unmsm.(png|svg|jpg), se incluye; si no, la portada sale sin logo
+    logo = next((f for e in ("png", "svg", "jpg") if (f := BUILD / f"logo-unmsm.{e}").exists()), None)
+    base = base.replace("<!--LOGO-->", f'<img class="logo" src="{logo.as_uri()}" alt="Logo de la Universidad Nacional Mayor de San Marcos">' if logo else "")
     assert "<!--FRONT-->" in base, "falta el marcador <!--FRONT--> en portada.html"
     paginas, previo = {}, None
     for vuelta in range(1, 5):
