@@ -40,6 +40,8 @@
   .stats { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted);
     font-size: 12px; font-variant-numeric: tabular-nums; }
   .stats b { color: var(--text); font-weight: 500; }
+  a.back { color: var(--muted); font-size: 12px; text-decoration: none; display: inline-block; margin-bottom: 8px; }
+  a.back:hover { color: var(--accent); }
   .hint { margin-top: 10px; color: var(--muted); font-size: 12px; }
   #nogl { display: none; position: fixed; inset: 0; place-items: center; text-align: center; padding: 24px; }
   @media (max-width: 560px) { #panel { width: calc(100% - 32px); max-height: 46%; } }
@@ -50,6 +52,7 @@
 <div id="nogl">Tu navegador no soporta WebGL. Prueba con Chrome, Firefox o Edge actualizados.</div>
 
 <div id="panel">
+  <a class="back" href="../../index.html">← Portada</a>
   <h1>Geometría fractal</h1>
   <div class="sub">Módulo 4 · Terreno fractal (diamond-square)</div>
 
@@ -105,7 +108,7 @@
     <span title="H = −log₂ r. Estimación teórica de la superficie de diamond-square, no una medición.">Hurst <b id="sH"></b> · Dimensión <b id="sD"></b></span><br>
     Zoom <b id="sZoom">1×</b> · <span id="sFps"></span>
   </div>
-  <div class="hint">Arrastrar: girar · Rueda o pellizco: zoom · Teclas: flechas y + / − · <a href="../../">← Portada</a></div>
+  <div class="hint">Arrastrar: girar · Rueda o pellizco: zoom · Teclas: flechas y + / −</div>
 </div>
 
 <script>
