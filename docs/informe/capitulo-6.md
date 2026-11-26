@@ -26,7 +26,7 @@ La aplicación trabaja con una imagen de 1 024 × 1 024 píxeles. Puede **genera
 
 Para cada tamaño de caja $s = 2^k$ píxeles se cuentan las cajas que tocan la figura. La aplicación dibuja esas cajas sobre la figura, muestra la gráfica log-log con la recta de ajuste y escribe el valor de *D*, el coeficiente $R^2$ y, en las figuras de prueba, el error respecto a la teoría. El ajuste usa solo $s = 8 \ldots 64$ px: con cajas menores se mide el grosor del trazo, y con cajas mayores la figura cabe en pocas cajas.
 
-La curva de Koch se genera con la misma regla `F → F+F−−F+F` del módulo 3, por lo que la medición cierra el ciclo entre ambos módulos.
+La curva de Koch se dibuja con la misma regla `F → F+F−−F+F` que usa el módulo 3. El módulo 5 incluye su propia copia de esa regla, no la importa del módulo 3, de modo que ambos módulos comparten la regla pero no el código.
 
 ### Validación
 
