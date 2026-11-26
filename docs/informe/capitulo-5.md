@@ -84,5 +84,5 @@ Los terrenos fractales son habituales en **videojuegos, simulación y cine** par
 
 ![Paleta «Ártico»](../presentacion/capturas/modulo4-paleta-artico.png){width=78% nota="Captura propia. Semilla 4817, *r* = 0,59."}
 
-<div class="demo"><img src="img/qr-modulo-4.svg" alt="Código QR del módulo 4"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/04-terreno-fractal/</span></p></div>
+<div class="demo"><img src="img/qr-modulo-4.svg" alt="Código QR del módulo 4"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url"><a href="https://pieersx.github.io/geometria-fractal/modulos/04-terreno-fractal/">https://pieersx.github.io/geometria-fractal/modulos/04-terreno-fractal/</a></span></p></div>
 

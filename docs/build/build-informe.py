@@ -53,10 +53,12 @@ def leer_entradas(tsv):
     return filas
 
 
-def fila(texto, pagina, nivel=1, negrita=False):
+def fila(texto, pagina, nivel=1, negrita=False, tok=None):
     cls = f"row l{nivel}" + (" b" if negrita else "")
-    return (f'<div class="{cls}"><span class="rt">{html.escape(texto)}</span><span class="dots"></span>'
-            f'<span class="pg">{pagina}</span></div>')
+    div = (f'<div class="{cls}"><span class="rt">{html.escape(texto)}</span><span class="dots"></span>'
+           f'<span class="pg">{pagina}</span></div>')
+    # enlace interno: pulsar la fila lleva a la sección, figura o tabla
+    return f'<a class="rowlink" href="#t{tok}">{div}</a>' if tok is not None else div
 
 
 def armar_front(entradas, paginas):
@@ -64,15 +66,15 @@ def armar_front(entradas, paginas):
     h = ['<div class="ft">Índice</div>']
     for e in entradas:
         if e["kind"] == "h":
-            h.append(fila(e["text"], pg(e), e["level"], e["level"] == 1))
+            h.append(fila(e["text"], pg(e), e["level"], e["level"] == 1, e["tok"]))
     h.append('<div class="ft brk">Lista de figuras</div>')
     for e in entradas:
         if e["kind"] == "f":
-            h.append(fila(f'Figura {e["num"]}. {e["text"]}', pg(e)))
+            h.append(fila(f'Figura {e["num"]}. {e["text"]}', pg(e), tok=e["tok"]))
     h.append('<div class="ft">Lista de tablas</div>')
     for e in entradas:
         if e["kind"] == "t":
-            h.append(fila(f'Tabla {e["num"]}. {e["text"]}', pg(e)))
+            h.append(fila(f'Tabla {e["num"]}. {e["text"]}', pg(e), tok=e["tok"]))
     return '<div class="front">' + "\n".join(h) + "</div>"
 
 
@@ -106,7 +108,7 @@ def chrome():
 
 def imprimir(html_path, pdf):
     subprocess.run([chrome(), "--headless=new", "--no-sandbox", "--disable-gpu", "--no-pdf-header-footer",
-                    f"--print-to-pdf={pdf}", pathlib.Path(html_path).as_uri()], check=True,
+                    "--generate-pdf-document-outline", f"--print-to-pdf={pdf}", pathlib.Path(html_path).as_uri()], check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
@@ -115,7 +117,7 @@ def main():
     master, base_html, tsv = tmp / "master.md", tmp / "base.html", tmp / "entradas.tsv"
     master.write_text(armar_master(), encoding="utf8")
     env = dict(os.environ, ENTRIES_TSV=str(tsv))
-    subprocess.run(["pandoc", str(master), "-f", "markdown+smart", "-t", "html5", "--standalone",
+    subprocess.run(["pandoc", str(master), "-f", "markdown+smart+autolink_bare_uris", "-t", "html5", "--standalone",
                     "--embed-resources", "--mathml", "--lua-filter", str(BUILD / "apa.lua"),
                     "--metadata", "pagetitle=Geometría fractal", "--metadata", "lang=es",
                     "--css", str(BUILD / "informe.css"), "--include-before-body", str(BUILD / "portada.html"),

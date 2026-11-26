@@ -142,4 +142,4 @@ Los L-systems se usan para **generar vegetación procedural** en videojuegos, ci
 
 ![Curva de Hilbert 3D](../presentacion/capturas/modulo3-hilbert3d.png){width=62% nota="Captura propia. Generación 3: una sola curva de 511 segmentos que visita los 512 puntos de un cubo de 8 × 8 × 8."}
 
-<div class="demo"><img src="img/qr-modulo-3.svg" alt="Código QR del módulo 3"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/03-l-systems/</span></p></div>
+<div class="demo"><img src="img/qr-modulo-3.svg" alt="Código QR del módulo 3"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url"><a href="https://pieersx.github.io/geometria-fractal/modulos/03-l-systems/">https://pieersx.github.io/geometria-fractal/modulos/03-l-systems/</a></span></p></div>

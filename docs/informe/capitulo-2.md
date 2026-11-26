@@ -106,7 +106,7 @@ Los conjuntos de escape se emplean en **generación de texturas y arte procedura
 
 ![Vista dividida: Mandelbrot y Julia](../presentacion/capturas/modulo1-dividida.png){width=88% nota="Captura propia, modo «Vista dividida». El recuadro de la derecha es el conjunto de Julia de $c = -0{,}4 + 0{,}6i$, el punto marcado con la cruz en el plano de Mandelbrot."}
 
-<div class="demo"><img src="img/qr-modulo-1.svg" alt="Código QR del módulo 1"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/01-conjuntos-escape/</span></p></div>
+<div class="demo"><img src="img/qr-modulo-1.svg" alt="Código QR del módulo 1"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url"><a href="https://pieersx.github.io/geometria-fractal/modulos/01-conjuntos-escape/">https://pieersx.github.io/geometria-fractal/modulos/01-conjuntos-escape/</a></span></p></div>
 
 ## 2.6 Referencias del capítulo
 

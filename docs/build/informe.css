@@ -73,3 +73,14 @@ math { font-family: "DejaVu Math TeX Gyre", "STIX Two Math", "Latin Modern Math"
 
 /* Bibliografía: sangría francesa (APA) */
 .bib p { padding-left: 1.27cm; text-indent: -1.27cm; text-align: left; }
+
+/* Enlaces: discretos en papel y activos en el PDF */
+a { color: inherit; text-decoration: none; }
+a.rowlink { display: block; }
+.bib a, .ref a { word-break: break-all; text-decoration: underline dotted; }
+
+/* Tablas largas (bitácora de IA): pueden continuar en la página siguiente, sin partir filas */
+table:has(tbody tr:nth-child(10)) { page-break-inside: auto; break-inside: auto; }
+table:has(tbody tr:nth-child(10)) tr { break-inside: avoid; }
+table:has(tbody tr:nth-child(10)) thead { display: table-header-group; }
+table:has(tbody tr:nth-child(10)) td:nth-child(2) { white-space: nowrap; }
