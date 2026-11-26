@@ -58,6 +58,24 @@
   body.is-veg .veg, body.is-geo .geo { display: block; }
   body.is-veg label.check.veg { display: flex; }
   #treeOnly, #forestOnly { display: none; }
+  #stepbar { position: fixed; left: 304px; right: 16px; bottom: 16px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 10px 14px; backdrop-filter: blur(8px); display: none; }
+  #stepbar.show { display: block; }
+  .strip { font: 15px/1.6 ui-monospace, Consolas, monospace; white-space: pre; overflow: hidden; text-align: center;
+    background: #0f131b; border: 1px solid var(--line); border-radius: 8px; padding: 4px 6px; }
+  .strip span { color: #5d6680; }
+  .strip .done { color: #a9b1c4; }
+  .strip .draw.done { color: #9fd99b; }
+  .strip .br.done { color: #8fb4ff; }
+  .strip .cur { background: var(--accent); color: #1a1405 !important; border-radius: 4px; font-weight: 700; }
+  .stepgrid { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; margin-top: 8px; align-items: start; }
+  .stepinfo { font-size: 13px; }
+  .stepinfo b { color: var(--accent); font-family: ui-monospace, Consolas, monospace; }
+  .stackview { font: 11.5px/1.5 ui-monospace, Consolas, monospace; color: var(--muted); }
+  .stepctl { display: flex; gap: 4px; align-items: center; }
+  .stepctl button { padding: 4px 9px; }
+  .stepctl input { width: 110px; }
+  @media (max-width: 760px) { #stepbar { left: 16px; } .stepgrid { grid-template-columns: 1fr; } }
   @media (max-width: 560px) { #panel { width: calc(100% - 32px); max-height: 46%; } }
 </style>
 </head>
@@ -125,6 +143,7 @@
 
   <div class="row" style="margin-top:12px">
     <button id="grow" class="primary">▶ Ver crecer</button>
+    <button id="step" title="Lee la cadena símbolo por símbolo">👣 Paso a paso</button>
   </div>
   <div class="row" style="margin-top:6px">
     <button id="reset">Reiniciar</button>
@@ -151,6 +170,23 @@
   </details>
 
   <div class="hint">Arrastrar: mover · Rueda o pellizco: zoom · Teclas: flechas, + / − y 0 · <a href="../../">← Portada</a></div>
+</div>
+
+<div id="stepbar" aria-live="polite">
+  <div class="strip" id="strip"></div>
+  <div class="stepgrid">
+    <div class="stepinfo" id="stepInfo"></div>
+    <div class="stepctl">
+      <button id="sFirst" title="Volver al inicio" aria-label="Volver al inicio">⏮</button>
+      <button id="sPrev" title="Símbolo anterior" aria-label="Símbolo anterior">◀</button>
+      <button id="sPlay" class="primary" title="Reproducir o pausar" aria-label="Reproducir o pausar">▶</button>
+      <button id="sNext" title="Símbolo siguiente" aria-label="Símbolo siguiente">▶|</button>
+      <button id="sLast" title="Ir al final" aria-label="Ir al final">⏭</button>
+      <input autocomplete="off" id="speed" type="range" min="0" max="1" step="0.01" value="0.35" aria-label="Velocidad">
+      <span id="vSpeed" style="font-size:12px;color:var(--muted);min-width:54px"></span>
+    </div>
+    <div class="stackview" id="stackView"></div>
+  </div>
 </div>
 
 <script>
@@ -320,7 +356,8 @@ function turtle(c, p, out) {
   const gust = windOn ? p.wind * (0.7 + 0.3 * Math.sin(t * 0.43 + ph)) : 0;
   let x = 0, y = 0, a = p.heading, lv = 0, dist = 0, ns = 0, ne = 0, sp = 0;
   let minX = 0, maxX = 0, minY = 0, maxY = 0, maxDist = 0;
-  for (let i = 0; i < ops.length; i++) {
+  const stop = p.stop === undefined ? ops.length : p.stop;
+  for (let i = 0; i < stop; i++) {
     const o = ops[i];
     if (o <= 2) {
       if (windOn) a -= gust * 0.009 * (0.3 + lv * 0.85) * (0.55 + 0.45 * Math.sin(t * 1.9 + lv * 0.9 + x * 0.06 + ph));
@@ -346,6 +383,7 @@ function turtle(c, p, out) {
     }
   }
   const k = ne * 4; end[k] = x; end[k + 1] = y; end[k + 2] = lv; end[k + 3] = ns; ne++;
+  out.hx = x; out.hy = y; out.ha = a; out.sp = sp;
   out.ns = ns; out.ne = ne; out.minX = minX; out.maxX = maxX; out.minY = minY; out.maxY = maxY;
   out.maxDist = maxDist || 1;
 }
@@ -378,10 +416,12 @@ function rebuild() {
     if (draws > LIMIT_SEGMENTS)
       throw Error(`El dibujo supera ${fmt(LIMIT_SEGMENTS)} segmentos. Baja una generación o usa menos árboles.`);
     if (i === 0) history = ex.history;
-    list.push({ c, stat: makeOut(c), live: makeOut(c), phase: hash(i + 1) * 6.28, s: 1, tx: 0, ty: 0, fade: 0, h: 1 });
+    list.push({ c, stat: makeOut(c), live: makeOut(c), phase: hash(i + 1) * 6.28, s: 1, tx: 0, ty: 0, fade: 0, h: 1,
+      str: i === 0 ? ex.str : null });
   }
   instances = list;
   info = { symbols, history, stochastic: rules.stochastic, ok: true };
+  step.map = null;
   reinterpret();
 }
 
@@ -390,6 +430,82 @@ function reinterpret() {
   for (const inst of instances) turtle(inst.c, turtleParams(inst, 0, 0), inst.stat);
   if (state.preset === "bosque") layoutForest();
   else { const o = instances[0].stat; instances[0].h = Math.max(1e-6, o.maxY - o.minY, o.maxX - o.minX); }
+  if (step.active) stepUpdate();
+}
+
+/* ---------- Paso a paso: la tortuga lee la cadena símbolo por símbolo ---------- */
+const step = { active: false, playing: false, pos: 0, cursor: 0, map: null, out: null };
+const stepSpeed = () => Math.round(Math.pow(10, +$("speed").value * 3));
+const ACTION = {
+  F: "avanza un paso y dibuja", G: "avanza un paso y dibuja", A: "avanza un paso y dibuja", B: "avanza un paso y dibuja",
+  f: "avanza un paso sin dibujar", "|": "da media vuelta (180°)",
+  "[": "guarda la posición y la dirección en la pila (empieza una rama)",
+  "]": "saca de la pila la última posición guardada (vuelve al punto donde nació la rama)"
+};
+function stepPrepare() {
+  const inst = instances[0];
+  if (!inst || !inst.str) return false;
+  if (!step.map) {
+    const s = inst.str, map = new Uint32Array(s.length + 1);
+    let n = 0;
+    for (let i = 0; i < s.length; i++) { if (OP[s[i]]) n++; map[i + 1] = n; }
+    step.map = map;
+    step.out = makeOut(inst.c);
+  }
+  return true;
+}
+function stepUpdate() {
+  if (!stepPrepare()) return;
+  const inst = instances[0], len = inst.str.length;
+  step.cursor = clamp(Math.floor(step.cursor), 0, len);
+  const prm = turtleParams(inst, 0, 0);
+  prm.stop = step.map[step.cursor];
+  turtle(inst.c, prm, step.out);
+  renderStepBar();
+  requestDraw();
+}
+const esc = c => c === "<" ? "&lt;" : c === ">" ? "&gt;" : c === "&" ? "&amp;" : c;
+function renderStepBar() {
+  const s = instances[0].str, c = step.cursor, len = s.length;
+  const half = Math.max(8, Math.floor(($("stepbar").clientWidth - 30) / 9.2 / 2));
+  const a = Math.max(0, c - 1 - half), b = Math.min(len, c - 1 + half + 1);
+  let html = a > 0 ? "<span>…</span>" : "";
+  for (let i = a; i < b; i++) {
+    const ch = s[i], o = OP[ch];
+    const cls = [i < c ? "done" : "", o === 1 ? "draw" : "", o === 6 || o === 7 ? "br" : "", i === c - 1 ? "cur" : ""].join(" ").trim();
+    html += `<span class="${cls}">${esc(ch)}</span>`;
+  }
+  if (b < len) html += "<span>…</span>";
+  $("strip").innerHTML = html;
+
+  const out = step.out, deg = v => (((v * 180 / Math.PI) % 360) + 360) % 360;
+  let txt;
+  if (c === 0) txt = `Inicio: la tortuga está en (0, 0) mirando a ${Math.round(deg(out.ha))}°. Pulsa ▶ para leer la cadena.`;
+  else {
+    const ch = s[c - 1];
+    const act = ACTION[ch] || (ch === "+" ? `gira ${state.angle}° a la izquierda`
+      : ch === "-" ? `gira ${state.angle}° a la derecha` : "no dibuja: solo sirve para reescribirse en la siguiente generación");
+    txt = `Símbolo <b>${fmt(c)}</b> de ${fmt(len)} · <b>${esc(ch)}</b> → ${act}.`;
+  }
+  $("stepInfo").innerHTML = txt + `<br><span style="color:var(--muted)">Segmentos dibujados: ${fmt(out.ns)} · Dirección: ${Math.round(deg(out.ha))}°</span>`;
+
+  const depth = out.sp / 5, st = out.stack, rows = [];
+  for (let d = depth - 1; d >= Math.max(0, depth - 4); d--) {
+    const k = d * 5;
+    rows.push(`${d + 1}: (${st[k].toFixed(1)}, ${st[k + 1].toFixed(1)}) ${Math.round(deg(st[k + 2]))}°`);
+  }
+  $("stackView").innerHTML = `Pila (${depth}):<br>` + (rows.length ? rows.join("<br>") + (depth > 4 ? "<br>…" : "") : "vacía");
+  $("sPlay").textContent = step.playing ? "⏸" : "▶";
+  $("vSpeed").textContent = stepSpeed() + " símb/s";
+}
+function stepGo(c) { step.playing = false; step.cursor = c; step.pos = c; stepUpdate(); }
+function setStepMode(on) {
+  if (on && (state.preset === "bosque" || !stepPrepare())) return;
+  step.active = on; step.playing = false;
+  $("stepbar").classList.toggle("show", on);
+  $("step").textContent = on ? "✕ Salir" : "👣 Paso a paso";
+  if (on) { stopGrow(); step.cursor = step.pos = 0; stepUpdate(); }
+  requestDraw();
 }
 
 function layoutForest() {
@@ -472,8 +588,9 @@ function drawPlain(W, H) {
 /* Zona libre del lienzo (sin el panel) */
 function area(W, H) {
   const r = panel.getBoundingClientRect();
-  if (W > 760) return { x0: r.right + 24, y0: 24, x1: W - 24, y1: H - 24 };
-  return { x0: 16, y0: Math.min(r.bottom, H * 0.5) + 12, x1: W - 16, y1: H - 16 };
+  const bottom = step.active ? $("stepbar").getBoundingClientRect().top - 12 : H - 24;
+  if (W > 760) return { x0: r.right + 24, y0: 24, x1: W - 24, y1: bottom };
+  return { x0: 16, y0: Math.min(r.bottom, H * 0.5) + 12, x1: W - 16, y1: Math.max(bottom, H * 0.6) };
 }
 
 /* Transformación modelo → pantalla, con la vista (zoom y arrastre) encima */
@@ -582,7 +699,7 @@ function resize() {
 function draw(time) {
   resize();
   const W = canvas.clientWidth, H = canvas.clientHeight;
-  const scenic = isVeg() && state.scene;
+  const scenic = isVeg() && state.scene && !step.active;
   scenic ? drawSky(W, H) : drawPlain(W, H);
   if (!instances.length) return;
   const F = lastFit = fit(W, H, scenic);
@@ -597,13 +714,26 @@ function draw(time) {
       ctx.beginPath(); ctx.ellipse(cx, F.oy + 3, rw, Math.max(4, rw * 0.08), 0, 0, Math.PI * 2); ctx.fill();
     }
   }
-  for (const inst of instances) {
+  if (step.active && step.out) {
+    const inst = instances[0], out = step.out;
+    drawInstance(inst, out, F, out.ns, scenic);
+    const ks = F.k * inst.s, ox = F.ox + inst.tx * F.k, oy = F.oy - inst.ty * F.k;
+    ctx.strokeStyle = "#8fb4ff"; ctx.fillStyle = "#8fb4ff"; ctx.lineWidth = 1.5;
+    ctx.font = "11px system-ui"; ctx.textAlign = "left";
+    const depth = out.sp / 5;
+    for (let d = 0; d < depth; d++) {
+      const x = ox + out.stack[d * 5] * ks, y = oy - out.stack[d * 5 + 1] * ks;
+      ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.stroke();
+      if (depth <= 12 || d >= depth - 3) ctx.fillText(String(d + 1), x + 7, y - 6);
+    }
+    head = { x: ox + out.hx * ks, y: oy - out.hy * ks, a: out.ha };
+  } else for (const inst of instances) {
     let out = inst.stat;
     if (windy) { turtle(inst.c, turtleParams(inst, state.wind, time), inst.live); out = inst.live; }
     const limit = anim.growing ? Math.floor(anim.progress * out.ns) : out.ns;
     drawInstance(inst, out, F, limit, scenic);
   }
-  if (anim.growing && head) {
+  if ((anim.growing || step.active) && head) {
     ctx.save(); ctx.translate(head.x, head.y); ctx.rotate(-head.a);
     ctx.shadowColor = "#f5b942"; ctx.shadowBlur = 12; ctx.fillStyle = "#f5b942";
     ctx.beginPath(); ctx.moveTo(9, 0); ctx.lineTo(-6, 6); ctx.lineTo(-3, 0); ctx.lineTo(-6, -6); ctx.closePath(); ctx.fill();
@@ -641,7 +771,7 @@ function updateExplain() {
 }
 
 /* ---------- Bucle de animación (solo cuando hace falta) ---------- */
-const windActive = () => isVeg() && state.wind > 0 && !document.hidden;
+const windActive = () => isVeg() && state.wind > 0 && !document.hidden && !step.active;
 let raf = 0, frames = 0, acc = 0, prevT = 0;
 function requestDraw() { if (!raf) raf = requestAnimationFrame(frame); }
 function frame(now) {
@@ -651,8 +781,14 @@ function frame(now) {
     anim.progress = Math.min(1, (t - anim.start) / anim.duration);
     if (anim.progress >= 1) { anim.growing = false; $("grow").textContent = "↺ Ver crecer otra vez"; }
   }
+  if (step.active && step.playing) {
+    const len = instances[0].str.length;
+    step.pos = Math.min(len, step.pos + stepSpeed() * (prevT ? t - prevT : 0));
+    if (Math.floor(step.pos) !== step.cursor) { step.cursor = Math.floor(step.pos); stepUpdate(); }
+    if (step.cursor >= len) { step.playing = false; renderStepBar(); }
+  }
   draw(t);
-  const looping = anim.growing || windActive();
+  const looping = anim.growing || windActive() || (step.active && step.playing);
   if (looping) {
     const dt = prevT ? t - prevT : 0; prevT = t; frames++; acc += dt;
     if (acc >= 0.5) { $("sFps").textContent = Math.round(frames / acc) + " fps"; frames = 0; acc = 0; }
@@ -705,6 +841,9 @@ function choose(name) {
   $("treeOnly").style.display = name === "arbol" ? "block" : "none";
   $("forestOnly").style.display = name === "bosque" ? "block" : "none";
   stopGrow();
+  setStepMode(false);
+  $("step").disabled = name === "bosque";
+  $("step").title = name === "bosque" ? "No disponible en el bosque: elige un solo árbol" : "Lee la cadena símbolo por símbolo";
   resetView();
   refresh("build");
 }
@@ -712,6 +851,7 @@ function choose(name) {
 function resetView() { view.zoom = 1; view.tx = 0; view.ty = 0; requestDraw(); }
 
 function startGrow() {
+  if (step.active) setStepMode(false);
   const total = instances.reduce((s, i) => s + i.stat.ns, 0);
   if (!total) return;
   anim.duration = clamp(total / 2500, 2.5, 9);
@@ -750,6 +890,16 @@ $("scene").onchange = e => { state.scene = e.target.checked; requestDraw(); };
 $("preset").onchange = e => choose(e.target.value);
 $("reset").onclick = () => choose(state.preset);
 $("grow").onclick = () => anim.growing ? (stopGrow(), requestDraw()) : startGrow();
+$("step").onclick = () => setStepMode(!step.active);
+$("sFirst").onclick = () => stepGo(0);
+$("sPrev").onclick = () => stepGo(step.cursor - 1);
+$("sNext").onclick = () => stepGo(step.cursor + 1);
+$("sLast").onclick = () => stepGo(instances[0].str.length);
+$("sPlay").onclick = () => {
+  if (step.cursor >= instances[0].str.length) step.cursor = step.pos = 0;
+  step.playing = !step.playing; step.pos = step.cursor; renderStepBar(); requestDraw();
+};
+$("speed").oninput = () => renderStepBar();
 $("shot").onclick = () => {
   draw(performance.now() / 1000);
   const a = document.createElement("a");
