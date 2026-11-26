@@ -15,7 +15,7 @@ El diagrama `arquitectura-app.drawio` resume la estructura: la portada enlaza a 
 | `index.html` | Portada con enlaces a los módulos |
 | `modulos/01-conjuntos-escape` | Mandelbrot y Julia en WebGL (implementado) |
 | `modulos/02-ifs-chaos-game` | Juego del caos: Sierpinski y helecho (pendiente) |
-| `modulos/03-l-systems` | L-systems en Canvas 2D: Koch, Sierpinski, dragón, plantas y bosque estocástico (implementado) |
+| `modulos/03-l-systems` | L-systems en Canvas 2D (Koch, Sierpinski, dragón, plantas, bosque) y en WebGL (árbol y curva de Hilbert 3D) (implementado) |
 | `modulos/04-terreno-fractal` | Terreno 3D con diamond-square en WebGL (implementado) |
 | `modulos/05-dimension-fractal` | Box-counting sobre una imagen cargada (pendiente) |
 | `modulos/_plantilla` | Base común: panel, lienzo, Reiniciar y Guardar PNG |
@@ -30,7 +30,7 @@ El diagrama `arquitectura-app.drawio` resume la estructura: la portada enlaza a 
 
 ## 4. Requisitos y ejecución
 
-- Navegador actual (Chrome, Firefox o Edge). Los módulos 1 y 4 requieren además soporte de WebGL.
+- Navegador actual (Chrome, Firefox o Edge). Los módulos 1 y 4, y el modo 3D del módulo 3, requieren además soporte de WebGL.
 - Abrir `index.html` o el módulo deseado. Opcionalmente, servir la carpeta con `python3 -m http.server 8000` y entrar a `http://localhost:8000`.
 
 ## 5. Interacción del módulo 1
@@ -39,7 +39,7 @@ Zoom con la rueda del ratón, desplazamiento arrastrando, selección entre Mande
 
 ## 6. Interacción del módulo 3
 
-Selección entre siete ejemplos, edición del axioma y de las reglas (incluidas reglas estocásticas con peso), generaciones, ángulo, ramas por nivel, número de árboles, irregularidad, viento y semilla. El botón «Ver crecer» anima la tortuga gráfica. Zoom con la rueda o con gestos táctiles, desplazamiento arrastrando, teclado y exportación a PNG. La aplicación muestra símbolos, segmentos, hojas, la cadena de cada generación y la dimensión teórica de los fractales geométricos, y avisa si las reglas tienen corchetes sin cerrar o superan los límites de tamaño.
+Selección entre nueve ejemplos (siete en 2D y dos en 3D), edición del axioma y de las reglas (incluidas reglas estocásticas con peso), generaciones, ángulo, ramas por nivel, número de árboles, irregularidad, viento y semilla. El botón «Ver crecer» anima la tortuga gráfica, y el modo «Paso a paso» lee la cadena símbolo por símbolo mostrando la pila. En 3D se ajustan además el giro sobre el eje y el tropismo, y la cámara gira alrededor del modelo. Zoom con la rueda o con gestos táctiles, desplazamiento arrastrando, teclado y exportación a PNG. La aplicación muestra símbolos, segmentos, hojas, la cadena de cada generación y la dimensión teórica de los fractales geométricos, y avisa si las reglas tienen corchetes sin cerrar o superan los límites de tamaño.
 
 ## 7. Limitaciones conocidas
 
