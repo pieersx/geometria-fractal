@@ -1,11 +1,11 @@
 # Conclusión
 
-> **Estado:** borrador. Completar con los resultados reales de los módulos 2 a 5 antes de entregar.
-
 El trabajo permitió estudiar y representar en tiempo real cinco técnicas de geometría fractal. Se confirmó que **reglas muy simples pueden generar estructuras de gran complejidad**: una iteración cuadrática produce los conjuntos de Mandelbrot y Julia, un puñado de transformaciones afines dibuja un helecho, y unas pocas reglas de reescritura describen una planta ramificada.
 
 Cada técnica tiene un perfil propio. Los conjuntos de escape aprovechan el paralelismo de la GPU pero chocan con los límites de precisión numérica. Los sistemas de funciones iteradas son compactos y tienen sólido respaldo matemático, aunque su convergencia es estocástica. Los L-systems modelan bien la ramificación, pero crecen exponencialmente con las generaciones. Los terrenos fractales dan paisajes convincentes con pocos parámetros, a costa de realismo geológico. La estimación de la dimensión fractal conecta la teoría con imágenes reales, aunque depende de la binarización y del rango de escalas.
 
 Desde la computación visual, el proyecto mostró el valor de combinar fundamentos matemáticos con una implementación interactiva: la interfaz con controles en tiempo real permite comprender el efecto de cada parámetro mejor que una descripción escrita. El uso de módulos independientes y de una plantilla común facilitó el trabajo en equipo.
 
-Como **trabajo futuro** se identifican: aumentar la precisión del zoom en los conjuntos de escape, extender los L-systems a reglas paramétricas o a tres dimensiones, incorporar erosión a los terrenos y validar el box-counting con formas de dimensión conocida.
+Las mediciones respaldan estas conclusiones. En el módulo 1, la GPU calcula el mismo Mandelbrot unas 25 veces más rápido que un bucle en JavaScript. En el módulo 5, el conteo de cajas midió la curva de Koch con una dimensión de 1,264 frente a la teórica de 1,262 (error de 0,2 %), y entre 1,2 % y 3,2 % de error en la línea, el triángulo de Sierpinski y el cuadrado. Que el error cambie con el rango de escalas elegido es la advertencia más importante del método. Además, la curva de Koch cierra un ciclo entre módulos: se genera con la regla de un L-system y se mide con box-counting.
+
+Como **trabajo futuro** se identifican: aumentar la precisión del zoom en los conjuntos de escape, añadir reglas paramétricas a los L-systems, incorporar erosión a los terrenos, buscar la posición de malla que minimiza el conteo en el box-counting y medir la dimensión de imágenes reales, como costas o siluetas de hojas.

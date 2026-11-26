@@ -4,11 +4,9 @@
 **Resumen del capítulo.** La aplicación es un conjunto de páginas web autocontenidas, una por técnica, con un panel de controles y un lienzo. Cada módulo se puede abrir desde el navegador, sin instalar nada.
 :::
 
-> **Estado:** borrador. Los módulos 1, 3 y 4 están implementados; los módulos 2 y 5 se describen según el diseño acordado.
-
 ## 7.1 Visión general
 
-La aplicación es un conjunto de páginas web interactivas, escritas en **HTML y JavaScript**, que usan **WebGL** en los conjuntos de escape y en el terreno fractal, y que se ejecutan en el navegador sin instalar nada. Una portada (`index.html`) enlaza a cinco módulos independientes, uno por técnica estudiada en el informe.
+La aplicación es un conjunto de páginas web interactivas, escritas en **HTML y JavaScript**, que usan **WebGL** en los conjuntos de escape, en el terreno fractal y en el modo 3D de los L-systems, y que se ejecutan en el navegador sin instalar nada. Una portada (`index.html`) enlaza a cinco módulos independientes, uno por técnica estudiada en el informe.
 
 ## 7.2 Arquitectura
 

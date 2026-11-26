@@ -4,8 +4,6 @@
 **Resumen del capítulo.** Mandelbrot y Julia iteran $z^2 + c$ y colorean cada píxel según la rapidez con que escapa. El módulo 1 lo calcula en la GPU con WebGL; su límite es la precisión de 32 bits al ampliar.
 :::
 
-> **Estado:** borrador. El módulo 1 ya cuenta con prototipo; el texto describe su comportamiento actual.
-
 ## 2.1 Descripción del algoritmo
 
 Los conjuntos de escape se definen iterando la función cuadrática compleja:

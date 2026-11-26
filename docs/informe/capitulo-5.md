@@ -4,8 +4,6 @@
 **Resumen del capítulo.** El módulo 4 genera terrenos con diamond-square y los dibuja en WebGL. La rugosidad $r$ controla el relieve y se relaciona con el exponente de Hurst $H$ y con la dimensión $D$.
 :::
 
-> **Estado:** ajustado al módulo 4 implementado. Base de Keyla Sihuacollo (diamond-square en Canvas 2D), rediseñada en WebGL con agua, cielo y niebla. El fBm se describe solo como método alternativo de referencia.
-
 ## 5.1 Descripción del algoritmo
 
 Un terreno natural presenta relieve a muchas escalas: cordilleras, colinas, rocas. Un **terreno fractal** reproduce esa propiedad combinando variaciones de altura en distintas escalas. Existen dos familias principales:

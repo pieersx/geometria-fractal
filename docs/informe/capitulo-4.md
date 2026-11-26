@@ -4,8 +4,6 @@
 **Resumen del capítulo.** Un L-system reescribe cadenas de símbolos que una tortuga gráfica interpreta como dibujo. El módulo 3 lo aplica a curvas fractales (Koch, Sierpinski, dragón y Hilbert 3D) y a vegetación procedural en 2D y 3D, con reglas editables y estocásticas.
 :::
 
-> **Estado:** ajustado al módulo 3 implementado. Base de Valeria Flores (árbol con ramas por nivel e irregularidad en Canvas 2D), rediseñada con el estilo de los módulos 1 y 4 y ampliada con más ejemplos, reglas estocásticas, animación de crecimiento, viento, un modo paso a paso y un modo 3D en WebGL.
-
 ## 4.1 Descripción del algoritmo
 
 Un **L-system** (sistema de Lindenmayer) es un sistema de reescritura de cadenas. Lindenmayer (1968) lo propuso para describir el desarrollo de organismos filamentosos, donde todas las células se dividen en paralelo. Se compone de:
