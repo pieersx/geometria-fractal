@@ -11,7 +11,7 @@ Documento vivo: se actualiza al cerrar cada tarea. Estado al 26/11/2026 (revisi�
 | Presentación | 14–17 diapositivas, poco texto y una imagen grande por diapositiva. PDF para compartir. | PDF regenerado el 26/11 (19 diapositivas; la meta era 14–17) |
 | Aplicación | 5 módulos funcionando | Los 5 módulos están integrados en `main` y revisados (código, textos y datos del informe). Falta la prueba en el equipo de la exposición |
 | Video | 1 video de 2–3 minutos con recorrido por los 5 módulos | No existe |
-| Bitácora de IA | Fecha, hora real, herramienta y tema de cada uso | Horas en `__:__` |
+| Bitácora de IA | Fecha, hora real, herramienta y tema de cada uso | Horas de Pieers completas hasta el 26/11 (11:45); falta registrar el uso de IA de los demás integrantes |
 
 ## 2. Cumplimiento de la rúbrica
 

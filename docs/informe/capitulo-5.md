@@ -38,6 +38,16 @@ La visualización usa **WebGL**. La altura de cada punto y su pendiente se enví
 
 Controles disponibles: paisajes predefinidos, paleta (alpina, desierto, violeta, ártico), rugosidad, altura del relieve (reescala sin regenerar), nivel del agua, altura del sol, nivel de detalle, semilla, forma de isla, malla visible, órbita automática, giro con ratón, pellizco o flechas, zoom con rueda o teclas + y −, reinicio de vista y guardado en PNG. El panel muestra el tamaño de la malla, *H*, *D*, el zoom y los cuadros por segundo.
 
+### Ejemplo con números
+
+Se toma una cuadrícula de 5 × 5 puntos (n = 2) con rugosidad $r = 0{,}59$. Las esquinas parten de $0{,}10$, $-0{,}20$, $0{,}30$ y $0{,}00$, y la amplitud inicial es 1. En el código, cada desplazamiento es $(\text{aleatorio} - 0{,}5) \cdot \text{amplitud}$, de modo que en la primera ronda queda entre $-0{,}5$ y $+0{,}5$. Los desplazamientos de este ejemplo son valores supuestos, para poder hacer las cuentas a mano; en la aplicación los fija la semilla.
+
+1. **Paso *diamond*.** El centro recibe el promedio de las cuatro esquinas, $(0{,}10 - 0{,}20 + 0{,}30 + 0{,}00)/4 = 0{,}05$, más un desplazamiento. Con $+0{,}20$ queda en $0{,}25$.
+2. **Paso *square*.** El punto medio del borde superior tiene tres vecinos: las dos esquinas de arriba y el centro. Su valor es $(0{,}10 - 0{,}20 + 0{,}25)/3 = 0{,}05$, más otro desplazamiento. Solo se promedian los vecinos que existen, porque el borde no tiene vecino hacia arriba.
+3. **Fin de la ronda.** La amplitud se multiplica por $r$: pasa de 1 a $0{,}59$. En la ronda siguiente los desplazamientos quedan entre $-0{,}30$ y $+0{,}30$, y después de la tercera ronda la amplitud es $0{,}59^3 \approx 0{,}21$.
+
+Esa reducción en cada ronda es lo que hace que el relieve grande domine y los detalles pequeños sean cada vez más suaves. Con $r = 0{,}59$ resulta $H = -\log_2 0{,}59 \approx 0{,}76$ y $D = 3 - H \approx 2{,}24$, los valores que muestra el panel.
+
 ## 5.2 Fortalezas
 
 - **Aspecto natural convincente** con pocos parámetros.
