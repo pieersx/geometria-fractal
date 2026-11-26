@@ -36,6 +36,18 @@ th { color: #6b3fd1; }
 .flow .ar { flex: 0 0 auto; background: none; align-self: center; font-size: 40px; padding: 0; }
 .ref { font-size: 19px; line-height: 1.35; margin-bottom: 8px; }
 
+
+a { color: #c9a8ff; }
+.light a { color: #6b3fd1; }
+.tag.ann { background: #1f4a5e; color: #d6f1ff; }
+.agenda { display: flex; gap: 12px; margin-top: 54px; }
+.agenda div { flex: 1; background: #1b1c36; border-radius: 12px; padding: 14px 16px; font-size: 20px; line-height: 1.3; }
+.agenda b { color: #c9a8ff; display: block; font-size: 20px; margin-bottom: 4px; }
+.idx { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+.idx div { background: #1b1c36; border-radius: 12px; padding: 14px 18px; font-size: 21px; line-height: 1.35; }
+.idx b { color: #c9a8ff; display: block; font-size: 22px; margin-bottom: 4px; }
+
+.tight th, .tight td { padding: 5px 14px; }
 body { counter-reset: sl; }
 .s { counter-increment: sl; }
 .s:not(:first-child)::after { content: counter(sl); position: absolute; bottom: 26px; right: 72px; font-size: 18px; color: #8a86ab; }
@@ -53,19 +65,15 @@ body { counter-reset: sl; }
 
 <section class="s">
   <p class="sub">Computación Visual · 8.º ciclo · Grupo 8</p>
-  <h1 style="margin-top:130px">Geometría fractal:<br>algoritmos y aplicación gráfica interactiva</h1>
-  <p class="sub" style="margin-top:40px">Universidad Nacional Mayor de San Marcos · Ingeniería de Sistemas<br>Exposición: 02/12/2026</p>
-</section>
-
-<section class="s light">
-  <h2>Qué vamos a ver</h2>
-  <ul>
-    <li><span class="k">¿Qué es un fractal?</span> y por qué importa en computación visual</li>
-    <li><span class="k">5 algoritmos</span>, cada uno con su demostración en la app</li>
-    <li><span class="k">Un hilo conductor:</span> la curva de Koch recorre tres módulos</li>
-    <li><span class="k">Demo en vivo</span> con participación del público</li>
-    <li><span class="k">Conclusiones</span> y preguntas</li>
-  </ul>
+  <h1 style="margin-top:70px">Geometría fractal:<br>algoritmos y aplicación gráfica interactiva</h1>
+  <p class="sub" style="margin-top:26px">Universidad Nacional Mayor de San Marcos · Ingeniería de Sistemas<br>Exposición: 02/12/2026</p>
+  <div class="agenda">
+    <div><b>1 · Concepto</b>¿Qué es un fractal?</div>
+    <div><b>2 · Algoritmos</b>Cinco técnicas, cada una con su demo</div>
+    <div><b>3 · Hilo conductor</b>La curva de Koch, de la regla a la medida</div>
+    <div><b>4 · En vivo</b>Demostración con el público</div>
+    <div><b>5 · Cierre</b>Conclusiones y preguntas</div>
+  </div>
 </section>
 
 <section class="s">
@@ -105,7 +113,7 @@ body { counter-reset: sl; }
     <img class="img" src="../presentacion/capturas/modulo1-zoom-3.png" alt="Mandelbrot con zoom de 1 500 aumentos">
   </div>
   <p class="who">Pachas Auris, Pieers Fernando</p>
-  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-1.svg" alt="QR módulo 1"></div>
+  <div class="qr"><a href="https://pieersx.github.io/geometria-fractal/modulos/01-conjuntos-escape/" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-1.svg" alt="QR módulo 1"></a></div>
 </section>
 
 <section class="s">
@@ -117,16 +125,6 @@ body { counter-reset: sl; }
     <div><img src="../presentacion/capturas/modulo1-julia-conejo.png"><p class="cap">c = −0,123 + 0,745i · «Conejo»</p></div>
   </div>
   <p style="margin-top:10px">Misma fórmula <code>z → z² + c</code>; solo cambia <span class="k">c</span> y la forma es otra.</p>
-</section>
-
-<section class="s">
-  <span class="tag">Módulo 1 · Aprender cómo se forma</span>
-  <h2>De cero al conjunto, capa por capa</h2>
-  <div class="duo">
-    <div><img src="../presentacion/capturas/modulo1-paso-12-limpio.png"><p class="cap">Construir desde cero: iteración 12</p></div>
-    <div><img src="../presentacion/capturas/modulo1-orbita-escapa-limpio.png"><p class="cap">Órbita de un punto que escapa</p></div>
-  </div>
-  <p style="margin-top:8px">Sin iteraciones todo es negro. Cada iteración añade una <span class="k">capa</span>; el punto escapa cuando su órbita sale de |z| = 2.</p>
 </section>
 
 <section class="s">
@@ -145,7 +143,7 @@ body { counter-reset: sl; }
     <img class="img" src="../presentacion/capturas/modulo2-helecho.png" alt="Helecho de Barnsley con juego del caos">
   </div>
   <p class="who">Cerna Aguilar, Emily Andrea</p>
-  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-2.svg" alt="QR módulo 2"></div>
+  <div class="qr"><a href="https://pieersx.github.io/geometria-fractal/modulos/02-ifs-chaos-game/" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-2.svg" alt="QR módulo 2"></a></div>
 </section>
 
 <section class="s">
@@ -163,7 +161,7 @@ body { counter-reset: sl; }
     <img class="img" src="../presentacion/capturas/modulo3-arbol3d-limpio.png" alt="Árbol 3D generado con un L-system">
   </div>
   <p class="who">Flores Cortez, Valeria Alexandra</p>
-  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-3.svg" alt="QR módulo 3"></div>
+  <div class="qr"><a href="https://pieersx.github.io/geometria-fractal/modulos/03-l-systems/" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-3.svg" alt="QR módulo 3"></a></div>
 </section>
 
 <section class="s">
@@ -191,7 +189,7 @@ body { counter-reset: sl; }
     <img class="img" src="../presentacion/capturas/modulo4-rugosidad-059.png" alt="Terreno fractal">
   </div>
   <p class="who">Sihuacollo Sierra, Keyla Noemi</p>
-  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-4.svg" alt="QR módulo 4"></div>
+  <div class="qr"><a href="https://pieersx.github.io/geometria-fractal/modulos/04-terreno-fractal/" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-4.svg" alt="QR módulo 4"></a></div>
 </section>
 
 <section class="s">
@@ -219,7 +217,7 @@ body { counter-reset: sl; }
     <img class="img" src="../presentacion/capturas/modulo5-koch.png" alt="Box-counting sobre la curva de Koch">
   </div>
   <p class="who">Puente Carmen, Rodrigo Joaquin</p>
-  <div class="qr"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-5.svg" alt="QR módulo 5"></div>
+  <div class="qr"><a href="https://pieersx.github.io/geometria-fractal/modulos/05-dimension-fractal/" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none"><span>Pruébalo<br>en la app</span><img src="../informe/img/qr-modulo-5.svg" alt="QR módulo 5"></a></div>
 </section>
 
 <section class="s light">
@@ -241,8 +239,9 @@ body { counter-reset: sl; }
     <li>Otra persona elige la <span class="k">semilla</span> del terreno</li>
     <li>Generamos Koch y medimos su dimensión</li>
   </ul>
-  <p class="sub" style="margin-top:40px">Plan B: video de 2–3 minutos con el recorrido por los cinco módulos.</p>
-  <div class="qr" style="bottom:60px;right:72px;font-size:20px"><span>Abre la app<br>desde tu celular</span><img src="../informe/img/qr-modulo-1.svg" alt="QR" style="width:120px;height:120px"></div>
+  <p class="sub" style="margin-top:36px">App: <a href="https://pieersx.github.io/geometria-fractal/">pieersx.github.io/geometria-fractal</a></p>
+  <p class="sub" style="margin-top:6px">Plan B: video de 2–3 minutos con el recorrido por los cinco módulos.</p>
+  <div class="qr" style="bottom:60px;right:72px;font-size:20px"><a href="https://pieersx.github.io/geometria-fractal/" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none"><span>Abre la app<br>desde tu celular</span><img src="../informe/img/qr-modulo-1.svg" alt="QR" style="width:120px;height:120px"></a></div>
 </section>
 
 <section class="s light">
@@ -269,16 +268,231 @@ body { counter-reset: sl; }
 
 <section class="s light">
   <h2>Referencias principales</h2>
-  <p class="ref">Barnsley, M. F., &amp; Demko, S. (1985). Iterated function systems and the global construction of fractals. <i>Proceedings of the Royal Society of London. A, 399</i>(1817), 243–275. https://doi.org/10.1098/rspa.1985.0057</p>
-  <p class="ref">Fournier, A., Fussell, D., &amp; Carpenter, L. (1982). Computer rendering of stochastic models. <i>Communications of the ACM, 25</i>(6), 371–384. https://doi.org/10.1145/358523.358553</p>
-  <p class="ref">Liebovitch, L. S., &amp; Toth, T. (1989). A fast algorithm to determine fractal dimensions by box counting. <i>Physics Letters A, 141</i>(8–9), 386–390. https://doi.org/10.1016/0375-9601(89)90854-2</p>
-  <p class="ref">Lindenmayer, A. (1968). Mathematical models for cellular interactions in development I. <i>Journal of Theoretical Biology, 18</i>(3), 280–299. https://doi.org/10.1016/0022-5193(68)90079-9</p>
-  <p class="ref">Mandelbrot, B. (1967). How long is the coast of Britain? Statistical self-similarity and fractional dimension. <i>Science, 156</i>(3775), 636–638. https://doi.org/10.1126/science.156.3775.636</p>
+  <p class="ref">Barnsley, M. F., &amp; Demko, S. (1985). Iterated function systems and the global construction of fractals. <i>Proceedings of the Royal Society of London. A, 399</i>(1817), 243–275. <a href="https://doi.org/10.1098/rspa.1985.0057">https://doi.org/10.1098/rspa.1985.0057</a></p>
+  <p class="ref">Fournier, A., Fussell, D., &amp; Carpenter, L. (1982). Computer rendering of stochastic models. <i>Communications of the ACM, 25</i>(6), 371–384. <a href="https://doi.org/10.1145/358523.358553">https://doi.org/10.1145/358523.358553</a></p>
+  <p class="ref">Liebovitch, L. S., &amp; Toth, T. (1989). A fast algorithm to determine fractal dimensions by box counting. <i>Physics Letters A, 141</i>(8–9), 386–390. <a href="https://doi.org/10.1016/0375-9601(89)90854-2">https://doi.org/10.1016/0375-9601(89)90854-2</a></p>
+  <p class="ref">Lindenmayer, A. (1968). Mathematical models for cellular interactions in development I. <i>Journal of Theoretical Biology, 18</i>(3), 280–299. <a href="https://doi.org/10.1016/0022-5193(68)90079-9">https://doi.org/10.1016/0022-5193(68)90079-9</a></p>
+  <p class="ref">Mandelbrot, B. (1967). How long is the coast of Britain? Statistical self-similarity and fractional dimension. <i>Science, 156</i>(3775), 636–638. <a href="https://doi.org/10.1126/science.156.3775.636">https://doi.org/10.1126/science.156.3775.636</a></p>
   <p class="sub" style="font-size:20px">Lista completa en el informe.</p>
 </section>
 
 <section class="s">
   <h1 style="margin-top:200px;text-align:center">¿Preguntas?</h1>
   <p class="sub" style="text-align:center">Grupo 8 · Computación Visual</p>
+  <p class="sub" style="text-align:center;font-size:20px;margin-top:30px">Las páginas siguientes son el anexo de respaldo: teoría, ejemplos con números y resultados.</p>
 </section>
+
+<!-- ===================== ANEXO (respaldo, no se expone) ===================== -->
+
+<section class="s">
+  <span class="tag ann">Anexo</span>
+  <h1 style="margin-top:20px">Teoría y resultados de respaldo</h1>
+  <p class="sub">Material para consultar durante las preguntas y para leer después. No se expone.</p>
+  <div class="idx">
+    <div><b>Módulo 1</b>A1 De cero al conjunto · A2 Ejemplo con números · A3 CPU frente a GPU</div>
+    <div><b>Módulo 2</b>A4 Tres pasos del juego del caos · A5 Helecho de Barnsley</div>
+    <div><b>Módulo 3</b>A6 Lectura de la tortuga · A7 Crecimiento por generación</div>
+    <div><b>Módulo 4</b>A8 Una ronda de diamond-square y la dimensión</div>
+    <div><b>Módulo 5</b>A9 Conteo de cajas de Koch · A10 Validación</div>
+    <div><b>Cierre</b>A11 Casos prácticos · A12 Tiempos medidos · A13 Bibliografía</div>
+  </div>
+</section>
+
+<section class="s">
+  <span class="tag ann">A1 · Módulo 1</span>
+  <h2>De cero al conjunto, capa por capa</h2>
+  <div class="duo">
+    <div><img src="../presentacion/capturas/modulo1-paso-12-limpio.png"><p class="cap">Construir desde cero: iteración 12</p></div>
+    <div><img src="../presentacion/capturas/modulo1-orbita-escapa-limpio.png"><p class="cap">Órbita de un punto que escapa</p></div>
+  </div>
+  <p style="margin-top:8px">Sin iteraciones todo es negro. Cada iteración añade una <span class="k">capa</span>; el punto escapa cuando su órbita sale de |z| = 2.</p>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A2 · Módulo 1</span>
+  <h2>Ejemplo con números: ¿escapa c = 1?</h2>
+  <div class="row" style="align-items:flex-start;height:auto">
+    <div class="col">
+      <table>
+        <tr><th>Iteración</th><th>Cálculo</th><th>zₙ</th><th>|zₙ| &gt; 2</th></tr>
+        <tr><td>0</td><td>valor inicial</td><td>0</td><td>no</td></tr>
+        <tr><td>1</td><td>0² + 1</td><td>1</td><td>no</td></tr>
+        <tr><td>2</td><td>1² + 1</td><td>2</td><td>no</td></tr>
+        <tr><td>3</td><td>2² + 1</td><td>5</td><td><b>sí</b></td></tr>
+        <tr><td>4</td><td>5² + 1</td><td>26</td><td>sí</td></tr>
+      </table>
+    </div>
+    <div class="col" style="flex:1">
+      <p><span class="k">c = 1 escapa</span> en la iteración 3: se pinta con el color de esa iteración.</p>
+      <p><span class="k">c = −1 pertenece:</span> la órbita es 0 → −1 → 0 → −1… y nunca crece (negro).</p>
+    </div>
+  </div>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A3 · Módulo 1</span>
+  <h2>Mandelbrot: CPU frente a GPU</h2>
+  <table>
+    <tr><th>Resolución</th><th>CPU (JavaScript), ms</th><th>GPU (WebGL), ms</th><th>Aceleración</th></tr>
+    <tr><td>800 × 600</td><td>37,9</td><td>1,5</td><td>≈ 25×</td></tr>
+    <tr><td>1920 × 1080</td><td>128</td><td>3,2</td><td>≈ 40×</td></tr>
+  </table>
+  <p style="margin-top:30px">Misma imagen (200 iteraciones, radio de escape 16), promedio de 10 corridas tras una de calentamiento. La GPU casi no sufre al subir de 480 000 a 2 073 600 píxeles porque calcula miles de píxeles en paralelo.</p>
+  <p class="sub" style="font-size:20px">Equipo: Ryzen 5 3600X, GeForce GTX 1650, Chromium 156, Windows 11 (25/11/2026). La CPU calcula con 64 bits y la GPU con 32: se compara velocidad, no exactitud.</p>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A4 · Módulo 2</span>
+  <h2>Tres pasos del juego del caos</h2>
+  <table>
+    <tr><th>Paso</th><th>Vértice</th><th>Cálculo con x′ = r·x + (1 − r)·v</th><th>Punto nuevo</th></tr>
+    <tr><td>0</td><td></td><td>punto inicial</td><td>(0,100; 0,100)</td></tr>
+    <tr><td>1</td><td>B = (1; 0)</td><td>0,5·0,1 + 0,5·1 y 0,5·0,1 + 0,5·0</td><td>(0,550; 0,050)</td></tr>
+    <tr><td>2</td><td>C = (0,5; 0,866)</td><td>0,5·0,55 + 0,5·0,5 y 0,5·0,05 + 0,5·0,866</td><td>(0,525; 0,458)</td></tr>
+    <tr><td>3</td><td>A = (0; 0)</td><td>0,5·0,525 y 0,5·0,458</td><td>(0,263; 0,229)</td></tr>
+  </table>
+  <p style="margin-top:28px">Con r = 1/2 el punto recorre la mitad del camino hacia el vértice elegido. Queda dentro del triángulo y no sale: por eso se descartan los primeros 20 puntos sin afectar el dibujo.</p>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A5 · Módulo 2</span>
+  <h2>Helecho de Barnsley: cuatro transformaciones</h2>
+  <table style="font-size:21px">
+    <tr><th>Papel</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>Probabilidad</th></tr>
+    <tr><td>Tallo</td><td>0</td><td>0</td><td>0</td><td>0,16</td><td>0</td><td>0</td><td>1 %</td></tr>
+    <tr><td>Helecho reducido</td><td>0,85</td><td>0,04</td><td>−0,04</td><td>0,85</td><td>0</td><td>1,6</td><td>85 %</td></tr>
+    <tr><td>Hoja izquierda</td><td>0,2</td><td>−0,26</td><td>0,23</td><td>0,22</td><td>0</td><td>1,6</td><td>7 %</td></tr>
+    <tr><td>Hoja derecha</td><td>−0,15</td><td>0,28</td><td>0,26</td><td>0,24</td><td>0</td><td>0,44</td><td>7 %</td></tr>
+  </table>
+  <p style="margin-top:24px">Cada transformación es x′ = a·x + b·y + e e y′ = c·x + d·y + f. Siete números por regla bastan para dibujar una hoja reconocible.</p>
+  <p class="sub" style="font-size:21px">Ejemplo: (0; 0) → (0; 1,6) → (0,064; 2,960) con la regla 2; con la regla 3 sobre ese punto resulta (−0,757; 2,266), a la izquierda del tallo.</p>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A6 · Módulo 3</span>
+  <h2>La tortuga lee F+F−−F+F</h2>
+  <table class="tight" style="font-size:21px">
+    <tr><th>Símbolo</th><th>Acción</th><th>Rumbo</th><th>Posición</th></tr>
+    <tr><td></td><td>inicio</td><td>0°</td><td>(0; 0)</td></tr>
+    <tr><td><code>F</code></td><td>avanza 1</td><td>0°</td><td>(1; 0)</td></tr>
+    <tr><td><code>+</code></td><td>gira 60° a la izquierda</td><td>60°</td><td>(1; 0)</td></tr>
+    <tr><td><code>F</code></td><td>avanza 1</td><td>60°</td><td>(1,5; 0,866)</td></tr>
+    <tr><td><code>− −</code></td><td>gira 120° a la derecha</td><td>−60°</td><td>(1,5; 0,866)</td></tr>
+    <tr><td><code>F</code></td><td>avanza 1</td><td>−60°</td><td>(2; 0)</td></tr>
+    <tr><td><code>+</code></td><td>gira 60° a la izquierda</td><td>0°</td><td>(2; 0)</td></tr>
+    <tr><td><code>F</code></td><td>avanza 1</td><td>0°</td><td>(3; 0)</td></tr>
+  </table>
+  <p style="margin-top:12px;font-size:22px">Un trazo recto de longitud 3 se convierte en 4 segmentos con un pico: cada generación alarga la curva por <span class="k">4/3</span>.</p>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A7 · Módulo 3</span>
+  <h2>La cadena crece exponencialmente</h2>
+  <table style="font-size:21px">
+    <tr><th>Ejemplo</th><th>Generaciones</th><th>Símbolos</th><th>Segmentos</th><th>Tiempo, ms</th></tr>
+    <tr><td>Curva de Koch</td><td>4</td><td>596</td><td>256</td><td>0,2</td></tr>
+    <tr><td>Curva de Koch</td><td>6</td><td>9 556</td><td>4 096</td><td>1,6</td></tr>
+    <tr><td>Triángulo de Sierpinski</td><td>8</td><td>13 121</td><td>6 561</td><td>1,4</td></tr>
+    <tr><td>Curva del dragón</td><td>14</td><td>65 534</td><td>16 384</td><td>4,5</td></tr>
+    <tr><td>Planta ramificada</td><td>5</td><td>88 940</td><td>32 768</td><td>4,9</td></tr>
+  </table>
+  <p style="margin-top:22px">Los segmentos se multiplican por 4 en cada generación de Koch, por 3 en Sierpinski y por 2 en el dragón. El tiempo sigue al tamaño de la cadena (unos 15 millones de símbolos por segundo). La app limita la cadena a 1 500 000 símbolos para proteger al navegador.</p>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A8 · Módulo 4</span>
+  <h2>Una ronda de diamond-square y la dimensión</h2>
+  <div class="row" style="align-items:flex-start;height:auto">
+    <div class="col">
+      <ul style="font-size:22px">
+        <li><b>Diamond:</b> el centro recibe el promedio de las 4 esquinas, (0,10 − 0,20 + 0,30 + 0,00)/4 = 0,05, más un desplazamiento (+0,20 → 0,25).</li>
+        <li><b>Square:</b> el punto medio del borde superior promedia sus 3 vecinos que existen: (0,10 − 0,20 + 0,25)/3 = 0,05, más otro desplazamiento.</li>
+        <li><b>Fin de ronda:</b> la amplitud se multiplica por r: 1 → 0,59 → 0,35 → 0,21.</li>
+      </ul>
+      <p class="sub" style="font-size:19px">Desplazamientos supuestos para poder hacer las cuentas a mano; en la app los fija la semilla.</p>
+    </div>
+    <div class="col" style="flex:1">
+      <table style="font-size:21px">
+        <tr><th>r</th><th>H = −log₂ r</th><th>D = 3 − H</th></tr>
+        <tr><td>0,40</td><td>1,32</td><td>2 (liso)</td></tr>
+        <tr><td>0,59</td><td>0,76</td><td>≈ 2,24</td></tr>
+        <tr><td>0,80</td><td>0,32</td><td>≈ 2,68</td></tr>
+      </table>
+      <p class="sub" style="font-size:19px">Es una estimación teórica de la superficie, no una medición.</p>
+    </div>
+  </div>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A9 · Módulo 5</span>
+  <h2>Box-counting con la curva de Koch</h2>
+  <div class="row" style="align-items:flex-start;height:auto">
+    <div class="col">
+      <table style="font-size:21px">
+        <tr><th>Lado de caja s (px)</th><th>Cajas N(s)</th><th>ln(1024/s)</th><th>ln N(s)</th></tr>
+        <tr><td>8</td><td>468</td><td>4,852</td><td>6,148</td></tr>
+        <tr><td>16</td><td>206</td><td>4,159</td><td>5,328</td></tr>
+        <tr><td>32</td><td>84</td><td>3,466</td><td>4,431</td></tr>
+        <tr><td>64</td><td>34</td><td>2,773</td><td>3,526</td></tr>
+      </table>
+    </div>
+    <div class="col" style="flex:1">
+      <p style="font-size:23px">Pendiente del ajuste: <span class="k">D = 1,264</span> con R² = 0,9995. Teórica: ln 4 / ln 3 ≈ 1,262.</p>
+      <p style="font-size:21px">Con solo las dos cajas más pequeñas la pendiente es 1,18; con las dos más grandes, 1,30. Por eso se ajusta sobre varias escalas y se declaran.</p>
+    </div>
+  </div>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A10 · Módulo 5</span>
+  <h2>Validación: dimensión teórica frente a medida</h2>
+  <table>
+    <tr><th>Figura</th><th>D teórica</th><th>D medida</th><th>Error</th></tr>
+    <tr><td>Línea recta</td><td>1,000</td><td>0,988</td><td>1,2 %</td></tr>
+    <tr><td>Curva de Koch</td><td>1,262</td><td>1,264</td><td>0,2 %</td></tr>
+    <tr><td>Triángulo de Sierpinski</td><td>1,585</td><td>1,535</td><td>3,2 %</td></tr>
+    <tr><td>Cuadrado relleno</td><td>2,000</td><td>1,936</td><td>3,2 %</td></tr>
+  </table>
+  <p style="margin-top:26px">Imagen de 1 024 px, cajas de 8 a 64 px, R² &gt; 0,999 en las cuatro. El error mayor aparece cuando la figura ocupa pocas cajas grandes y el resultado depende de la posición de la malla. Con cajas de 4 a 128 px, Koch da 1,260 y el cuadrado 1,892: <span class="k">el rango de escalas siempre se indica.</span></p>
+</section>
+
+<section class="s">
+  <span class="tag ann">A11 · Casos prácticos</span>
+  <h2>Dónde se usa cada técnica</h2>
+  <table style="color:#eceaf7;font-size:21px">
+    <tr><th style="color:#c9a8ff">Módulo</th><th style="color:#c9a8ff">Caso práctico</th></tr>
+    <tr><td>1 · Conjuntos de escape</td><td>Texturas y arte procedural; prueba de rendimiento de GPU</td></tr>
+    <tr><td>2 · IFS y juego del caos</td><td>Vegetación y formas naturales; base de la compresión fractal de imágenes</td></tr>
+    <tr><td>3 · L-systems</td><td>Vegetación procedural en videojuegos, cine y simulación</td></tr>
+    <tr><td>4 · Terreno fractal</td><td>Paisajes para videojuegos, simulación y cine (Perlin, 1985)</td></tr>
+    <tr><td>5 · Dimensión fractal</td><td>Caracterizar costas, ramificaciones y texturas de tejidos o superficies</td></tr>
+  </table>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A12 · Mediciones</span>
+  <h2>Tiempos de cálculo de los módulos 2 a 5</h2>
+  <table style="font-size:21px">
+    <tr><th>Módulo</th><th>Qué se midió</th><th>Resultado</th></tr>
+    <tr><td>2</td><td>Juego del caos, 10⁵ · 10⁶ · 10⁷ puntos</td><td>22 · 98 · 551 ms (≈ 18 millones de puntos por segundo)</td></tr>
+    <tr><td>3</td><td>Reescribir y recorrer la planta de 88 940 símbolos</td><td>4,9 ms</td></tr>
+    <tr><td>4</td><td>Diamond-square, niveles 8 (257²) y 9 (513²)</td><td>0,84 ms y 4,64 ms</td></tr>
+    <tr><td>5</td><td>Binarizar, contar cajas y ajustar, imagen de 1 024²</td><td>≈ 3 ms</td></tr>
+  </table>
+  <p class="sub" style="margin-top:22px;font-size:20px">Equipo: Ryzen 5 5500, 32 GB de RAM, Linux, Chromium 156 (26/11/2026). Solo cálculo en CPU: no se midió el dibujo WebGL. Los tiempos menores a 1 ms son órdenes de magnitud. No se comparan con los de la diapositiva A3, que son de otro equipo.</p>
+</section>
+
+<section class="s light">
+  <span class="tag ann">A13 · Bibliografía</span>
+  <h2>Referencias completas</h2>
+  <p class="ref">Barnsley, M. F., &amp; Demko, S. (1985). Iterated function systems and the global construction of fractals. <i>Proceedings of the Royal Society of London. A, 399</i>(1817), 243–275. <a href="https://doi.org/10.1098/rspa.1985.0057">https://doi.org/10.1098/rspa.1985.0057</a></p>
+  <p class="ref">Fournier, A., Fussell, D., &amp; Carpenter, L. (1982). Computer rendering of stochastic models. <i>Communications of the ACM, 25</i>(6), 371–384. <a href="https://doi.org/10.1145/358523.358553">https://doi.org/10.1145/358523.358553</a></p>
+  <p class="ref">Hutchinson, J. E. (1981). Fractals and self-similarity. <i>Indiana University Mathematics Journal, 30</i>(5), 713–747. <a href="https://doi.org/10.1512/iumj.1981.30.30055">https://doi.org/10.1512/iumj.1981.30.30055</a></p>
+  <p class="ref">Liebovitch, L. S., &amp; Toth, T. (1989). A fast algorithm to determine fractal dimensions by box counting. <i>Physics Letters A, 141</i>(8–9), 386–390. <a href="https://doi.org/10.1016/0375-9601(89)90854-2">https://doi.org/10.1016/0375-9601(89)90854-2</a></p>
+  <p class="ref">Lindenmayer, A. (1968). Mathematical models for cellular interactions in development I. <i>Journal of Theoretical Biology, 18</i>(3), 280–299. <a href="https://doi.org/10.1016/0022-5193(68)90079-9">https://doi.org/10.1016/0022-5193(68)90079-9</a></p>
+  <p class="ref">Mandelbrot, B. (1967). How long is the coast of Britain? Statistical self-similarity and fractional dimension. <i>Science, 156</i>(3775), 636–638. <a href="https://doi.org/10.1126/science.156.3775.636">https://doi.org/10.1126/science.156.3775.636</a></p>
+  <p class="ref">Perlin, K. (1985). An image synthesizer. <i>ACM SIGGRAPH Computer Graphics, 19</i>(3), 287–296. <a href="https://doi.org/10.1145/325165.325247">https://doi.org/10.1145/325165.325247</a></p>
+  <p class="sub" style="font-size:19px">Informe completo y bitácora de uso de IA: ver el PDF del informe.</p>
+</section>
+
 </body></html>
