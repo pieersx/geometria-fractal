@@ -1,5 +1,5 @@
 /* Estilo del informe (APA 7): Times New Roman 12 pt, interlineado 1,5, encabezado con número de página. */
-@page { size: A4; margin: 2.5cm 2.5cm 2.5cm 3cm;
+@page { size: A4; margin: 2.54cm;
   @top-left  { content: "Geometría fractal"; font: italic 10pt "Times New Roman", "Liberation Serif", serif; color: #444; }
   @top-right { content: counter(page); font: 10pt "Times New Roman", "Liberation Serif", serif; } }
 @page :first { @top-left { content: none; } @top-right { content: none; } }
@@ -15,24 +15,13 @@ code, pre { font: 10.5pt "DejaVu Sans Mono", monospace; background: #f3f3f3; }
 pre { padding: .5em .8em; white-space: pre-wrap; page-break-inside: avoid; }
 .tok { font-size: 2px; line-height: 0; color: #fff; }
 
-/* Portada: bloques agrupados, jerarquía clara y el último renglón al pie de la hoja sin pasar a la siguiente */
-.portada { height: 23.9cm; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+/* Portada (APA 7 con encabezado institucional): Times New Roman 12 pt en todo, solo negrita como énfasis,
+   interlineado 1,5, centrada. Los bloques se reparten a lo alto de la hoja y el último queda al pie sin pasar a otra página. */
+.portada { height: 24.4cm; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
   text-align: center; page-break-after: always; break-after: page; overflow: hidden; }
 .portada .g { width: 100%; }
-.portada p { margin: 0; text-align: center; line-height: 1.4; }
-.portada .logo { display: block; margin: 0 auto .6cm; height: 3.8cm; width: auto; }
-.portada .univ { font-size: 14.5pt; font-weight: bold; letter-spacing: .02em; }
-.portada .lema { font-size: 10.5pt; font-style: italic; color: #333; margin: .05cm 0 .45cm; }
-.portada .fac { font-size: 12pt; font-weight: bold; }
-.portada .esc { font-size: 12pt; }
-.portada .g1::after { content: ""; display: block; width: 7cm; border-top: 1.5px solid #222; margin: .9cm auto 0; }
-.portada .tipo { font-size: 11pt; font-weight: bold; letter-spacing: .22em; color: #333; margin-bottom: .35cm; }
-.portada .titulo { font-size: 32pt; font-weight: bold; line-height: 1.15; }
-.portada .g2::after { content: ""; display: block; width: 7cm; border-top: 1.5px solid #222; margin: .9cm auto 0; }
-.portada .g3 p { font-size: 12.5pt; line-height: 1.65; }
-.portada .rol { font-size: 11pt; font-weight: bold; letter-spacing: .22em; color: #333; margin-bottom: .3cm; }
-.portada .nom { font-size: 12.5pt; line-height: 1.65; }
-.portada .pie { font-size: 12.5pt; font-weight: bold; }
+.portada p { margin: 0; text-align: center; font-size: 12pt; line-height: 1.5; }
+.portada .logo { display: block; margin: 0 auto .4cm; height: 3.4cm; width: auto; }
 
 /* Índice y listas */
 .front { text-align: left; font-size: 11.5pt; line-height: 1.35; }
