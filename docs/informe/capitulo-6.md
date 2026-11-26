@@ -28,6 +28,21 @@ Para cada tamaño de caja $s = 2^k$ píxeles se cuentan las cajas que tocan la f
 
 La curva de Koch se dibuja con la misma regla `F → F+F−−F+F` que usa el módulo 3. El módulo 5 incluye su propia copia de esa regla, no la importa del módulo 3, de modo que ambos módulos comparten la regla pero no el código.
 
+### Ejemplo con números
+
+Con la curva de Koch de la aplicación (imagen de 1 024 px) se obtienen estos conteos:
+
+| Lado de la caja *s* (px) | Cajas ocupadas *N(s)* | $\ln(1024/s)$ | $\ln N(s)$ |
+|---|---|---|---|
+| 8 | 468 | 4,852 | 6,148 |
+| 16 | 206 | 4,159 | 5,328 |
+| 32 | 84 | 3,466 | 4,431 |
+| 64 | 34 | 2,773 | 3,526 |
+
+: Conteo de cajas de la curva de Koch
+
+Al duplicar el lado de la caja, el número de cajas se divide aproximadamente entre $2^{D}$: de 468 a 206 baja 2,27 veces, de 206 a 84, 2,45 veces, y de 84 a 34, 2,47 veces. Con $D = 1{,}262$ se esperaría un factor $2^{1{,}262} \approx 2{,}40$. El ajuste por mínimos cuadrados de $\ln N$ frente a $\ln(1024/s)$ da una pendiente de **1,264**, con $R^2 = 0{,}9995$, muy cerca del valor teórico $\ln 4 / \ln 3 \approx 1{,}262$. Si se usaran solo las dos cajas más pequeñas, la pendiente sería 1,18, y con las dos más grandes, 1,30; por eso conviene ajustar sobre varias escalas y declararlas.
+
 ### Validación
 
 Se midieron figuras de dimensión conocida (escalas de 8 a 64 px, imagen de 1 024 px):

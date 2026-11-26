@@ -40,6 +40,25 @@ Cada generación multiplica por 4 el número de segmentos y divide su largo entr
 
 $$D = \frac{\ln 4}{\ln 3} \approx 1{,}262$$
 
+### Ejemplo de lectura con la tortuga
+
+Para la cadena de la generación 1, `F+F−−F+F`, con paso 1, giro de 60° y rumbo inicial 0° (hacia la derecha), la tortuga hace lo siguiente:
+
+| Símbolo | Acción | Rumbo | Posición |
+|---|---|---|---|
+| | inicio | 0° | (0; 0) |
+| `F` | avanza 1 | 0° | (1; 0) |
+| `+` | gira 60° a la izquierda | 60° | (1; 0) |
+| `F` | avanza 1 | 60° | (1,5; 0,866) |
+| `−` `−` | gira 120° a la derecha | −60° | (1,5; 0,866) |
+| `F` | avanza 1 | −60° | (2; 0) |
+| `+` | gira 60° a la izquierda | 0° | (2; 0) |
+| `F` | avanza 1 | 0° | (3; 0) |
+
+: Lectura de `F+F−−F+F` por la tortuga gráfica
+
+Se dibujan 4 segmentos y la figura termina en $(3;\,0)$: el trazo recto de longitud 3 se reemplazó por una línea quebrada de longitud 4, con un pico en $(1{,}5;\,0{,}866)$. Por eso cada generación alarga la curva en un factor $4/3$.
+
 ### L-systems estocásticos
 
 En un L-system **estocástico**, un símbolo puede tener varias producciones, cada una con un peso. Al reescribir, cada aparición del símbolo elige una producción al azar según esos pesos. Así, las mismas reglas producen plantas distintas de una misma «especie». Para que el resultado se pueda reproducir, el azar sale de un generador pseudoaleatorio con **semilla**.

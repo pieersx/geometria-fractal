@@ -23,6 +23,28 @@ El atractor se dibuja con un algoritmo probabilístico:
 
 Los puntos se aproximan al atractor y lo recubren de forma progresiva.
 
+### Ejemplo con números
+
+**Triángulo de Sierpinski, $r = 1/2$.** Los vértices son $A = (0;\,0)$, $B = (1;\,0)$ y $C = (0{,}5;\,0{,}866)$. La aplicación parte del punto $(0{,}1;\,0{,}1)$. Si los tres primeros vértices elegidos al azar son $B$, $C$ y $A$:
+
+| Paso | Vértice | Cálculo con $x' = r\,x + (1-r)\,v$ | Punto nuevo |
+|---|---|---|---|
+| 0 | | punto inicial | (0,100; 0,100) |
+| 1 | $B$ | $0{,}5 \cdot 0{,}1 + 0{,}5 \cdot 1$ y $0{,}5 \cdot 0{,}1 + 0{,}5 \cdot 0$ | (0,550; 0,050) |
+| 2 | $C$ | $0{,}5 \cdot 0{,}55 + 0{,}5 \cdot 0{,}5$ y $0{,}5 \cdot 0{,}05 + 0{,}5 \cdot 0{,}866$ | (0,525; 0,458) |
+| 3 | $A$ | $0{,}5 \cdot 0{,}525$ y $0{,}5 \cdot 0{,}458$ | (0,263; 0,229) |
+
+: Tres pasos del juego del caos en el triángulo de Sierpinski
+
+En cada paso el punto recorre la mitad del camino hacia el vértice elegido. Después de unos pocos pasos queda dentro del triángulo y nunca sale, por eso los primeros puntos (la aplicación descarta 20) no afectan al dibujo final.
+
+**Helecho de Barnsley.** Se usan las transformaciones de la aplicación: la segunda, $x' = 0{,}85\,x + 0{,}04\,y$ y $y' = -0{,}04\,x + 0{,}85\,y + 1{,}6$, y la tercera, $x' = 0{,}2\,x - 0{,}26\,y$ y $y' = 0{,}23\,x + 0{,}22\,y + 1{,}6$. Partiendo de $(0;\,0)$:
+
+- Con la segunda: $(0;\,0) \to (0;\,1{,}6)$. Con la segunda otra vez: $(0{,}064;\,2{,}960)$.
+- Con la tercera sobre ese punto: $x' = 0{,}2 \cdot 0{,}064 - 0{,}26 \cdot 2{,}96 = -0{,}757$ e $y' = 0{,}23 \cdot 0{,}064 + 0{,}22 \cdot 2{,}96 + 1{,}6 = 2{,}266$, es decir, un punto a la izquierda del tallo, en la zona de las hojas.
+
+La segunda transformación se elige el 85 % de las veces, así que la mayoría de los puntos sube por el tronco; las hojas aparecen con menor frecuencia (7 % cada una).
+
 ### Ejemplos en la aplicación
 
 - **Triángulo de Sierpinski.** Tres transformaciones que acercan el punto a un vértice elegido al azar: $x' = r\,x + (1-r)\,v$, de modo que el punto queda a una fracción $r$ de su distancia anterior y recorre $1-r$ del camino. Con $r = 1/2$ la dimensión de semejanza es $\ln 3 / \ln 2 \approx 1{,}585$.

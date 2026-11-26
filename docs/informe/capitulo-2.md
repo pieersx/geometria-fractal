@@ -15,6 +15,22 @@ $$z_{n+1} = z_n^{2} + c$$
 
 En la práctica no se puede iterar indefinidamente. Se fija un número máximo de iteraciones y se considera que un punto **escapa** cuando |z| supera un radio de escape: si |z| > 2, la sucesión diverge con seguridad. Los puntos que no escapan tras el máximo de iteraciones se pintan como pertenecientes al conjunto (negro en la aplicación). Los demás se colorean según la rapidez con que escapan.
 
+### Ejemplo con números
+
+Se toma $c = 1$ en el conjunto de Mandelbrot, con $z_0 = 0$:
+
+| Iteración | Cálculo | $z_n$ | $\lvert z_n\rvert > 2$ |
+|---|---|---|---|
+| 0 | valor inicial | 0 | no |
+| 1 | $0^2 + 1$ | 1 | no |
+| 2 | $1^2 + 1$ | 2 | no |
+| 3 | $2^2 + 1$ | 5 | **sí** |
+| 4 | $5^2 + 1$ | 26 | sí |
+
+: Órbita de $c = 1$: la sucesión escapa en la iteración 3
+
+Como $\lvert z_3 \rvert = 5 > 2$, el punto $c = 1$ **escapa** y se pinta con el color de la iteración 3. En cambio, con $c = -1$ la sucesión es $0 \to -1 \to 0 \to -1 \to \dots$: se repite sin crecer, nunca supera 2 y el punto **pertenece al conjunto** (negro). El mismo caso aparece en la captura del apartado 2.5, donde $c = 0{,}723 + 0{,}277i$ también escapa en la iteración 3. La opción «Órbita de un punto» de la aplicación dibuja estas sucesiones sobre la imagen.
+
 ### Coloreado suave
 
 Colorear por el número entero de iteraciones produce bandas visibles. El módulo 1 aplica un coloreado suave que usa un valor continuo de iteración:
