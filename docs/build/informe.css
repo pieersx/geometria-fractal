@@ -28,7 +28,7 @@ pre { padding: .5em .8em; white-space: pre-wrap; page-break-inside: avoid; }
 .portada .fac { font-size: 15pt; }
 .portada .eap { font-size: 14pt; }
 .portada .tipo { font-size: 16pt; }
-.portada .titulo { font-size: 26pt; line-height: 1.25; }
+.portada .titulo { font-size: 16pt; }
 
 /* Índice y listas */
 .front { text-align: left; font-size: 11.5pt; line-height: 1.35; }
