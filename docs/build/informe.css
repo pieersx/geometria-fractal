@@ -15,17 +15,19 @@ code, pre { font: 10.5pt "DejaVu Sans Mono", monospace; background: #f3f3f3; }
 pre { padding: .5em .8em; white-space: pre-wrap; page-break-inside: avoid; }
 .tok { font-size: 2px; line-height: 0; color: #fff; }
 
-/* Portada: modelo institucional de la facultad, centrado y sin adornos */
-.portada { text-align: center; page-break-after: always; padding-top: 0; min-height: 24.2cm; position: relative; }
-.portada p { margin: 0; text-align: center; line-height: 1.5; }
-.portada .univ, .portada .fac { font-size: 13pt; font-weight: bold; }
-.portada .eap { font-size: 13pt; }
-.portada .logo { display: block; margin: 0 auto 1cm; height: 3.8cm; width: auto; }
-.portada .tipo { font-size: 13pt; font-weight: bold; margin-top: 2cm; }
-.portada .titulo { font-size: 20pt; font-weight: bold; margin: .15cm 0 1.1cm; letter-spacing: .01em; }
-.portada .rol { font-size: 13pt; font-weight: bold; }
-.portada .nom { font-size: 12.5pt; margin-bottom: .95cm; }
-.portada .pie-portada { position: absolute; left: 0; right: 0; bottom: 0; font-size: 12.5pt; }
+/* Portada: modelo institucional. Ocupa toda la hoja; el último bloque queda al pie sin pasar a la página siguiente */
+.portada { height: 23.9cm; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+  text-align: center; page-break-after: always; break-after: page; overflow: hidden; }
+.portada .g { width: 100%; }
+.portada p { margin: 0; text-align: center; line-height: 1.45; }
+.portada .logo { display: block; margin: 0 auto .75cm; height: 3.8cm; width: auto; }
+.portada .univ { font-size: 14pt; font-weight: bold; }
+.portada .lema { font-size: 10.5pt; font-weight: bold; margin-bottom: .55cm; }
+.portada .fac { font-size: 12pt; }
+.portada .titulo { font-size: 18pt; font-weight: bold; line-height: 1.3; }
+.portada .rol { font-size: 13pt; font-weight: bold; margin-bottom: .15cm; }
+.portada .sub { font-size: 12pt; }
+.portada .nom { font-size: 12pt; }
 
 /* Índice y listas */
 .front { text-align: left; font-size: 11.5pt; line-height: 1.35; }
@@ -74,7 +76,7 @@ math { font-family: "DejaVu Math TeX Gyre", "STIX Two Math", "Latin Modern Math"
 .demo svg, .demo img { flex: 0 0 2.6cm; width: 2.6cm; height: 2.6cm; min-width: 2.6cm; }
 .demo img { width: 2.6cm; height: 2.6cm; min-width: 2.6cm; flex: 0 0 2.6cm; border: 0 !important; max-height: none !important; }
 .demo p { margin: 0; font-size: 10.5pt; line-height: 1.4; }
-.demo .url { font-size: 9pt; font-family: "DejaVu Sans Mono", monospace; white-space: nowrap; }
+.demo .url { font-size: 9pt; font-family: "DejaVu Sans Mono", monospace; white-space: normal; }
 
 /* Bibliografía: sangría francesa (APA) */
 .bib p { padding-left: 1.27cm; text-indent: -1.27cm; text-align: left; }
@@ -89,3 +91,6 @@ table:has(tbody tr:nth-child(10)) { page-break-inside: auto; break-inside: auto;
 table:has(tbody tr:nth-child(10)) tr { break-inside: avoid; }
 table:has(tbody tr:nth-child(10)) thead { display: table-header-group; }
 table:has(tbody tr:nth-child(10)) td:nth-child(2) { white-space: nowrap; }
+
+/* Las direcciones largas (QR de cada módulo) deben partirse: si se salen del ancho, Chrome encoge todo el documento al imprimir */
+.url, .demo p { min-width: 0; overflow-wrap: anywhere; word-break: break-all; }
