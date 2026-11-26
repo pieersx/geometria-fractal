@@ -3,128 +3,813 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L-systems · Geometría fractal</title>
+<title>Geometría fractal · L-systems</title>
 <link rel="icon" href="data:,">
 <style>
-  :root { --bg:#0b0d12; --panel:#141821ee; --line:#262c3a; --text:#e6e9f0; --muted:#8b93a7; --accent:#f5b942; }
+  :root {
+    --bg: #0b0d12; --panel: #141821ee; --line: #262c3a; --text: #e6e9f0;
+    --muted: #8b93a7; --accent: #f5b942;
+  }
   * { box-sizing: border-box; }
-  html, body { margin:0; height:100%; background:var(--bg); color:var(--text);
-    font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif; overflow:hidden; }
-  canvas { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
-  #panel { position:fixed; top:16px; left:16px; width:272px; max-height:calc(100% - 32px); overflow:auto;
-    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; backdrop-filter:blur(8px); }
-  h1 { font-size:15px; margin:0 0 2px; }
-  .sub { color:var(--muted); font-size:12px; margin-bottom:12px; }
-  a.back { color:var(--muted); font-size:12px; text-decoration:none; display:inline-block; margin-bottom:8px; }
-  a.back:hover { color:var(--accent); }
-  label { display:block; color:var(--muted); font-size:12px; margin:10px 0 4px; }
-  .row { display:flex; gap:6px; }
-  button, select { font:inherit; color:var(--text); background:#1c2230; border:1px solid var(--line);
-    border-radius:8px; padding:6px 10px; cursor:pointer; }
-  button:hover, select:hover { border-color:var(--accent); }
-  .row > button { flex:1; }
-  select { width:100%; }
-  input[type=range] { width:100%; accent-color:var(--accent); }
-  .val { float:right; color:var(--text); font-variant-numeric:tabular-nums; }
-  .stats { margin-top:12px; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
-  .stats b { color:var(--text); font-weight:500; }
-  .hint { margin-top:10px; color:var(--muted); font-size:12px; }
-  @media (max-width:560px) { #panel { width:calc(100% - 32px); max-height:46%; } }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+  canvas.dragging { cursor: grabbing; }
+  canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  #panel { position: fixed; top: 16px; left: 16px; width: 272px; max-height: calc(100% - 32px); overflow: auto;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px;
+    backdrop-filter: blur(8px); }
+  h1 { font-size: 15px; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+  a { color: var(--accent); }
+  label { display: block; color: var(--muted); font-size: 12px; margin: 10px 0 4px; }
+  .row { display: flex; gap: 6px; }
+  button, select { font: inherit; color: var(--text); background: #1c2230; border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  button:hover, select:hover { border-color: var(--accent); }
+  button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); color: #1a1405; border-color: var(--accent); font-weight: 600; }
+  .row > button { flex: 1; }
+  select { width: 100%; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  input[type=number], input[type=text], textarea { width: 100%; font: inherit; color: var(--text); background: #1c2230;
+    border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+  input[type=text], textarea { font: 12.5px/1.5 ui-monospace, Consolas, monospace; }
+  textarea { resize: vertical; min-height: 74px; }
+  .val { float: right; color: var(--text); font-variant-numeric: tabular-nums; }
+  .check { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; color: var(--text); cursor: pointer; }
+  .check input { accent-color: var(--accent); margin: 0; }
+  .desc { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+  .sym { color: var(--muted); font-size: 11.5px; margin-top: 6px; line-height: 1.5; }
+  .sym code, .code { font-family: ui-monospace, Consolas, monospace; color: var(--text); }
+  #warn { color: var(--accent); display: none; margin-top: 8px; font-size: 12px; }
+  #warn.show { display: block; }
+  .stats { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted);
+    font-size: 12px; font-variant-numeric: tabular-nums; }
+  .stats b { color: var(--text); font-weight: 500; }
+  details { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; font-size: 12px; color: var(--muted); }
+  summary { cursor: pointer; color: var(--text); font-weight: 500; }
+  details p { margin: 6px 0; }
+  .code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; background: #0f131b; border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px; font-size: 11.5px; line-height: 1.55; margin-top: 6px; }
+  .hint { margin-top: 10px; color: var(--muted); font-size: 12px; }
+  .veg, .geo { display: none; }
+  body.is-veg .veg, body.is-geo .geo { display: block; }
+  body.is-veg label.check.veg { display: flex; }
+  #treeOnly, #forestOnly { display: none; }
+  @media (max-width: 560px) { #panel { width: calc(100% - 32px); max-height: 46%; } }
 </style>
 </head>
-<body>
-<canvas id="c"></canvas>
+<body class="is-veg">
+<canvas id="c" tabindex="0" aria-label="Dibujo del L-system. Arrastra para mover, rueda o pellizco para acercar."></canvas>
 
 <div id="panel">
-  <a class="back" href="../../">← Portada</a>
-  <h1>L-systems</h1>
-  <div class="sub">Módulo 3 · Curva de Koch y plantas</div>
+  <h1>Geometría fractal</h1>
+  <div class="sub">Módulo 3 · L-systems (reescritura y tortuga gráfica)</div>
 
-  <!-- TODO: reemplaza este control de ejemplo por los parámetros de tu algoritmo.
-       Mantén el mismo estilo (label + input) para que todos los módulos se vean igual. -->
-  <label>Parámetro de ejemplo <span class="val" id="vP"></span></label>
-  <input id="p" type="range" min="1" max="100" step="1" value="50">
+  <label for="preset">Ejemplo</label>
+  <select id="preset">
+    <optgroup label="Fractales geométricos">
+      <option value="koch">Curva de Koch</option>
+      <option value="copo">Copo de nieve de Koch</option>
+      <option value="sierpinski">Triángulo de Sierpinski</option>
+      <option value="dragon">Curva del dragón</option>
+    </optgroup>
+    <optgroup label="Vegetación procedural">
+      <option value="planta">Planta ramificada</option>
+      <option value="arbol" selected>Árbol en un paisaje</option>
+      <option value="bosque">Bosque estocástico</option>
+    </optgroup>
+  </select>
+  <p class="desc" id="desc"></p>
+
+  <label for="gen">Generaciones <span class="val" id="vGen"></span></label>
+  <input autocomplete="off" id="gen" type="range" min="0" max="7" step="1" value="5">
+
+  <label for="angle">Ángulo de giro <span class="val" id="vAngle"></span></label>
+  <input autocomplete="off" id="angle" type="range" min="0" max="120" step="0.5" value="24">
+
+  <div class="veg">
+    <div id="treeOnly">
+      <label for="branches">Ramas por nivel <span class="val" id="vBranches"></span></label>
+      <input autocomplete="off" id="branches" type="range" min="2" max="6" step="1" value="3">
+    </div>
+    <div id="forestOnly">
+      <label for="trees">Árboles en el bosque <span class="val" id="vTrees"></span></label>
+      <input autocomplete="off" id="trees" type="range" min="2" max="9" step="1" value="5">
+    </div>
+    <label for="irr">Irregularidad <span class="val" id="vIrr"></span></label>
+    <input autocomplete="off" id="irr" type="range" min="0" max="20" step="1" value="8">
+    <label for="wind">Viento <span class="val" id="vWind"></span></label>
+    <input autocomplete="off" id="wind" type="range" min="0" max="1" step="0.05" value="0.35">
+    <label for="seed">Semilla</label>
+    <div class="row">
+      <input autocomplete="off" id="seed" type="number" min="0" max="4294967295" step="1" value="2024">
+      <button id="dice" title="Otra semilla" aria-label="Otra semilla" style="flex:0 0 auto">🎲</button>
+    </div>
+    <label class="check veg"><input autocomplete="off" id="leaves" type="checkbox" checked> Mostrar hojas</label>
+    <label class="check veg"><input autocomplete="off" id="scene" type="checkbox" checked> Mostrar paisaje</label>
+  </div>
+
+  <label for="axiom">Axioma</label>
+  <input autocomplete="off" id="axiom" type="text" value="X" spellcheck="false">
+  <label for="rules">Reglas (una por línea: símbolo=producción)</label>
+  <textarea autocomplete="off" id="rules" spellcheck="false"></textarea>
+  <div class="sym">
+    <code>F G A B</code> avanzar dibujando · <code>f</code> avanzar sin dibujar ·
+    <code>+ −</code> girar · <code>|</code> media vuelta · <code>[ ]</code> guardar / recuperar posición ·
+    otras letras (<code>X</code>, <code>Y</code>) solo se reescriben.
+    Regla estocástica: <code>X(0.5)=F[+X]</code>
+  </div>
 
   <div class="row" style="margin-top:12px">
+    <button id="grow" class="primary">▶ Ver crecer</button>
+  </div>
+  <div class="row" style="margin-top:6px">
     <button id="reset">Reiniciar</button>
     <button id="shot">Guardar PNG</button>
   </div>
+  <div id="warn" role="alert"></div>
 
-  <div class="stats"><span id="stats"></span></div>
-  <div class="hint">Edita el axioma y las reglas para generar tus propias figuras</div>
+  <div class="stats">
+    Generación <b id="sGen"></b> · Símbolos <b id="sSym"></b><br>
+    Segmentos <b id="sSeg"></b><span class="veg" style="display:inline" id="sLeafWrap"> · Hojas <b id="sLeaf"></b></span><br>
+    <span id="sDimWrap">Dimensión <b id="sDim"></b> <span id="sDimTxt"></span><br></span>
+    Zoom <b id="sZoom">1×</b> · <span id="sFps"></span>
+  </div>
+
+  <details id="howBox">
+    <summary>¿Cómo funciona?</summary>
+    <p>Se parte del axioma. En cada generación, <b>todas</b> las letras que tienen regla se reemplazan a la vez. Luego una «tortuga» lee la cadena símbolo por símbolo y dibuja.</p>
+    <span class="code" id="seq"></span>
+  </details>
+  <details>
+    <summary>¿Para qué sirve?</summary>
+    <p id="use"></p>
+    <p>Referencia: Lindenmayer (1968). Las hojas, el grosor y el paisaje son añadidos gráficos, no simulación biológica.</p>
+  </details>
+
+  <div class="hint">Arrastrar: mover · Rueda o pellizco: zoom · Teclas: flechas, + / − y 0 · <a href="../../">← Portada</a></div>
 </div>
 
 <script>
 "use strict";
 /* =====================================================================
-   PLANTILLA BASE · Módulo 3: L-systems
-   Qué hacer:
-   - Implementar reescritura de cadenas (axioma + reglas) y un intérprete tipo tortuga (F, +, -, [, ]).
-   - Presets: curva de Koch, árbol/planta con ramificación y al menos una figura más.
-   - Controles: número de iteraciones, ángulo, longitud de paso y campos editables de axioma y reglas.
-   - Mostrar el largo de la cadena y el número de segmentos (crece muy rápido: limita las iteraciones).
-   Reglas: ver CONTRIBUTING.md. Este archivo debe funcionar sin instalar nada.
+   Módulo 3 · L-systems
+   Base: versión de Valeria Flores (Canvas 2D, árbol con ramas por nivel
+   e irregularidad). Rediseño con el estilo de los módulos 1 y 4.
+   Flujo: reglas → expand() → compile() → turtle() → draw()
    ===================================================================== */
+const $ = id => document.getElementById(id);
+const canvas = $("c"), ctx = canvas.getContext("2d");
+const panel = $("panel");
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");   // Si necesitas GPU, cambia a getContext("webgl") (ver módulo 1)
+const LIMIT_SYMBOLS = 1500000;   // longitud máxima de la cadena
+const LIMIT_SEGMENTS = 400000;   // segmentos máximos que se dibujan
+const fmt = n => n.toLocaleString("es-PE");
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
-/* Estado del módulo: guarda aquí todos los parámetros */
-const DEFAULTS = { p: 50 };
-const state = { ...DEFAULTS };
+/* ---------- Reglas del árbol según el número de ramas (idea de Valeria) ---------- */
+function treeRules(branches) {
+  const parts = [], mid = (branches - 1) / 2;
+  for (let i = 0; i < branches; i++) {
+    const off = i - mid;
+    const turn = off > 0 ? "+".repeat(Math.round(off)) : off < 0 ? "-".repeat(Math.round(-off)) : "";
+    parts.push("[" + turn + "X]");
+  }
+  return "X=F" + parts.join("") + "FX\nF=FF";
+}
 
-/* Ajusta el lienzo a la pantalla y a la densidad de píxeles */
+/* ---------- Ejemplos ---------- */
+const LN = Math.log;
+const PRESETS = {
+  koch: { veg: false, axiom: "F", rules: "F=F+F--F+F", angle: 60, gen: 4, maxGen: 7, heading: 0,
+    dim: [LN(4) / LN(3), "(ln 4 / ln 3)"],
+    desc: "Cada segmento se cambia por cuatro de un tercio de su largo. Es autosimilar.",
+    use: "Ejemplo clásico de autosimilitud: su longitud crece ×4/3 en cada generación y tiende a infinito, aunque ocupa una región acotada. Se usa para explicar la dimensión fractal y para generar contornos y motivos geométricos." },
+  copo: { veg: false, axiom: "F--F--F", rules: "F=F+F--F+F", angle: 60, gen: 4, maxGen: 6, heading: 0,
+    dim: [LN(4) / LN(3), "(ln 4 / ln 3)"],
+    desc: "Tres curvas de Koch sobre un triángulo: perímetro infinito, área finita.",
+    use: "El axioma cambia (un triángulo) pero la regla es la misma que la curva de Koch: basta modificar el punto de partida para obtener otra figura. Su área converge a 8/5 del triángulo inicial." },
+  sierpinski: { veg: false, axiom: "A", rules: "A=B-A-B\nB=A+B+A", angle: 60, gen: 6, maxGen: 10, heading: 0,
+    dim: [LN(3) / LN(2), "(ln 3 / ln 2)"],
+    desc: "Una sola curva continua que se acerca al triángulo de Sierpinski (punta de flecha).",
+    use: "El mismo fractal del módulo 2 (IFS) obtenido aquí por reescritura de cadenas: dos métodos distintos llegan al mismo conjunto límite." },
+  dragon: { veg: false, axiom: "FX", rules: "X=X+YF+\nY=-FX-Y", angle: 90, gen: 12, maxGen: 16, heading: 0,
+    dim: [2, "(llena una región del plano)"],
+    desc: "Equivale a doblar una tira de papel por la mitad una y otra vez y abrirla en ángulos rectos.",
+    use: "Muestra que las letras sin dibujo (X, Y) sirven como «memoria» de la gramática. La curva nunca se cruza a sí misma y sus copias encajan como baldosas." },
+  planta: { veg: true, style: "plant", axiom: "F", rules: "F=FF+[+F-F-F]-[-F+F+F]", angle: 22.5, gen: 4, maxGen: 6, heading: 90,
+    irr: 2, wind: 0.2, leaves: false, scene: false, leafDepth: 2,
+    desc: "Los corchetes guardan y recuperan la posición: así nacen las ramas.",
+    use: "Con una sola regla se obtiene la silueta de un arbusto. Es la base de la vegetación procedural: pocas reglas, mucha variedad." },
+  arbol: { veg: true, style: "bark", axiom: "X", rules: null, angle: 24, gen: 5, maxGen: 7, heading: 90,
+    irr: 8, wind: 0.35, leaves: true, scene: true, branches: 3, leafDepth: 2,
+    desc: "Elige cuántas ramas nacen en cada nivel. La irregularidad le quita rigidez.",
+    use: "Vegetación para videojuegos y cine: el L-system construye el esqueleto ramificado; el grosor, las hojas, el viento y el paisaje son mejoras gráficas, no una simulación del crecimiento real." },
+  bosque: { veg: true, style: "bark", axiom: "X",
+    rules: "X(0.34)=F[+X][-X]FX\nX(0.33)=F[+X]F[-X]+X\nX(0.33)=F[-X]F[+X]-X\nF=FF",
+    angle: 25, gen: 5, maxGen: 6, heading: 90, irr: 10, wind: 0.35, leaves: true, scene: true, trees: 5, leafDepth: 2,
+    desc: "Reglas estocásticas: cada X elige al azar una de tres producciones. Cada árbol usa otra semilla.",
+    use: "Así se pueblan escenarios enteros: las mismas reglas dan árboles distintos pero de la misma «especie». La semilla hace que el bosque sea reproducible." }
+};
+
+const state = { preset: "arbol", gen: 5, angle: 24, axiom: "X", rules: "", branches: 3, trees: 5,
+  irr: 8, wind: 0.35, seed: 2024, leaves: true, scene: true, edited: false };
+const view = { zoom: 1, tx: 0, ty: 0 };
+const anim = { growing: false, progress: 1, start: 0, duration: 3 };
+
+/* ---------- Generador pseudoaleatorio con semilla (mulberry32) ---------- */
+function rng32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function hash(n) { const x = Math.sin(n * 12.9898) * 43758.5453123; return x - Math.floor(x); }
+
+/* ---------- 1. Lectura de reglas ---------- */
+const normalize = s => s.replace(/[−–]/g, "-").replace(/→|->/g, "=");
+function parseRules(text) {
+  const groups = new Map();
+  normalize(text).split(/\r?\n/).forEach((raw, i) => {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) return;
+    const eq = line.indexOf("=");
+    if (eq < 1) throw Error(`Línea ${i + 1}: escribe la regla como F=FF (o X(0.5)=F[+X] si es estocástica).`);
+    const m = line.slice(0, eq).trim().match(/^(\S)\s*(?:\(\s*([0-9]*\.?[0-9]+)\s*\))?$/u);
+    if (!m) throw Error(`Línea ${i + 1}: el lado izquierdo debe ser un solo símbolo, con un peso opcional, por ejemplo X(0.3).`);
+    const w = m[2] === undefined ? 1 : +m[2];
+    if (!(w > 0)) throw Error(`Línea ${i + 1}: el peso de una regla estocástica debe ser mayor que 0.`);
+    if (!groups.has(m[1])) groups.set(m[1], []);
+    groups.get(m[1]).push({ prod: line.slice(eq + 1).replace(/\s+/g, ""), w });
+  });
+  const table = Object.create(null);
+  let stochastic = false;
+  for (const [sym, list] of groups) {
+    if (list.length > 1) stochastic = true;
+    const total = list.reduce((s, r) => s + r.w, 0);
+    let acc = 0;
+    table[sym] = list.map(r => ({ prod: r.prod, cum: (acc += r.w) / total }));
+  }
+  return { table, stochastic };
+}
+
+/* ---------- 2. Reescritura paralela ---------- */
+const PREVIEW = 90;
+function expand(axiom, rules, n, rnd) {
+  let s = axiom;
+  const history = [{ len: s.length, head: s.slice(0, PREVIEW) }];
+  for (let g = 0; g < n; g++) {
+    const parts = [];
+    let len = 0;
+    for (const c of s) {
+      const r = rules.table[c];
+      let rep = c;
+      if (r) {
+        if (r.length === 1) rep = r[0].prod;
+        else { const u = rnd(); rep = (r.find(x => u <= x.cum) || r[r.length - 1]).prod; }
+      }
+      len += rep.length;
+      if (len > LIMIT_SYMBOLS)
+        throw Error(`La generación ${g + 1} supera el límite de ${fmt(LIMIT_SYMBOLS)} símbolos. Baja una generación o simplifica las reglas.`);
+      parts.push(rep);
+    }
+    s = parts.join("");
+    history.push({ len: s.length, head: s.slice(0, PREVIEW) });
+  }
+  return { str: s, history };
+}
+
+/* ---------- 3. Compilación a instrucciones de tortuga ---------- */
+const OP = { F: 1, G: 1, A: 1, B: 1, f: 2, "+": 3, "-": 4, "|": 5, "[": 6, "]": 7 };
+function compile(str, rnd) {
+  const ops = new Uint8Array(str.length);
+  let n = 0, draws = 0, depth = 0, ends = 1;
+  for (let i = 0; i < str.length; i++) {
+    const o = OP[str[i]];
+    if (!o) continue;
+    if (o === 1) draws++;
+    else if (o === 6) depth++;
+    else if (o === 7) { if (--depth < 0) throw Error("Hay un ] sin su [ correspondiente."); ends++; }
+    ops[n++] = o;
+  }
+  if (depth > 0) throw Error("Hay [ sin cerrar: revisa las reglas.");
+  const r1 = new Float32Array(n), r2 = new Float32Array(n);
+  for (let i = 0; i < n; i++) { r1[i] = rnd() * 2 - 1; r2[i] = rnd() * 2 - 1; }
+  return { ops: ops.subarray(0, n), r1, r2, draws, ends };
+}
+
+/* ---------- 4. Tortuga gráfica ----------
+   Coordenadas matemáticas (y hacia arriba). "+" gira a la izquierda.
+   seg: x1, y1, x2, y2, nivel, distancia a la raíz · end: x, y, nivel, índice de segmento */
+function makeOut(c) {
+  return { seg: new Float32Array(c.draws * 6), end: new Float32Array(c.ends * 4), stack: [],
+    ns: 0, ne: 0, minX: 0, maxX: 0, minY: 0, maxY: 0, maxDist: 1 };
+}
+function turtle(c, p, out) {
+  const { ops, r1, r2 } = c, seg = out.seg, end = out.end, st = out.stack;
+  const theta = p.theta, wob = p.wobble * 0.35, taper = p.taper, irr = p.irr;
+  const windOn = p.wind > 0, t = p.t, ph = p.phase;
+  const gust = windOn ? p.wind * (0.7 + 0.3 * Math.sin(t * 0.43 + ph)) : 0;
+  let x = 0, y = 0, a = p.heading, lv = 0, dist = 0, ns = 0, ne = 0, sp = 0;
+  let minX = 0, maxX = 0, minY = 0, maxY = 0, maxDist = 0;
+  for (let i = 0; i < ops.length; i++) {
+    const o = ops[i];
+    if (o <= 2) {
+      if (windOn) a -= gust * 0.009 * (0.3 + lv * 0.85) * (0.55 + 0.45 * Math.sin(t * 1.9 + lv * 0.9 + x * 0.06 + ph));
+      const da = a + wob * r1[i];
+      const len = taper ? Math.max(0.45, 1 - lv * 0.045 + r2[i] * 0.012 * irr) : 1;
+      const nx = x + Math.cos(da) * len, ny = y + Math.sin(da) * len;
+      if (o === 1) {
+        const k = ns * 6;
+        seg[k] = x; seg[k + 1] = y; seg[k + 2] = nx; seg[k + 3] = ny; seg[k + 4] = lv; seg[k + 5] = dist;
+        ns++;
+      }
+      x = nx; y = ny; dist += len;
+      if (dist > maxDist) maxDist = dist;
+      if (x < minX) minX = x; else if (x > maxX) maxX = x;
+      if (y < minY) minY = y; else if (y > maxY) maxY = y;
+    } else if (o === 3) a += theta + (taper ? wob * r1[i] : 0);
+    else if (o === 4) a -= theta + (taper ? wob * r2[i] : 0);
+    else if (o === 5) a += Math.PI;
+    else if (o === 6) { st[sp++] = x; st[sp++] = y; st[sp++] = a; st[sp++] = lv; st[sp++] = dist; lv++; }
+    else {
+      const k = ne * 4; end[k] = x; end[k + 1] = y; end[k + 2] = lv; end[k + 3] = ns; ne++;
+      dist = st[--sp]; lv = st[--sp]; a = st[--sp]; y = st[--sp]; x = st[--sp];
+    }
+  }
+  const k = ne * 4; end[k] = x; end[k + 1] = y; end[k + 2] = lv; end[k + 3] = ns; ne++;
+  out.ns = ns; out.ne = ne; out.minX = minX; out.maxX = maxX; out.minY = minY; out.maxY = maxY;
+  out.maxDist = maxDist || 1;
+}
+
+/* ---------- Construcción: una "instancia" por árbol (el bosque tiene varias) ---------- */
+let instances = [], info = { symbols: 0, history: [], ok: false };
+const P = () => PRESETS[state.preset];
+const isVeg = () => P().veg;
+
+function turtleParams(inst, wind, t) {
+  const p = P();
+  return { theta: state.angle * Math.PI / 180, heading: p.heading * Math.PI / 180,
+    wobble: p.veg ? state.irr * Math.PI / 180 : 0, irr: p.veg ? state.irr : 0,
+    taper: p.style === "bark", wind, t, phase: inst.phase };
+}
+
+function rebuild() {
+  const p = P();
+  const rules = parseRules(state.rules);
+  const axiom = normalize(state.axiom).replace(/\s+/g, "");
+  if (!axiom) throw Error("El axioma no puede estar vacío.");
+  const count = state.preset === "bosque" ? state.trees : 1;
+  const list = [];
+  let symbols = 0, draws = 0, history = [];
+  for (let i = 0; i < count; i++) {
+    const rnd = rng32((state.seed + i * 7919) >>> 0);
+    const ex = expand(axiom, rules, state.gen, rnd);
+    const c = compile(ex.str, rnd);
+    symbols += ex.str.length; draws += c.draws;
+    if (draws > LIMIT_SEGMENTS)
+      throw Error(`El dibujo supera ${fmt(LIMIT_SEGMENTS)} segmentos. Baja una generación o usa menos árboles.`);
+    if (i === 0) history = ex.history;
+    list.push({ c, stat: makeOut(c), live: makeOut(c), phase: hash(i + 1) * 6.28, s: 1, tx: 0, ty: 0, fade: 0, h: 1 });
+  }
+  instances = list;
+  info = { symbols, history, stochastic: rules.stochastic, ok: true };
+  reinterpret();
+}
+
+/* Vuelve a pasar la tortuga sin viento: da el contorno y la disposición del bosque */
+function reinterpret() {
+  for (const inst of instances) turtle(inst.c, turtleParams(inst, 0, 0), inst.stat);
+  if (state.preset === "bosque") layoutForest();
+  else { const o = instances[0].stat; instances[0].h = Math.max(1e-6, o.maxY - o.minY, o.maxX - o.minX); }
+}
+
+function layoutForest() {
+  const n = instances.length, rnd = rng32(state.seed ^ 0x9E3779B9);
+  const width = n * 0.5;
+  instances.forEach((inst, i) => {
+    const o = inst.stat, back = i % 2 === 1;
+    inst.h = Math.max(1e-6, o.maxY - o.minY);
+    const scale = back ? 0.58 + rnd() * 0.12 : 0.88 + rnd() * 0.17;
+    inst.s = scale / inst.h;
+    inst.tx = (i + 0.5) / n * width + (rnd() - 0.5) * 0.12;
+    inst.ty = back ? 0.07 : 0;
+    inst.fade = back ? 0.45 : 0;
+  });
+  instances.sort((a, b) => b.fade - a.fade);   // primero los del fondo
+}
+
+/* ---------- Dibujo ---------- */
+const BARK = ["#4a3324", "#583d2a", "#674a31", "#735b39", "#6f6c40", "#65814a"];
+const STEM = ["#2f6b3f", "#3d8550", "#4f9a5a", "#69ad5f", "#86bf63", "#a3cf6a"];
+const LEAF = ["#3f8750", "#62a75a", "#7eae54", "#99b859"];
+const HAZE = "#8a6f86";
+const CURVE = ["#f5b942", "#f08a4b", "#e5566f", "#b45be0", "#6f7cf6", "#3dd6c6"];
+const POW = Array.from({ length: 64 }, (_, i) => Math.pow(0.68, i));
+
+const hexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+function mix(a, b, t) {
+  const A = hexRgb(a), B = hexRgb(b);
+  return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(",")})`;
+}
+const CURVE_STEPS = 64;
+const CURVE_COLS = Array.from({ length: CURVE_STEPS }, (_, i) => {
+  const u = i / (CURVE_STEPS - 1) * (CURVE.length - 1), j = Math.min(CURVE.length - 2, Math.floor(u));
+  return mix(CURVE[j], CURVE[j + 1], u - j);
+});
+
+function drawSky(W, H) {
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, "#141a33"); sky.addColorStop(0.45, "#3a2d5c");
+  sky.addColorStop(0.72, "#c4665d"); sky.addColorStop(0.86, "#f2a65e");
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#ffffff";
+  for (let i = 0; i < 70; i++) {
+    ctx.globalAlpha = 0.15 + hash(i * 3.1) * 0.5;
+    ctx.fillRect(hash(i * 7.7) * W, hash(i * 1.3) * H * 0.38, 1.2, 1.2);
+  }
+  ctx.globalAlpha = 1;
+  const sx = W * 0.8, sy = H * 0.72, sr = Math.min(W, H) * 0.055;
+  const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, sr * 7);
+  glow.addColorStop(0, "rgba(255,214,150,0.55)"); glow.addColorStop(1, "rgba(255,190,120,0)");
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#ffe3a8"; ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fill();
+  const ridge = (base, amp, f, seed, color) => {
+    ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W + 8; x += 8) {
+      const u = x / W;
+      ctx.lineTo(x, H * (base - amp * (0.55 * Math.sin(u * f + seed) + 0.3 * Math.sin(u * f * 2.3 + seed * 2) + 0.15 * Math.sin(u * f * 5.1 + seed * 3))));
+    }
+    ctx.lineTo(W, H); ctx.fill();
+  };
+  ridge(0.74, 0.09, 5.0, 1.3, "#6b4a6e");
+  ridge(0.79, 0.06, 7.0, 4.1, "#4a3852");
+  ridge(0.84, 0.04, 4.0, 2.2, "#2d2c36");
+  const g = ctx.createLinearGradient(0, H * 0.84, 0, H);
+  g.addColorStop(0, "#26301f"); g.addColorStop(1, "#11170f");
+  ctx.fillStyle = g; ctx.fillRect(0, H * 0.855, W, H * 0.15);
+  ctx.fillStyle = "#33422a";
+  for (let i = 0; i < 120; i++) {
+    const x = hash(i * 9.1) * W, y = H * (0.86 + hash(i * 4.7) * 0.13);
+    ctx.fillRect(x, y - 5, 1.3, 6);
+  }
+}
+function drawPlain(W, H) {
+  ctx.fillStyle = "#0b0d12"; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(W * 0.6, H * 0.5, 0, W * 0.6, H * 0.5, Math.max(W, H) * 0.6);
+  g.addColorStop(0, "#161c28"); g.addColorStop(1, "#0b0d12");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+
+/* Zona libre del lienzo (sin el panel) */
+function area(W, H) {
+  const r = panel.getBoundingClientRect();
+  if (W > 760) return { x0: r.right + 24, y0: 24, x1: W - 24, y1: H - 24 };
+  return { x0: 16, y0: Math.min(r.bottom, H * 0.5) + 12, x1: W - 16, y1: H - 16 };
+}
+
+/* Transformación modelo → pantalla, con la vista (zoom y arrastre) encima */
+function fit(W, H, scenic) {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const inst of instances) {
+    const o = inst.stat;
+    minX = Math.min(minX, inst.tx + o.minX * inst.s); maxX = Math.max(maxX, inst.tx + o.maxX * inst.s);
+    minY = Math.min(minY, inst.ty + o.minY * inst.s); maxY = Math.max(maxY, inst.ty + o.maxY * inst.s);
+  }
+  const A = area(W, H), aw = A.x1 - A.x0, ah = A.y1 - A.y0;
+  const bw = Math.max(maxX - minX, 1e-6), bh = Math.max(maxY - minY, 1e-6);
+  let k, ox, oy;
+  if (scenic) {
+    const ground = H * 0.885;
+    k = Math.min(aw * 0.92 / bw, (ground - A.y0 - 10) / Math.max(maxY, 1e-6));
+    ox = (A.x0 + A.x1) / 2 - (minX + maxX) / 2 * k;
+    oy = ground;
+  } else {
+    k = Math.min(aw / bw, ah / bh) * 0.94;
+    ox = (A.x0 + A.x1) / 2 - (minX + maxX) / 2 * k;
+    oy = (A.y0 + A.y1) / 2 + (minY + maxY) / 2 * k;
+  }
+  return { k: k * view.zoom, ox: ox * view.zoom + view.tx, oy: oy * view.zoom + view.ty, base: k };
+}
+
+let lastFit = null, head = null;
+
+function drawInstance(inst, out, F, limit, scenic) {
+  const p = P(), seg = out.seg, ks = F.k * inst.s;
+  const ox = F.ox + inst.tx * F.k, oy = F.oy - inst.ty * F.k;
+  const paths = new Map();
+  const path = key => { let q = paths.get(key); if (!q) paths.set(key, q = new Path2D()); return q; };
+
+  if (!p.veg) {
+    const w = clamp(ks * 0.28, 0.8, 3);
+    for (let j = 0; j < limit; j++) {
+      const k = j * 6, q = path(Math.floor(j / Math.max(1, out.ns) * CURVE_STEPS));
+      q.moveTo(ox + seg[k] * ks, oy - seg[k + 1] * ks); q.lineTo(ox + seg[k + 2] * ks, oy - seg[k + 3] * ks);
+    }
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    for (const pass of [0, 1]) {
+      ctx.globalAlpha = pass ? 1 : 0.16;
+      ctx.lineWidth = pass ? w : w * 4;
+      for (const [ci, q] of paths) { ctx.strokeStyle = CURVE_COLS[ci]; ctx.stroke(q); }
+    }
+    ctx.globalAlpha = 1;
+  } else {
+    const hpx = inst.h * ks;
+    const bark = p.style === "bark";
+    const base = bark ? clamp(hpx * 0.03, 1.2, 24) : clamp(hpx * 0.007, 0.8, 3.2);
+    const pal = (bark ? BARK : STEM).map(c => inst.fade ? mix(c, HAZE, inst.fade) : c);
+    const md = out.maxDist;
+    for (let j = 0; j < limit; j++) {
+      const k = j * 6, lv = seg[k + 4];
+      let w = base * POW[Math.min(63, lv)] * (bark ? 1 - 0.55 * Math.min(1, seg[k + 5] / md) : 1);
+      w = Math.max(0.5, Math.round(w * 2) / 2);
+      const q = path(Math.min(5, lv) * 1000 + w * 2);
+      q.moveTo(ox + seg[k] * ks, oy - seg[k + 1] * ks); q.lineTo(ox + seg[k + 2] * ks, oy - seg[k + 3] * ks);
+    }
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    for (const [key, q] of paths) {
+      ctx.strokeStyle = pal[Math.floor(key / 1000)]; ctx.lineWidth = (key % 1000) / 2; ctx.stroke(q);
+    }
+    if (state.leaves) drawLeaves(inst, out, ks, ox, oy, limit, hpx, scenic);
+  }
+  if (limit > 0) {
+    const k = (limit - 1) * 6;
+    head = { x: ox + seg[k + 2] * ks, y: oy - seg[k + 3] * ks, a: Math.atan2(seg[k + 3] - seg[k + 1], seg[k + 2] - seg[k]) };
+  }
+}
+
+let leafCount = 0;
+function drawLeaves(inst, out, ks, ox, oy, limit, hpx, scenic) {
+  const end = out.end, minLv = P().leafDepth;
+  const r = clamp(hpx * 0.0085, 1.3, 6), irr = state.irr;
+  const count = 1 + Math.floor(irr / 6), spread = (4 + irr * 0.5) * r / 4;
+  const cols = LEAF.map(c => inst.fade ? mix(c, HAZE, inst.fade) : c);
+  const tip = scenic ? mix("#e9b86a", HAZE, inst.fade) : "#c0d178";
+  const paths = cols.map(() => new Path2D()), hi = new Path2D();
+  const seedOff = inst.phase * 100;
+  for (let i = 0; i < out.ne; i++) {
+    const k = i * 4;
+    if (end[k + 2] < minLv || end[k + 3] > limit) continue;
+    const x = ox + end[k] * ks, y = oy - end[k + 1] * ks;
+    for (let j = 0; j < count; j++) {
+      const dx = (hash(i * 11 + j * 17 + seedOff) - 0.5) * spread * 2;
+      const dy = (hash(i * 13 + j * 19 + seedOff) - 0.5) * spread * 2;
+      const q = paths[(i + j) % 4];
+      q.moveTo(x + dx + r, y + dy); q.arc(x + dx, y + dy, r, 0, Math.PI * 2);
+      if ((i + j) % 3 === 0) { hi.moveTo(x + dx + r * 0.6, y + dy - r * 0.3); hi.arc(x + dx + r * 0.3, y + dy - r * 0.3, r * 0.3, 0, Math.PI * 2); }
+      leafCount++;
+    }
+  }
+  cols.forEach((c, i) => { ctx.fillStyle = c; ctx.fill(paths[i]); });
+  ctx.fillStyle = tip; ctx.globalAlpha = 0.55; ctx.fill(hi); ctx.globalAlpha = 1;
+}
+
 function resize() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const w = Math.floor(canvas.clientWidth * dpr), h = Math.floor(canvas.clientHeight * dpr);
   if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
-/* ---------------------------------------------------------------------
-   TODO: implementa aquí tu algoritmo. Se llama cada vez que algo cambia.
-   Dibuja en `ctx`; el tamaño real del lienzo es canvas.width × canvas.height.
-   --------------------------------------------------------------------- */
-function render() {
+function draw(time) {
   resize();
-  const W = canvas.width, H = canvas.height;
-  ctx.fillStyle = "#0b0d12"; ctx.fillRect(0, 0, W, H);
-
-  // Ejemplo mínimo: una circunferencia cuyo radio depende del parámetro. Bórralo.
-  ctx.strokeStyle = "#f5b942"; ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(W * 0.6, H / 2, (state.p / 100) * Math.min(W, H) * 0.35, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.fillStyle = "#8b93a7"; ctx.font = `${Math.round(16 * (W / canvas.clientWidth))}px system-ui`;
-  ctx.textAlign = "center";
-  ctx.fillText("Módulo 3 · implementa render()", W * 0.6, H - 40);
-
-  document.getElementById("stats").textContent = "Parámetro: " + state.p;   // TODO: muestra tus datos (iteraciones, puntos, dimensión…)
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  const scenic = isVeg() && state.scene;
+  scenic ? drawSky(W, H) : drawPlain(W, H);
+  if (!instances.length) return;
+  const F = lastFit = fit(W, H, scenic);
+  const windy = windActive();
+  head = null; leafCount = 0;
+  if (scenic) {
+    for (const inst of instances) {
+      if (inst.fade) continue;
+      const o = inst.stat, cx = F.ox + (inst.tx + (o.minX + o.maxX) / 2 * inst.s) * F.k;
+      const rw = clamp((o.maxX - o.minX) * inst.s * F.k * 0.3, 20, 220);
+      ctx.fillStyle = "rgba(10,14,8,0.45)";
+      ctx.beginPath(); ctx.ellipse(cx, F.oy + 3, rw, Math.max(4, rw * 0.08), 0, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  for (const inst of instances) {
+    let out = inst.stat;
+    if (windy) { turtle(inst.c, turtleParams(inst, state.wind, time), inst.live); out = inst.live; }
+    const limit = anim.growing ? Math.floor(anim.progress * out.ns) : out.ns;
+    drawInstance(inst, out, F, limit, scenic);
+  }
+  if (anim.growing && head) {
+    ctx.save(); ctx.translate(head.x, head.y); ctx.rotate(-head.a);
+    ctx.shadowColor = "#f5b942"; ctx.shadowBlur = 12; ctx.fillStyle = "#f5b942";
+    ctx.beginPath(); ctx.moveTo(9, 0); ctx.lineTo(-6, 6); ctx.lineTo(-3, 0); ctx.lineTo(-6, -6); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  updateStats();
 }
 
-/* ---------- Controles (patrón común a todos los módulos) ---------- */
-const $ = id => document.getElementById(id);
+/* ---------- Estadísticas y explicación ---------- */
+function updateStats() {
+  const total = instances.reduce((s, i) => s + i.stat.ns, 0);
+  const drawn = anim.growing ? instances.reduce((s, i) => s + Math.floor(anim.progress * i.stat.ns), 0) : total;
+  $("sGen").textContent = state.gen;
+  $("sSym").textContent = fmt(info.symbols);
+  $("sSeg").textContent = anim.growing ? `${fmt(drawn)} / ${fmt(total)}` : fmt(total);
+  $("sLeaf").textContent = state.leaves ? fmt(leafCount) : "ocultas";
+  $("sLeafWrap").style.display = isVeg() ? "inline" : "none";
+  const p = P(), showDim = p.dim && !state.edited;
+  $("sDimWrap").style.display = showDim ? "inline" : "none";
+  if (showDim) {
+    $("sDim").textContent = p.dim[0] === 2 ? "2" : p.dim[0].toFixed(3).replace(".", ",");
+    $("sDimTxt").textContent = p.dim[1];
+  }
+  $("sZoom").textContent = (view.zoom < 10 ? view.zoom.toFixed(1) : Math.round(view.zoom)) + "×";
+}
 
-$("p").oninput = e => { state.p = +e.target.value; $("vP").textContent = state.p; render(); };
+function updateExplain() {
+  const lines = [`Axioma: ${normalize(state.axiom)}`, "Reglas:", ...normalize(state.rules).split(/\r?\n/).filter(l => l.trim()).map(l => "  " + l.trim()), ""];
+  info.history.slice(0, 6).forEach((h, g) => {
+    lines.push(`Gen ${g} (${fmt(h.len)} símbolos): ${h.head}${h.len > PREVIEW ? "…" : ""}`);
+  });
+  if (info.history.length > 6) lines.push(`…\nGen ${info.history.length - 1}: ${fmt(info.history[info.history.length - 1].len)} símbolos`);
+  if (info.stochastic) lines.push("\nReglas estocásticas: cada símbolo elige su producción según el peso y la semilla.");
+  $("seq").textContent = lines.join("\n");
+}
 
-$("reset").onclick = () => {
-  Object.assign(state, DEFAULTS);
-  $("p").value = state.p; $("vP").textContent = state.p;
-  render();
-};
+/* ---------- Bucle de animación (solo cuando hace falta) ---------- */
+const windActive = () => isVeg() && state.wind > 0 && !document.hidden;
+let raf = 0, frames = 0, acc = 0, prevT = 0;
+function requestDraw() { if (!raf) raf = requestAnimationFrame(frame); }
+function frame(now) {
+  raf = 0;
+  const t = now / 1000;
+  if (anim.growing) {
+    anim.progress = Math.min(1, (t - anim.start) / anim.duration);
+    if (anim.progress >= 1) { anim.growing = false; $("grow").textContent = "↺ Ver crecer otra vez"; }
+  }
+  draw(t);
+  const looping = anim.growing || windActive();
+  if (looping) {
+    const dt = prevT ? t - prevT : 0; prevT = t; frames++; acc += dt;
+    if (acc >= 0.5) { $("sFps").textContent = Math.round(frames / acc) + " fps"; frames = 0; acc = 0; }
+    raf = requestAnimationFrame(frame);
+  } else { prevT = 0; frames = 0; acc = 0; $("sFps").textContent = ""; }
+}
 
+/* ---------- Reconstrucción con manejo de errores ---------- */
+function refresh(level) {      // level: "build" | "turtle" | "draw"
+  const warn = $("warn");
+  try {
+    if (level === "build") rebuild();
+    else if (level === "turtle" && info.ok) reinterpret();
+    warn.classList.remove("show");
+    updateExplain();
+  } catch (e) {
+    warn.textContent = "⚠ " + e.message;
+    warn.classList.add("show");
+  }
+  syncLabels();
+  requestDraw();
+}
+
+function syncLabels() {
+  $("vGen").textContent = state.gen;
+  $("vAngle").textContent = String(state.angle).replace(".", ",") + "°";
+  $("vBranches").textContent = state.branches;
+  $("vTrees").textContent = state.trees;
+  $("vIrr").textContent = state.irr + "°";
+  $("vWind").textContent = state.wind === 0 ? "sin viento" : Math.round(state.wind * 100) + " %";
+}
+
+/* ---------- Elegir ejemplo ---------- */
+function choose(name) {
+  state.preset = name;
+  const p = PRESETS[name];
+  Object.assign(state, {
+    gen: p.gen, angle: p.angle, axiom: p.axiom, edited: false,
+    branches: p.branches || 3, trees: p.trees || 5, irr: p.irr || 0,
+    wind: reduceMotion ? 0 : (p.wind || 0), leaves: !!p.leaves, scene: !!p.scene
+  });
+  state.rules = name === "arbol" ? treeRules(state.branches) : p.rules;
+  $("preset").value = name;
+  $("gen").max = p.maxGen;
+  for (const id of ["gen", "angle", "axiom", "rules", "branches", "trees", "irr", "wind"]) $(id).value = state[id];
+  $("leaves").checked = state.leaves; $("scene").checked = state.scene;
+  $("desc").textContent = p.desc; $("use").textContent = p.use;
+  document.body.classList.toggle("is-veg", p.veg);
+  document.body.classList.toggle("is-geo", !p.veg);
+  $("treeOnly").style.display = name === "arbol" ? "block" : "none";
+  $("forestOnly").style.display = name === "bosque" ? "block" : "none";
+  stopGrow();
+  resetView();
+  refresh("build");
+}
+
+function resetView() { view.zoom = 1; view.tx = 0; view.ty = 0; requestDraw(); }
+
+function startGrow() {
+  const total = instances.reduce((s, i) => s + i.stat.ns, 0);
+  if (!total) return;
+  anim.duration = clamp(total / 2500, 2.5, 9);
+  anim.start = performance.now() / 1000; anim.progress = 0; anim.growing = true;
+  $("grow").textContent = "■ Detener";
+  requestDraw();
+}
+function stopGrow() { anim.growing = false; anim.progress = 1; $("grow").textContent = "▶ Ver crecer"; }
+
+/* ---------- Controles ---------- */
+const bind = (id, key, level, conv = Number) => $(id).addEventListener("input", e => {
+  state[key] = conv(e.target.value);
+  refresh(level);
+});
+bind("gen", "gen", "build");
+bind("angle", "angle", "turtle");
+bind("irr", "irr", "turtle");
+bind("wind", "wind", "draw");
+bind("trees", "trees", "build");
+$("branches").addEventListener("input", e => {
+  state.branches = +e.target.value;
+  state.rules = treeRules(state.branches); $("rules").value = state.rules; state.edited = false;
+  refresh("build");
+});
+$("seed").addEventListener("input", e => {
+  const v = Math.floor(+e.target.value);
+  if (!Number.isFinite(v) || v < 0) return;
+  state.seed = v >>> 0; refresh("build");
+});
+$("dice").onclick = () => { state.seed = Math.floor(Math.random() * 1e6); $("seed").value = state.seed; refresh("build"); };
+for (const id of ["axiom", "rules"]) $(id).addEventListener("input", e => {
+  state[id] = e.target.value; state.edited = true; stopGrow(); refresh("build");
+});
+$("leaves").onchange = e => { state.leaves = e.target.checked; requestDraw(); };
+$("scene").onchange = e => { state.scene = e.target.checked; requestDraw(); };
+$("preset").onchange = e => choose(e.target.value);
+$("reset").onclick = () => choose(state.preset);
+$("grow").onclick = () => anim.growing ? (stopGrow(), requestDraw()) : startGrow();
 $("shot").onclick = () => {
-  render();
+  draw(performance.now() / 1000);
   const a = document.createElement("a");
-  a.download = "modulo-3.png";
+  a.download = `l-system-${state.preset}.png`;
   a.href = canvas.toDataURL("image/png");
   a.click();
 };
 
-window.addEventListener("resize", render);
+/* ---------- Vista: arrastrar, rueda, pellizco y teclado ---------- */
+function zoomAt(mx, my, f) {
+  const z = clamp(view.zoom * f, 0.2, 200);
+  f = z / view.zoom;
+  view.tx = mx - (mx - view.tx) * f; view.ty = my - (my - view.ty) * f; view.zoom = z;
+  requestDraw();
+}
+const pointers = new Map();
+let pinch = 0;
+canvas.addEventListener("pointerdown", e => {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  canvas.setPointerCapture(e.pointerId);
+  canvas.classList.add("dragging");
+  if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); }
+});
+canvas.addEventListener("pointermove", e => {
+  const p = pointers.get(e.pointerId);
+  if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  if (pointers.size === 1) { view.tx += dx; view.ty += dy; requestDraw(); }
+  else if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (pinch) zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / pinch);
+    pinch = d;
+  }
+});
+const endPointer = e => { pointers.delete(e.pointerId); if (!pointers.size) canvas.classList.remove("dragging"); pinch = 0; };
+canvas.addEventListener("pointerup", endPointer);
+canvas.addEventListener("pointercancel", endPointer);
+canvas.addEventListener("wheel", e => {
+  e.preventDefault();
+  zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015));
+}, { passive: false });
+canvas.addEventListener("dblclick", resetView);
+canvas.addEventListener("keydown", e => {
+  const W = canvas.clientWidth, H = canvas.clientHeight, step = 40;
+  const actions = {
+    ArrowLeft: () => { view.tx += step; }, ArrowRight: () => { view.tx -= step; },
+    ArrowUp: () => { view.ty += step; }, ArrowDown: () => { view.ty -= step; },
+    "+": () => zoomAt(W / 2, H / 2, 1.25), "=": () => zoomAt(W / 2, H / 2, 1.25),
+    "-": () => zoomAt(W / 2, H / 2, 0.8), "0": resetView
+  };
+  if (actions[e.key]) { e.preventDefault(); actions[e.key](); requestDraw(); }
+});
+
+window.addEventListener("resize", requestDraw);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) requestDraw(); });
 
 /* ---------- Arranque ---------- */
-$("vP").textContent = state.p;
-render();
+choose("arbol");
 </script>
 </body>
 </html>
