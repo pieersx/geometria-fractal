@@ -1,6 +1,6 @@
 # Guion y guía del módulo 3 · L-systems
 
-Para la exposición del **02/12/2026**. Expone: **Valeria Flores**. Tiempo en la exposición: **2 minutos y medio** (diapositivas 9 y 10 del [guion general](guion-exposicion.md)).
+Para la exposición del **02/12/2026**. Expone: **Valeria Flores**. Tiempo en la exposición: **2 minutos y medio** (diapositivas 8 y 9 del [guion general](guion-exposicion.md)).
 
 ## 1. Antes de empezar
 
