@@ -54,6 +54,8 @@
   details p { margin: 6px 0; }
   .code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; background: #0f131b; border: 1px solid var(--line);
     border-radius: 8px; padding: 8px; font-size: 11.5px; line-height: 1.55; margin-top: 6px; }
+  a.back { color: var(--muted); font-size: 12px; text-decoration: none; display: inline-block; margin-bottom: 8px; }
+  a.back:hover { color: var(--accent); }
   .hint { margin-top: 10px; color: var(--muted); font-size: 12px; }
   .veg, .d3 { display: none; }
   body.is-veg .veg, body.is-3d .d3 { display: block; }
@@ -85,6 +87,7 @@
 <canvas id="gl" tabindex="0" style="display:none" aria-label="L-system en 3D. Arrastra para girar, rueda o pellizco para acercar."></canvas>
 
 <div id="panel">
+  <a class="back" href="../../index.html">← Portada</a>
   <h1>Geometría fractal</h1>
   <div class="sub">Módulo 3 · L-systems</div>
 
@@ -186,7 +189,7 @@
     <span class="code" id="seq"></span>
   </details>
 
-  <div class="hint">Arrastrar: mover (en 3D, girar) · Rueda: zoom · <a href="../../index.html">← Portada</a></div>
+  <div class="hint">Arrastrar: mover (en 3D, girar) · Rueda: zoom</div>
 </div>
 
 <div id="stepbar" aria-live="polite">
