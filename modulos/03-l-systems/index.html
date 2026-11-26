@@ -54,9 +54,11 @@
   .code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; background: #0f131b; border: 1px solid var(--line);
     border-radius: 8px; padding: 8px; font-size: 11.5px; line-height: 1.55; margin-top: 6px; }
   .hint { margin-top: 10px; color: var(--muted); font-size: 12px; }
-  .veg, .geo { display: none; }
-  body.is-veg .veg, body.is-geo .geo { display: block; }
-  body.is-veg label.check.veg { display: flex; }
+  .veg, .geo, .d3 { display: none !important; }
+  body.is-veg .veg, body.is-geo .geo, body.is-3d .d3 { display: block !important; }
+  body.is-veg label.check.veg { display: flex !important; }
+  body.is-3d span.d3 { display: inline !important; }
+  body.is-3d .d3 label.check { display: flex; }
   #treeOnly, #forestOnly { display: none; }
   #stepbar { position: fixed; left: 304px; right: 16px; bottom: 16px; background: var(--panel); border: 1px solid var(--line);
     border-radius: 12px; padding: 10px 14px; backdrop-filter: blur(8px); display: none; }
@@ -81,6 +83,7 @@
 </head>
 <body class="is-veg">
 <canvas id="c" tabindex="0" aria-label="Dibujo del L-system. Arrastra para mover, rueda o pellizco para acercar."></canvas>
+<canvas id="gl" tabindex="0" style="display:none" aria-label="L-system en 3D. Arrastra para girar, rueda o pellizco para acercar."></canvas>
 
 <div id="panel">
   <h1>Geometría fractal</h1>
@@ -99,6 +102,10 @@
       <option value="arbol" selected>Árbol en un paisaje</option>
       <option value="bosque">Bosque estocástico</option>
     </optgroup>
+    <optgroup label="3D (WebGL)">
+      <option value="arbol3d">Árbol 3D</option>
+      <option value="hilbert3d">Curva de Hilbert 3D</option>
+    </optgroup>
   </select>
   <p class="desc" id="desc"></p>
 
@@ -107,6 +114,16 @@
 
   <label for="angle">Ángulo de giro <span class="val" id="vAngle"></span></label>
   <input autocomplete="off" id="angle" type="range" min="0" max="120" step="0.5" value="24">
+
+  <div class="d3">
+    <label for="roll">Giro sobre su eje ( / \ ) <span class="val" id="vRoll"></span></label>
+    <input autocomplete="off" id="roll" type="range" min="0" max="180" step="0.5" value="137.5">
+    <div id="tropBox">
+      <label for="trop">Gravedad (tropismo) <span class="val" id="vTrop"></span></label>
+      <input autocomplete="off" id="trop" type="range" min="-0.3" max="0.4" step="0.01" value="0.12">
+    </div>
+    <label class="check"><input autocomplete="off" id="orbit" type="checkbox" checked> Órbita automática</label>
+  </div>
 
   <div class="veg">
     <div id="treeOnly">
@@ -138,7 +155,8 @@
     <code>F G A B</code> avanzar dibujando · <code>f</code> avanzar sin dibujar ·
     <code>+ −</code> girar · <code>|</code> media vuelta · <code>[ ]</code> guardar / recuperar posición ·
     otras letras (<code>X</code>, <code>Y</code>) solo se reescriben.
-    Regla estocástica: <code>X(0.5)=F[+X]</code>
+    Regla estocástica: <code>X(0.5)=F[+X]</code>.
+    <span class="d3" style="display:inline">En 3D: <code>&amp; ^</code> inclinar · <code>\ /</code> rotar sobre su eje · <code>A B C D</code> no dibujan.</span>
   </div>
 
   <div class="row" style="margin-top:12px">
@@ -153,7 +171,7 @@
 
   <div class="stats">
     Generación <b id="sGen"></b> · Símbolos <b id="sSym"></b><br>
-    Segmentos <b id="sSeg"></b><span class="veg" style="display:inline" id="sLeafWrap"> · Hojas <b id="sLeaf"></b></span><br>
+    Segmentos <b id="sSeg"></b><span id="sLeafWrap"> · Hojas <b id="sLeaf"></b></span><span id="sTriWrap"> · Triángulos <b id="sTri"></b></span><br>
     <span id="sDimWrap">Dimensión <b id="sDim"></b> <span id="sDimTxt"></span><br></span>
     Zoom <b id="sZoom">1×</b> · <span id="sFps"></span>
   </div>
@@ -249,11 +267,21 @@ const PRESETS = {
     rules: "X(0.34)=F[+X][-X]FX\nX(0.33)=F[+X]F[-X]+X\nX(0.33)=F[-X]F[+X]-X\nF=FF",
     angle: 25, gen: 5, maxGen: 6, heading: 90, irr: 10, wind: 0.35, leaves: true, scene: true, trees: 5, leafDepth: 2,
     desc: "Reglas estocásticas: cada X elige al azar una de tres producciones. Cada árbol usa otra semilla.",
-    use: "Así se pueblan escenarios enteros: las mismas reglas dan árboles distintos pero de la misma «especie». La semilla hace que el bosque sea reproducible." }
+    use: "Así se pueblan escenarios enteros: las mismas reglas dan árboles distintos pero de la misma «especie». La semilla hace que el bosque sea reproducible." },
+  arbol3d: { veg: true, d3: true, style: "bark", axiom: "FFFFFFFA", rules: "A=FF[&FA]/[&FA]/[&FA]",
+    angle: 30, roll: 137.5, trop: 0.12, gen: 6, maxGen: 8, heading: 90, irr: 6, wind: 0.35, leaves: true, scene: true, leafDepth: 4,
+    desc: "Tortuga 3D: & ^ inclinan la rama y / \\ la rotan sobre su eje. Dibujado en la GPU con WebGL.",
+    use: "La misma reescritura, ahora con orientación 3D (vectores H, L, U). El giro de 137,5° (ángulo áureo) reparte las ramas alrededor del tronco, como en la filotaxis de muchas plantas. La gravedad (tropismo) curva las ramas hacia abajo." },
+  hilbert3d: { veg: false, d3: true, axiom: "A",
+    rules: "A=B-F+CFC+F-D&F^D-F+&&CFC+F+B//\nB=A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//\nC=|D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//\nD=|CFB-F+B|FA&F^A&&FB-F+B|FC//",
+    angle: 90, roll: 90, trop: 0, gen: 3, maxGen: 4, heading: 90, dim: [3, "(llena el cubo)"],
+    desc: "Una sola curva que recorre las 8ⁿ celdas de un cubo sin cruzarse nunca.",
+    use: "Curva que llena el espacio: en la generación n visita los 8ⁿ puntos de una cuadrícula cúbica una sola vez. Su versión 2D se usa para ordenar datos espaciales (índices en bases de datos y caché de texturas)." }
 };
+const has3d = !!document.createElement("canvas").getContext("webgl");
 
 const state = { preset: "arbol", gen: 5, angle: 24, axiom: "X", rules: "", branches: 3, trees: 5,
-  irr: 8, wind: 0.35, seed: 2024, leaves: true, scene: true, edited: false };
+  irr: 8, wind: 0.35, seed: 2024, leaves: true, scene: true, edited: false, roll: 0, trop: 0, orbit: !reduceMotion };
 const view = { zoom: 1, tx: 0, ty: 0 };
 const anim = { growing: false, progress: 1, start: 0, duration: 3 };
 
@@ -325,11 +353,13 @@ function expand(axiom, rules, n, rnd) {
 
 /* ---------- 3. Compilación a instrucciones de tortuga ---------- */
 const OP = { F: 1, G: 1, A: 1, B: 1, f: 2, "+": 3, "-": 4, "|": 5, "[": 6, "]": 7 };
-function compile(str, rnd) {
+/* En 3D, A B C D no dibujan (la curva de Hilbert 3D las usa como símbolos de control) */
+const OP3 = { F: 1, G: 1, f: 2, "+": 3, "-": 4, "|": 5, "[": 6, "]": 7, "&": 8, "^": 9, "\\": 10, "/": 11 };
+function compile(str, rnd, table = OP) {
   const ops = new Uint8Array(str.length);
   let n = 0, draws = 0, depth = 0, ends = 1;
   for (let i = 0; i < str.length; i++) {
-    const o = OP[str[i]];
+    const o = table[str[i]];
     if (!o) continue;
     if (o === 1) draws++;
     else if (o === 6) depth++;
@@ -405,6 +435,7 @@ function rebuild() {
   const rules = parseRules(state.rules);
   const axiom = normalize(state.axiom).replace(/\s+/g, "");
   if (!axiom) throw Error("El axioma no puede estar vacío.");
+  if (p.d3) return rebuild3(axiom, rules);
   const count = state.preset === "bosque" ? state.trees : 1;
   const list = [];
   let symbols = 0, draws = 0, history = [];
@@ -427,6 +458,7 @@ function rebuild() {
 
 /* Vuelve a pasar la tortuga sin viento: da el contorno y la disposición del bosque */
 function reinterpret() {
+  if (P().d3) return reinterpret3();
   for (const inst of instances) turtle(inst.c, turtleParams(inst, 0, 0), inst.stat);
   if (state.preset === "bosque") layoutForest();
   else { const o = instances[0].stat; instances[0].h = Math.max(1e-6, o.maxY - o.minY, o.maxX - o.minX); }
@@ -697,6 +729,7 @@ function resize() {
 }
 
 function draw(time) {
+  if (P().d3) return draw3(time);
   resize();
   const W = canvas.clientWidth, H = canvas.clientHeight;
   const scenic = isVeg() && state.scene && !step.active;
@@ -751,6 +784,7 @@ function updateStats() {
   $("sSeg").textContent = anim.growing ? `${fmt(drawn)} / ${fmt(total)}` : fmt(total);
   $("sLeaf").textContent = state.leaves ? fmt(leafCount) : "ocultas";
   $("sLeafWrap").style.display = isVeg() ? "inline" : "none";
+  $("sTriWrap").style.display = "none";
   const p = P(), showDim = p.dim && !state.edited;
   $("sDimWrap").style.display = showDim ? "inline" : "none";
   if (showDim) {
@@ -788,7 +822,7 @@ function frame(now) {
     if (step.cursor >= len) { step.playing = false; renderStepBar(); }
   }
   draw(t);
-  const looping = anim.growing || windActive() || (step.active && step.playing);
+  const looping = anim.growing || windActive() || (step.active && step.playing) || (P().d3 && state.orbit && !document.hidden);
   if (looping) {
     const dt = prevT ? t - prevT : 0; prevT = t; frames++; acc += dt;
     if (acc >= 0.5) { $("sFps").textContent = Math.round(frames / acc) + " fps"; frames = 0; acc = 0; }
@@ -819,6 +853,423 @@ function syncLabels() {
   $("vTrees").textContent = state.trees;
   $("vIrr").textContent = state.irr + "°";
   $("vWind").textContent = state.wind === 0 ? "sin viento" : Math.round(state.wind * 100) + " %";
+  $("vRoll").textContent = String(state.roll).replace(".", ",") + "°";
+  $("vTrop").textContent = state.trop === 0 ? "sin efecto" : (state.trop > 0 ? "hacia abajo " : "hacia arriba ") + Math.abs(state.trop).toFixed(2).replace(".", ",");
+}
+
+/* =====================================================================
+   Modo 3D (WebGL)
+   La tortuga lleva tres vectores: H (hacia dónde avanza), L (izquierda)
+   y U (arriba). + − giran sobre U, & ^ sobre L y \ / sobre H.
+   Cada segmento se convierte en un tubo de triángulos que dibuja la GPU.
+   ===================================================================== */
+const glc = $("gl");
+const gl = has3d ? glc.getContext("webgl", { antialias: true, preserveDrawingBuffer: true }) : null;
+const LIMIT_3D = 60000;
+const g3 = { c: null, out: null, nseg: 0, vps: 0, tris: 0, leafN: 0, leafSeg: null, leafSize: 0.1,
+  treeH: 1, center: [0, 0, 0], radius: 1, groundN: 0, lastT: 0, buf: {} };
+const view3 = { yaw: 0.7, pitch: 0.22, zoom: 1 };
+
+function makeOut3(c) {
+  return { seg: new Float32Array(c.draws * 9), end: new Float32Array(c.ends * 5), ns: 0, ne: 0,
+    min: [0, 0, 0], max: [0, 0, 0], maxDist: 1 };
+}
+
+function turtle3(c, p, out) {
+  const { ops, r1, r2 } = c, seg = out.seg, end = out.end, st = [];
+  const th = p.theta, roll = p.roll, wob = p.wobble * 0.35, taper = p.taper, irr = p.irr, trop = p.trop;
+  let pos = [0, 0, 0], H = [0, 1, 0], L = [-1, 0, 0], U = [0, 0, 1], lv = 0, dist = 0, ns = 0, ne = 0, maxDist = 0;
+  const mn = [0, 0, 0], mx = [0, 0, 0];
+  const rot = (A, B, t) => {
+    const c = Math.cos(t), s = Math.sin(t);
+    for (let k = 0; k < 3; k++) { const a = A[k], b = B[k]; A[k] = a * c + b * s; B[k] = -a * s + b * c; }
+  };
+  const ortho = () => {      // vuelve a dejar H, L, U perpendiculares y de largo 1
+    let n = Math.hypot(H[0], H[1], H[2]); H[0] /= n; H[1] /= n; H[2] /= n;
+    const d = L[0] * H[0] + L[1] * H[1] + L[2] * H[2];
+    L[0] -= d * H[0]; L[1] -= d * H[1]; L[2] -= d * H[2];
+    n = Math.hypot(L[0], L[1], L[2]) || 1; L[0] /= n; L[1] /= n; L[2] /= n;
+    U[0] = H[1] * L[2] - H[2] * L[1]; U[1] = H[2] * L[0] - H[0] * L[2]; U[2] = H[0] * L[1] - H[1] * L[0];
+  };
+  for (let i = 0; i < ops.length; i++) {
+    const o = ops[i];
+    if (o <= 2) {
+      const grow = lv / (lv + 1.5);       // el tronco (nivel 0) no se desvía; las ramas finas, más
+      if (taper && wob && lv) { const w = wob * 0.5 * grow; for (let k = 0; k < 3; k++) H[k] += w * (r1[i] * L[k] + r2[i] * U[k]); ortho(); }
+      if (trop && lv) {       // tropismo: H se inclina hacia T = (0, −1, 0)
+        const h1 = H[1], e = trop * 0.15 * grow;
+        H[0] += e * h1 * H[0]; H[1] += e * (h1 * h1 - 1); H[2] += e * h1 * H[2]; ortho();
+      }
+      const len = taper ? Math.max(0.45, 1 - lv * 0.045 + r2[i] * 0.012 * irr) : 1;
+      const np = [pos[0] + H[0] * len, pos[1] + H[1] * len, pos[2] + H[2] * len];
+      if (o === 1) {
+        const k = ns * 9;
+        seg[k] = pos[0]; seg[k + 1] = pos[1]; seg[k + 2] = pos[2];
+        seg[k + 3] = np[0]; seg[k + 4] = np[1]; seg[k + 5] = np[2];
+        seg[k + 6] = lv; seg[k + 7] = dist; seg[k + 8] = len; ns++;
+      }
+      pos = np; dist += len;
+      if (dist > maxDist) maxDist = dist;
+      for (let k = 0; k < 3; k++) { if (pos[k] < mn[k]) mn[k] = pos[k]; if (pos[k] > mx[k]) mx[k] = pos[k]; }
+    } else if (o === 3) rot(H, L, th + (taper ? wob * r1[i] : 0));
+    else if (o === 4) rot(H, L, -th - (taper ? wob * r2[i] : 0));
+    else if (o === 5) for (let k = 0; k < 3; k++) { H[k] = -H[k]; L[k] = -L[k]; }
+    else if (o === 6) { st.push([pos, H.slice(), L.slice(), U.slice(), lv, dist]); lv++; }
+    else if (o === 7) {
+      const k = ne * 5; end[k] = pos[0]; end[k + 1] = pos[1]; end[k + 2] = pos[2]; end[k + 3] = lv; end[k + 4] = ns; ne++;
+      [pos, H, L, U, lv, dist] = st.pop();
+    }
+    else if (o === 8) rot(H, U, -th);
+    else if (o === 9) rot(H, U, th);
+    else if (o === 10) rot(L, U, roll);
+    else rot(L, U, -roll);
+  }
+  const k = ne * 5; end[k] = pos[0]; end[k + 1] = pos[1]; end[k + 2] = pos[2]; end[k + 3] = lv; end[k + 4] = ns; ne++;
+  out.ns = ns; out.ne = ne; out.min = mn; out.max = mx; out.maxDist = maxDist || 1;
+}
+
+function rebuild3(axiom, rules) {
+  if (!gl) throw Error("Tu navegador no soporta WebGL: el modo 3D no está disponible.");
+  const rnd = rng32(state.seed >>> 0);
+  const ex = expand(axiom, rules, state.gen, rnd);
+  const c = compile(ex.str, rnd, OP3);
+  if (c.draws > LIMIT_3D) throw Error(`El dibujo 3D supera ${fmt(LIMIT_3D)} segmentos. Baja una generación.`);
+  g3.c = c; g3.out = makeOut3(c);
+  instances = [];
+  info = { symbols: ex.str.length, history: ex.history, stochastic: rules.stochastic, ok: true };
+  reinterpret3();
+}
+
+function reinterpret3() {
+  const p = P();
+  turtle3(g3.c, { theta: state.angle * Math.PI / 180, roll: state.roll * Math.PI / 180,
+    wobble: p.veg ? state.irr * Math.PI / 180 : 0, irr: p.veg ? state.irr : 0,
+    taper: p.style === "bark", trop: p.veg ? state.trop : 0 }, g3.out);
+  buildMesh3();
+}
+
+/* ---------- Geometría: tubos, hojas y suelo ---------- */
+const rgb01 = s => (s[0] === "#" ? hexRgb(s) : s.match(/\d+/g).slice(0, 3).map(Number)).map(v => v / 255);
+function upload(name, data) {
+  if (!g3.buf[name]) g3.buf[name] = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, g3.buf[name]);
+  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+}
+
+function buildMesh3() {
+  const p = P(), o = g3.out, n = o.ns, seg = o.seg, bark = p.style === "bark";
+  const sides = bark ? 7 : 8, vps = sides * 6;
+  const hU = Math.max(o.max[1] - o.min[1], 1e-6);
+  const ext = [0, 1, 2].map(k => o.max[k] - o.min[k]);
+  g3.treeH = hU;
+  g3.center = [0, 1, 2].map(k => (o.max[k] + o.min[k]) / 2);
+  g3.radius = Math.max(0.5 * Math.hypot(ext[0], ext[1], ext[2]), 1);
+  const base = bark ? hU * 0.02 : 0.17, minR = hU * 0.0015, md = o.maxDist;
+  const pal = (bark ? BARK : CURVE_COLS).map(rgb01);
+  const cs = [], sn = [];
+  for (let s = 0; s <= sides; s++) { cs.push(Math.cos(s / sides * Math.PI * 2)); sn.push(Math.sin(s / sides * Math.PI * 2)); }
+  const data = new Float32Array(n * vps * 9);
+  let w = 0;
+  const put = (x, y, z, nx, ny, nz, c) => {
+    data[w++] = x; data[w++] = y; data[w++] = z; data[w++] = nx; data[w++] = ny; data[w++] = nz;
+    data[w++] = c[0]; data[w++] = c[1]; data[w++] = c[2];
+  };
+  for (let j = 0; j < n; j++) {
+    const k = j * 9, lv = Math.min(63, seg[k + 6]), d0 = seg[k + 7], len = seg[k + 8];
+    let dx = seg[k + 3] - seg[k], dy = seg[k + 4] - seg[k + 1], dz = seg[k + 5] - seg[k + 2];
+    const l = Math.hypot(dx, dy, dz) || 1; dx /= l; dy /= l; dz /= l;
+    const r0 = bark ? Math.max(base * POW[lv] * (1 - 0.55 * Math.min(1, d0 / md)), minR) : base;
+    const r1 = bark ? Math.max(base * POW[lv] * (1 - 0.55 * Math.min(1, (d0 + len) / md)), minR) : base;
+    const e0 = bark ? r0 * 0.5 : base * 0.98, e1 = bark ? 0 : base * 0.98;
+    const ax = seg[k] - dx * e0, ay = seg[k + 1] - dy * e0, az = seg[k + 2] - dz * e0;
+    const bx = seg[k + 3] + dx * e1, by = seg[k + 4] + dy * e1, bz = seg[k + 5] + dz * e1;
+    let rx = 0, ry = 1, rz = 0;
+    if (Math.abs(dy) > 0.9) { rx = 1; ry = 0; }
+    let ux = dy * rz - dz * ry, uy = dz * rx - dx * rz, uz = dx * ry - dy * rx;
+    const ul = Math.hypot(ux, uy, uz); ux /= ul; uy /= ul; uz /= ul;
+    const vx = dy * uz - dz * uy, vy = dz * ux - dx * uz, vz = dx * uy - dy * ux;
+    const col = bark ? pal[Math.min(5, lv)] : pal[Math.min(CURVE_STEPS - 1, Math.floor(j / n * CURVE_STEPS))];
+    for (let s = 0; s < sides; s++) {
+      const n0x = ux * cs[s] + vx * sn[s], n0y = uy * cs[s] + vy * sn[s], n0z = uz * cs[s] + vz * sn[s];
+      const n1x = ux * cs[s + 1] + vx * sn[s + 1], n1y = uy * cs[s + 1] + vy * sn[s + 1], n1z = uz * cs[s + 1] + vz * sn[s + 1];
+      put(ax + n0x * r0, ay + n0y * r0, az + n0z * r0, n0x, n0y, n0z, col);
+      put(bx + n0x * r1, by + n0y * r1, bz + n0z * r1, n0x, n0y, n0z, col);
+      put(bx + n1x * r1, by + n1y * r1, bz + n1z * r1, n1x, n1y, n1z, col);
+      put(ax + n0x * r0, ay + n0y * r0, az + n0z * r0, n0x, n0y, n0z, col);
+      put(bx + n1x * r1, by + n1y * r1, bz + n1z * r1, n1x, n1y, n1z, col);
+      put(ax + n1x * r0, ay + n1y * r0, az + n1z * r0, n1x, n1y, n1z, col);
+    }
+  }
+  upload("mesh", data);
+  g3.nseg = n; g3.vps = vps; g3.tris = n * sides * 2;
+
+  /* Hojas: puntos en los extremos de las ramas finas */
+  const lp = [], ls = [];
+  if (bark) {
+    const leafCols = LEAF.map(rgb01), spread = hU * 0.03, cnt = 2 + Math.floor(state.irr / 6);
+    for (let i = 0; i < o.ne; i++) {
+      const k = i * 5;
+      if (o.end[k + 3] < p.leafDepth) continue;
+      for (let j = 0; j < cnt; j++) {
+        const c = leafCols[(i + j) % 4];
+        lp.push(o.end[k] + (hash(i * 3.1 + j * 7.3) - 0.5) * 2 * spread,
+                o.end[k + 1] + (hash(i * 5.7 + j * 1.9) - 0.5) * 2 * spread,
+                o.end[k + 2] + (hash(i * 2.3 + j * 4.1) - 0.5) * 2 * spread, c[0], c[1], c[2]);
+        ls.push(o.end[k + 4]);
+      }
+    }
+  }
+  upload("leaf", new Float32Array(lp));
+  g3.leafN = ls.length; g3.leafSeg = Uint32Array.from(ls); g3.leafSize = hU * 0.024;
+
+  /* Suelo: disco con sombra al centro que se funde con el horizonte */
+  const R = g3.radius * 9, cx = g3.center[0], cz = g3.center[2], y0 = Math.min(0, o.min[1]);
+  const inner = rgb01("#10170d"), mid = rgb01("#2a3a22"), outer = rgb01("#26301f"), gd = [];
+  const ring = (r, c, a) => [cx + Math.cos(a) * r, y0, cz + Math.sin(a) * r, 0, 1, 0, ...c];
+  const r1 = g3.radius * 0.35, N = 48;
+  for (let s = 0; s < N; s++) {
+    const a0 = s / N * Math.PI * 2, a1 = (s + 1) / N * Math.PI * 2;
+    gd.push(cx, y0, cz, 0, 1, 0, ...inner, ...ring(r1, mid, a1), ...ring(r1, mid, a0));
+    gd.push(...ring(r1, mid, a0), ...ring(r1, mid, a1), ...ring(R, outer, a1));
+    gd.push(...ring(r1, mid, a0), ...ring(R, outer, a1), ...ring(R, outer, a0));
+  }
+  upload("ground", new Float32Array(gd));
+  g3.groundN = gd.length / 9;
+}
+
+/* ---------- Shaders ---------- */
+const SWAY = `
+uniform float uTime, uWind, uTreeH;
+vec3 sway(vec3 p) {
+  float h = clamp(p.y / uTreeH, 0.0, 1.5);
+  float k = uWind * h * h * uTreeH * 0.035;
+  return p + vec3((sin(uTime * 1.3 + p.y * 0.15 + p.x * 0.1) * 0.6 + 0.6) * k, 0.0, cos(uTime * 1.05 + p.z * 0.15) * k * 0.5);
+}`;
+const VS_MESH = `
+attribute vec3 aPos, aNor, aCol;
+uniform mat4 uMVP;
+varying vec3 vNor, vCol, vPos;
+${SWAY}
+void main() { vec3 p = sway(aPos); vPos = p; vNor = aNor; vCol = aCol; gl_Position = uMVP * vec4(p, 1.0); }`;
+const FS_MESH = `
+precision mediump float;
+uniform vec3 uSun, uSunCol, uSkyAmb, uGroundAmb, uFogCol, uEye;
+uniform float uFogNear, uFogFar, uSpec;
+varying vec3 vNor, vCol, vPos;
+void main() {
+  vec3 n = normalize(vNor);
+  vec3 v = normalize(uEye - vPos);
+  if (dot(n, v) < 0.0) n = -n;
+  float d = max(dot(n, uSun), 0.0);
+  vec3 amb = mix(uGroundAmb, uSkyAmb, n.y * 0.5 + 0.5);
+  float sp = pow(max(dot(n, normalize(uSun + v)), 0.0), 40.0) * uSpec;
+  float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0);
+  vec3 c = vCol * (amb + uSunCol * d) + uSunCol * sp + rim * 0.25 * uSunCol * vCol;
+  float f = smoothstep(uFogNear, uFogFar, length(uEye - vPos));
+  gl_FragColor = vec4(mix(c, uFogCol, f), 1.0);
+}`;
+const VS_LEAF = `
+attribute vec3 aPos, aCol;
+uniform mat4 uMVP;
+uniform float uSize, uVH;
+varying vec3 vCol;
+${SWAY}
+void main() {
+  gl_Position = uMVP * vec4(sway(aPos), 1.0);
+  gl_PointSize = clamp(uSize * uVH / gl_Position.w, 1.0, 64.0);
+  vCol = aCol;
+}`;
+const FS_LEAF = `
+precision mediump float;
+uniform vec3 uLight;
+varying vec3 vCol;
+void main() {
+  vec2 q = gl_PointCoord * 2.0 - 1.0;
+  float r = dot(q, q);
+  if (r > 1.0) discard;
+  float shade = 0.7 + 0.45 * (0.5 - 0.5 * q.y) - 0.15 * r;
+  gl_FragColor = vec4(vCol * uLight * shade, 1.0);
+}`;
+const VS_SKY = `
+attribute vec2 aP;
+varying vec2 vUv;
+void main() { vUv = aP * 0.5 + 0.5; gl_Position = vec4(aP, 0.999, 1.0); }`;
+const FS_SKY = `
+precision mediump float;
+uniform vec3 uTop, uMid, uHor, uLow, uGlow;
+uniform vec2 uSunUv;
+uniform float uHorY, uAspect, uSunOn;
+varying vec2 vUv;
+void main() {
+  float t = vUv.y - uHorY;
+  vec3 c = t > 0.0 ? mix(mix(uHor, uMid, smoothstep(0.0, 0.35, t)), uTop, smoothstep(0.35, 0.9, t))
+                   : mix(uHor, uLow, smoothstep(0.0, 0.12, -t));
+  float d = length((vUv - uSunUv) * vec2(uAspect, 1.0));
+  c += uGlow * uSunOn * (exp(-d * 5.0) * 0.6 + smoothstep(0.045, 0.035, d));
+  gl_FragColor = vec4(c, 1.0);
+}`;
+
+function program(vs, fs) {
+  const sh = (type, src) => {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw Error(gl.getShaderInfoLog(s));
+    return s;
+  };
+  const pr = gl.createProgram();
+  gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(pr);
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw Error(gl.getProgramInfoLog(pr));
+  const u = {}, a = {};
+  for (let i = 0; i < gl.getProgramParameter(pr, gl.ACTIVE_UNIFORMS); i++) {
+    const n = gl.getActiveUniform(pr, i).name; u[n] = gl.getUniformLocation(pr, n);
+  }
+  for (let i = 0; i < gl.getProgramParameter(pr, gl.ACTIVE_ATTRIBUTES); i++) {
+    const n = gl.getActiveAttrib(pr, i).name; a[n] = gl.getAttribLocation(pr, n);
+  }
+  return { pr, u, a };
+}
+let PM, PL, PS;
+if (gl) {
+  PM = program(VS_MESH, FS_MESH); PL = program(VS_LEAF, FS_LEAF); PS = program(VS_SKY, FS_SKY);
+  upload("sky", new Float32Array([-1, -1, 3, -1, -1, 3]));
+}
+
+/* ---------- Matrices (column-major, como espera WebGL) ---------- */
+function perspective(fov, asp, near, far) {
+  const f = 1 / Math.tan(fov / 2), nf = 1 / (near - far);
+  return [f / asp, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0];
+}
+function lookAt(e, t) {
+  let z = [e[0] - t[0], e[1] - t[1], e[2] - t[2]], l = Math.hypot(...z); z = z.map(v => v / l);
+  let x = [z[2], 0, -z[0]]; l = Math.hypot(...x) || 1; x = x.map(v => v / l);       // up × z, con up = (0, 1, 0)
+  const y = [z[1] * x[2] - z[2] * x[1], z[2] * x[0] - z[0] * x[2], z[0] * x[1] - z[1] * x[0]];
+  const dot = v => v[0] * e[0] + v[1] * e[1] + v[2] * e[2];
+  return [x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, -dot(x), -dot(y), -dot(z), 1];
+}
+function mul(a, b) {
+  const o = new Array(16);
+  for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) {
+    let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + r] * b[c * 4 + k];
+    o[c * 4 + r] = s;
+  }
+  return o;
+}
+const project = (m, p) => {
+  const x = m[0] * p[0] + m[4] * p[1] + m[8] * p[2] + m[12], y = m[1] * p[0] + m[5] * p[1] + m[9] * p[2] + m[13];
+  const w = m[3] * p[0] + m[7] * p[1] + m[11] * p[2] + m[15];
+  return [x / w, y / w, w];
+};
+
+function bindAttr(prog, name, size, stride, off) {
+  const loc = prog.a[name];
+  if (loc === undefined || loc < 0) return;
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, size, gl.FLOAT, false, stride * 4, off * 4);
+}
+
+const LOOKS = {
+  scene: { top: "#141a33", mid: "#3a2d5c", hor: "#e08a5e", low: "#1d2718", glow: [1, 0.72, 0.42], sunOn: 1,
+    sun: [0.62, 0.32, -0.72], sunCol: [1.0, 0.8, 0.6], sky: [0.42, 0.4, 0.6], ground: [0.2, 0.16, 0.13], spec: 0.15, leaf: [0.95, 0.93, 0.82], fog: true },
+  plain: { top: "#0b0d12", mid: "#10141d", hor: "#1a2030", low: "#0b0d12", glow: [0, 0, 0], sunOn: 0,
+    sun: [0.45, 0.75, 0.5], sunCol: [0.85, 0.85, 0.9], sky: [0.36, 0.37, 0.45], ground: [0.12, 0.12, 0.16], spec: 0.55, leaf: [1, 1, 1], fog: false }
+};
+
+function draw3(time) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = glc.clientWidth, H = glc.clientHeight;
+  const cw = Math.floor(W * dpr), ch = Math.floor(H * dpr);
+  if (glc.width !== cw || glc.height !== ch) { glc.width = cw; glc.height = ch; }
+  gl.viewport(0, 0, cw, ch);
+  const dt = g3.lastT ? Math.min(0.1, time - g3.lastT) : 0; g3.lastT = time;
+  if (state.orbit && !reduceMotion) view3.yaw += dt * 0.2;
+  if (!g3.out) return;
+
+  const scenic = isVeg() && state.scene, look = scenic ? LOOKS.scene : LOOKS.plain;
+  const tgt = [g3.center[0], isVeg() ? g3.treeH * 0.45 : g3.center[1], g3.center[2]];
+  const dist = g3.radius * (isVeg() ? 3.1 : 3.6) / view3.zoom;
+  const cp = Math.cos(view3.pitch);
+  const eye = [tgt[0] + dist * cp * Math.sin(view3.yaw), tgt[1] + dist * Math.sin(view3.pitch), tgt[2] + dist * cp * Math.cos(view3.yaw)];
+  const fov = 40 * Math.PI / 180;
+  let mvp = mul(perspective(fov, W / H, dist * 0.02, dist * 30), lookAt(eye, tgt));
+  // Desplaza el centro de la imagen a la zona que no tapa el panel
+  const r = panel.getBoundingClientRect();
+  const sx = W > 760 ? ((r.right + W) / 2) / W * 2 - 1 : 0;
+  const sy = W > 760 ? 0 : -(((Math.min(r.bottom, H * 0.5) + H) / 2) / H * 2 - 1);
+  mvp = mul([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, sx, sy, 0, 1], mvp);
+
+  gl.clearColor(0, 0, 0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  /* Cielo */
+  const sunDir = look.sun, sl = Math.hypot(...sunDir), sd = sunDir.map(v => v / sl);
+  const sp = project(mvp, [eye[0] + sd[0] * dist * 10, eye[1] + sd[1] * dist * 10, eye[2] + sd[2] * dist * 10]);
+  const fw = [tgt[0] - eye[0], 0, tgt[2] - eye[2]], fl = Math.hypot(...fw) || 1;
+  const hp = project(mvp, [eye[0] + fw[0] / fl * dist * 25, eye[1], eye[2] + fw[2] / fl * dist * 25]);
+  gl.disable(gl.DEPTH_TEST); gl.depthMask(false);
+  gl.useProgram(PS.pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER, g3.buf.sky); bindAttr(PS, "aP", 2, 2, 0);
+  for (const [u, hx] of [["uTop", look.top], ["uMid", look.mid], ["uHor", look.hor], ["uLow", look.low]]) gl.uniform3fv(PS.u[u], rgb01(hx));
+  gl.uniform3fv(PS.u.uGlow, look.glow);
+  gl.uniform2f(PS.u.uSunUv, sp[0] * 0.5 + 0.5, sp[1] * 0.5 + 0.5);
+  gl.uniform1f(PS.u.uSunOn, sp[2] > 0 ? look.sunOn : 0);
+  gl.uniform1f(PS.u.uHorY, clamp(hp[1] * 0.5 + 0.5, -0.5, 1.5));
+  gl.uniform1f(PS.u.uAspect, W / H);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.enable(gl.DEPTH_TEST); gl.depthMask(true);
+
+  /* Ramas y suelo */
+  const wind = windActive() ? state.wind : 0;
+  gl.useProgram(PM.pr);
+  gl.uniformMatrix4fv(PM.u.uMVP, false, mvp);
+  gl.uniform3fv(PM.u.uSun, sd); gl.uniform3fv(PM.u.uSunCol, look.sunCol);
+  gl.uniform3fv(PM.u.uSkyAmb, look.sky); gl.uniform3fv(PM.u.uGroundAmb, look.ground);
+  gl.uniform3fv(PM.u.uFogCol, rgb01(look.hor)); gl.uniform3fv(PM.u.uEye, eye);
+  gl.uniform1f(PM.u.uFogNear, look.fog ? dist * 1.2 : 1e9); gl.uniform1f(PM.u.uFogFar, look.fog ? dist * 4.5 : 2e9);
+  gl.uniform1f(PM.u.uSpec, look.spec);
+  gl.uniform1f(PM.u.uTime, time); gl.uniform1f(PM.u.uWind, wind); gl.uniform1f(PM.u.uTreeH, g3.treeH);
+  if (scenic) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, g3.buf.ground);
+    bindAttr(PM, "aPos", 3, 9, 0); bindAttr(PM, "aNor", 3, 9, 3); bindAttr(PM, "aCol", 3, 9, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, g3.groundN);
+  }
+  const limit = anim.growing ? Math.floor(anim.progress * g3.nseg) : g3.nseg;
+  gl.bindBuffer(gl.ARRAY_BUFFER, g3.buf.mesh);
+  bindAttr(PM, "aPos", 3, 9, 0); bindAttr(PM, "aNor", 3, 9, 3); bindAttr(PM, "aCol", 3, 9, 6);
+  if (limit) gl.drawArrays(gl.TRIANGLES, 0, limit * g3.vps);
+
+  /* Hojas */
+  leafCount = 0;
+  if (state.leaves && g3.leafN) {
+    let lo = 0, hi = g3.leafN;          // hojas cuyo segmento ya se dibujó
+    while (lo < hi) { const m = (lo + hi) >> 1; if (g3.leafSeg[m] <= limit) lo = m + 1; else hi = m; }
+    leafCount = lo;
+    if (lo) {
+      gl.useProgram(PL.pr);
+      gl.uniformMatrix4fv(PL.u.uMVP, false, mvp);
+      gl.uniform1f(PL.u.uSize, g3.leafSize); gl.uniform1f(PL.u.uVH, ch / (2 * Math.tan(fov / 2)));
+      gl.uniform1f(PL.u.uTime, time); gl.uniform1f(PL.u.uWind, wind); gl.uniform1f(PL.u.uTreeH, g3.treeH);
+      gl.uniform3fv(PL.u.uLight, look.leaf);
+      gl.bindBuffer(gl.ARRAY_BUFFER, g3.buf.leaf);
+      bindAttr(PL, "aPos", 3, 6, 0); bindAttr(PL, "aCol", 3, 6, 3);
+      gl.drawArrays(gl.POINTS, 0, lo);
+    }
+  }
+  for (const pr of [PM, PL, PS]) for (const n in pr.a) if (pr.a[n] >= 0) gl.disableVertexAttribArray(pr.a[n]);
+  updateStats3(limit);
+}
+
+function updateStats3(limit) {
+  $("sGen").textContent = state.gen;
+  $("sSym").textContent = fmt(info.symbols);
+  $("sSeg").textContent = anim.growing ? `${fmt(limit)} / ${fmt(g3.nseg)}` : fmt(g3.nseg);
+  $("sLeafWrap").style.display = isVeg() ? "inline" : "none";
+  $("sLeaf").textContent = state.leaves ? fmt(leafCount) : "ocultas";
+  $("sTriWrap").style.display = "inline";
+  $("sTri").textContent = fmt(g3.tris);
+  const p = P(), showDim = p.dim && !state.edited;
+  $("sDimWrap").style.display = showDim ? "inline" : "none";
+  if (showDim) { $("sDim").textContent = String(p.dim[0]); $("sDimTxt").textContent = p.dim[1]; }
+  $("sZoom").textContent = view3.zoom.toFixed(1) + "×";
 }
 
 /* ---------- Elegir ejemplo ---------- */
@@ -828,31 +1279,41 @@ function choose(name) {
   Object.assign(state, {
     gen: p.gen, angle: p.angle, axiom: p.axiom, edited: false,
     branches: p.branches || 3, trees: p.trees || 5, irr: p.irr || 0,
-    wind: reduceMotion ? 0 : (p.wind || 0), leaves: !!p.leaves, scene: !!p.scene
+    wind: reduceMotion ? 0 : (p.wind || 0), leaves: !!p.leaves, scene: !!p.scene,
+    roll: p.roll || 0, trop: p.trop || 0
   });
   state.rules = name === "arbol" ? treeRules(state.branches) : p.rules;
   $("preset").value = name;
   $("gen").max = p.maxGen;
-  for (const id of ["gen", "angle", "axiom", "rules", "branches", "trees", "irr", "wind"]) $(id).value = state[id];
-  $("leaves").checked = state.leaves; $("scene").checked = state.scene;
+  for (const id of ["gen", "angle", "axiom", "rules", "branches", "trees", "irr", "wind", "roll", "trop"]) $(id).value = state[id];
+  $("leaves").checked = state.leaves; $("scene").checked = state.scene; $("orbit").checked = state.orbit;
   $("desc").textContent = p.desc; $("use").textContent = p.use;
   document.body.classList.toggle("is-veg", p.veg);
   document.body.classList.toggle("is-geo", !p.veg);
+  document.body.classList.toggle("is-3d", !!p.d3);
+  canvas.style.display = p.d3 ? "none" : "block";
+  glc.style.display = p.d3 ? "block" : "none";
   $("treeOnly").style.display = name === "arbol" ? "block" : "none";
   $("forestOnly").style.display = name === "bosque" ? "block" : "none";
+  $("tropBox").style.display = p.veg ? "block" : "none";
   stopGrow();
   setStepMode(false);
-  $("step").disabled = name === "bosque";
-  $("step").title = name === "bosque" ? "No disponible en el bosque: elige un solo árbol" : "Lee la cadena símbolo por símbolo";
+  const noStep = name === "bosque" || !!p.d3;
+  $("step").disabled = noStep;
+  $("step").title = noStep ? "Disponible en los ejemplos 2D de un solo dibujo" : "Lee la cadena símbolo por símbolo";
   resetView();
   refresh("build");
 }
 
-function resetView() { view.zoom = 1; view.tx = 0; view.ty = 0; requestDraw(); }
+function resetView() {
+  view.zoom = 1; view.tx = 0; view.ty = 0;
+  view3.yaw = 0.7; view3.pitch = P().veg ? 0.22 : 0.5; view3.zoom = 1;
+  requestDraw();
+}
 
 function startGrow() {
   if (step.active) setStepMode(false);
-  const total = instances.reduce((s, i) => s + i.stat.ns, 0);
+  const total = P().d3 ? g3.nseg : instances.reduce((s, i) => s + i.stat.ns, 0);
   if (!total) return;
   anim.duration = clamp(total / 2500, 2.5, 9);
   anim.start = performance.now() / 1000; anim.progress = 0; anim.growing = true;
@@ -871,6 +1332,9 @@ bind("angle", "angle", "turtle");
 bind("irr", "irr", "turtle");
 bind("wind", "wind", "draw");
 bind("trees", "trees", "build");
+bind("roll", "roll", "turtle");
+bind("trop", "trop", "turtle");
+$("orbit").onchange = e => { state.orbit = e.target.checked; requestDraw(); };
 $("branches").addEventListener("input", e => {
   state.branches = +e.target.value;
   state.rules = treeRules(state.branches); $("rules").value = state.rules; state.edited = false;
@@ -904,56 +1368,71 @@ $("shot").onclick = () => {
   draw(performance.now() / 1000);
   const a = document.createElement("a");
   a.download = `l-system-${state.preset}.png`;
-  a.href = canvas.toDataURL("image/png");
+  a.href = (P().d3 ? glc : canvas).toDataURL("image/png");
   a.click();
 };
 
 /* ---------- Vista: arrastrar, rueda, pellizco y teclado ---------- */
+/* En 2D arrastrar mueve el dibujo; en 3D gira la cámara alrededor del árbol */
 function zoomAt(mx, my, f) {
+  if (P().d3) { view3.zoom = clamp(view3.zoom * f, 0.3, 8); requestDraw(); return; }
   const z = clamp(view.zoom * f, 0.2, 200);
   f = z / view.zoom;
   view.tx = mx - (mx - view.tx) * f; view.ty = my - (my - view.ty) * f; view.zoom = z;
   requestDraw();
 }
+function dragBy(dx, dy) {
+  if (P().d3) {
+    view3.yaw -= dx * 0.008;
+    view3.pitch = clamp(view3.pitch + dy * 0.006, P().veg ? 0.02 : -1.4, 1.45);
+  } else { view.tx += dx; view.ty += dy; }
+  requestDraw();
+}
 const pointers = new Map();
 let pinch = 0;
-canvas.addEventListener("pointerdown", e => {
-  if (e.pointerType === "mouse" && e.button !== 0) return;
-  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  canvas.setPointerCapture(e.pointerId);
-  canvas.classList.add("dragging");
-  if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); }
-});
-canvas.addEventListener("pointermove", e => {
-  const p = pointers.get(e.pointerId);
-  if (!p) return;
-  const dx = e.clientX - p.x, dy = e.clientY - p.y;
-  p.x = e.clientX; p.y = e.clientY;
-  if (pointers.size === 1) { view.tx += dx; view.ty += dy; requestDraw(); }
-  else if (pointers.size === 2) {
-    const [a, b] = [...pointers.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
-    if (pinch) zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / pinch);
-    pinch = d;
-  }
-});
-const endPointer = e => { pointers.delete(e.pointerId); if (!pointers.size) canvas.classList.remove("dragging"); pinch = 0; };
-canvas.addEventListener("pointerup", endPointer);
-canvas.addEventListener("pointercancel", endPointer);
-canvas.addEventListener("wheel", e => {
-  e.preventDefault();
-  zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015));
-}, { passive: false });
-canvas.addEventListener("dblclick", resetView);
-canvas.addEventListener("keydown", e => {
-  const W = canvas.clientWidth, H = canvas.clientHeight, step = 40;
-  const actions = {
-    ArrowLeft: () => { view.tx += step; }, ArrowRight: () => { view.tx -= step; },
-    ArrowUp: () => { view.ty += step; }, ArrowDown: () => { view.ty -= step; },
-    "+": () => zoomAt(W / 2, H / 2, 1.25), "=": () => zoomAt(W / 2, H / 2, 1.25),
-    "-": () => zoomAt(W / 2, H / 2, 0.8), "0": resetView
-  };
-  if (actions[e.key]) { e.preventDefault(); actions[e.key](); requestDraw(); }
-});
+for (const el of [canvas, glc]) {
+  el.addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    el.setPointerCapture(e.pointerId);
+    el.classList.add("dragging");
+    if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); }
+  });
+  el.addEventListener("pointermove", e => {
+    const p = pointers.get(e.pointerId);
+    if (!p) return;
+    const dx = e.clientX - p.x, dy = e.clientY - p.y;
+    p.x = e.clientX; p.y = e.clientY;
+    if (pointers.size === 1) dragBy(dx, dy);
+    else if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (pinch) zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / pinch);
+      pinch = d;
+    }
+  });
+  const endPointer = e => { pointers.delete(e.pointerId); if (!pointers.size) el.classList.remove("dragging"); pinch = 0; };
+  el.addEventListener("pointerup", endPointer);
+  el.addEventListener("pointercancel", endPointer);
+  el.addEventListener("wheel", e => {
+    e.preventDefault();
+    zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015));
+  }, { passive: false });
+  el.addEventListener("dblclick", resetView);
+  el.addEventListener("keydown", e => {
+    const W = el.clientWidth, H = el.clientHeight, s = 40;
+    const actions = {
+      ArrowLeft: () => dragBy(s, 0), ArrowRight: () => dragBy(-s, 0),
+      ArrowUp: () => dragBy(0, s), ArrowDown: () => dragBy(0, -s),
+      "+": () => zoomAt(W / 2, H / 2, 1.25), "=": () => zoomAt(W / 2, H / 2, 1.25),
+      "-": () => zoomAt(W / 2, H / 2, 0.8), "0": resetView
+    };
+    if (actions[e.key]) { e.preventDefault(); actions[e.key](); }
+  });
+}
+if (!has3d) for (const v of ["arbol3d", "hilbert3d"]) {
+  const opt = $("preset").querySelector(`option[value=${v}]`);
+  opt.disabled = true; opt.textContent += " (requiere WebGL)";
+}
 
 window.addEventListener("resize", requestDraw);
 document.addEventListener("visibilitychange", () => { if (!document.hidden) requestDraw(); });
