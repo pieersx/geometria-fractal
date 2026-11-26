@@ -15,13 +15,20 @@ code, pre { font: 10.5pt "DejaVu Sans Mono", monospace; background: #f3f3f3; }
 pre { padding: .5em .8em; white-space: pre-wrap; page-break-inside: avoid; }
 .tok { font-size: 2px; line-height: 0; color: #fff; }
 
-/* Portada (APA 7 con encabezado institucional): Times New Roman 12 pt en todo, solo negrita como énfasis,
-   interlineado 1,5, centrada. Los bloques se reparten a lo alto de la hoja y el último queda al pie sin pasar a otra página. */
+/* Portada: encabezado institucional en Times New Roman, solo negrita como énfasis, centrada y sin adornos.
+   Los tamaños siguen una jerarquía (título > universidad > facultad > datos) para llenar la hoja; los bloques se reparten
+   a lo alto y el último queda al pie sin pasar a otra página. */
 .portada { height: 24.4cm; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
   text-align: center; page-break-after: always; break-after: page; overflow: hidden; }
 .portada .g { width: 100%; }
-.portada p { margin: 0; text-align: center; font-size: 12pt; line-height: 1.5; }
-.portada .logo { display: block; margin: 0 auto .4cm; height: 3.4cm; width: auto; }
+.portada p { margin: 0; text-align: center; font-size: 15pt; line-height: 1.4; }
+.portada .logo { display: block; margin: 0 auto .45cm; height: 4.4cm; width: auto; }
+.portada .univ { font-size: 17pt; }
+.portada .lema { font-size: 14pt; }
+.portada .fac { font-size: 15pt; }
+.portada .eap { font-size: 14pt; }
+.portada .tipo { font-size: 16pt; }
+.portada .titulo { font-size: 26pt; line-height: 1.25; }
 
 /* Índice y listas */
 .front { text-align: left; font-size: 11.5pt; line-height: 1.35; }
