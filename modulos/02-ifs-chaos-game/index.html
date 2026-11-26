@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IFS y Chaos Game · Geometría fractal</title>
+<title>IFS y juego del caos · Geometría fractal</title>
 <link rel="icon" href="data:,">
 <style>
   :root { --bg:#0b0d12; --panel:#141821ee; --line:#262c3a; --text:#e6e9f0; --muted:#8b93a7; --accent:#f5b942; }
@@ -18,6 +18,7 @@
   a.back { color:var(--muted); font-size:12px; text-decoration:none; display:inline-block; margin-bottom:8px; }
   a.back:hover { color:var(--accent); }
   label { display:block; color:var(--muted); font-size:12px; margin:10px 0 4px; }
+  label.chk { display:flex; align-items:center; gap:6px; margin:8px 0 0; cursor:pointer; }
   .row { display:flex; gap:6px; }
   button, select { font:inherit; color:var(--text); background:#1c2230; border:1px solid var(--line);
     border-radius:8px; padding:6px 10px; cursor:pointer; }
@@ -25,10 +26,12 @@
   .row > button { flex:1; }
   select { width:100%; }
   input[type=range] { width:100%; accent-color:var(--accent); }
+  input[type=checkbox] { accent-color:var(--accent); }
   .val { float:right; color:var(--text); font-variant-numeric:tabular-nums; }
   .stats { margin-top:12px; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
   .stats b { color:var(--text); font-weight:500; }
   .hint { margin-top:10px; color:var(--muted); font-size:12px; }
+  .hidden { display:none; }
   @media (max-width:560px) { #panel { width:calc(100% - 32px); max-height:46%; } }
 </style>
 </head>
@@ -37,94 +40,185 @@
 
 <div id="panel">
   <a class="back" href="../../">← Portada</a>
-  <h1>IFS y Chaos Game</h1>
-  <div class="sub">Módulo 2 · Helecho de Barnsley y Sierpinski</div>
+  <h1>IFS y juego del caos</h1>
+  <div class="sub">Módulo 2 · Un punto, un dado y unas pocas reglas</div>
 
-  <!-- TODO: reemplaza este control de ejemplo por los parámetros de tu algoritmo.
-       Mantén el mismo estilo (label + input) para que todos los módulos se vean igual. -->
-  <label>Parámetro de ejemplo <span class="val" id="vP"></span></label>
-  <input id="p" type="range" min="1" max="100" step="1" value="50">
+  <label for="fig">Fractal</label>
+  <select id="fig">
+    <option value="helecho">Helecho de Barnsley (IFS, 4 transformaciones)</option>
+    <option value="triangulo" selected>Triángulo de Sierpinski (juego del caos)</option>
+    <option value="alfombra">Alfombra de Sierpinski (8 vértices)</option>
+  </select>
+
+  <div id="rCtl">
+    <label>Razón de salto r <span class="val" id="vR"></span></label>
+    <input id="r" type="range" min="0.2" max="0.8" step="any" value="0.5">
+  </div>
+
+  <label>Número de puntos <span class="val" id="vN"></span></label>
+  <input id="n" type="range" min="3" max="6.7" step="0.1" value="5.4">
+
+  <label class="chk"><input id="col" type="checkbox"> Colorear según la regla que dibujó cada punto</label>
+
+  <div class="stats"><span id="stats"></span></div>
 
   <div class="row" style="margin-top:12px">
     <button id="reset">Reiniciar</button>
     <button id="shot">Guardar PNG</button>
   </div>
-
-  <div class="stats"><span id="stats"></span></div>
-  <div class="hint">Arrastra para mover · rueda para acercar (opcional)</div>
+  <div class="hint" id="hint"></div>
 </div>
 
 <script>
 "use strict";
 /* =====================================================================
-   PLANTILLA BASE · Módulo 2: IFS y Chaos Game
-   Qué hacer:
-   - Implementar el juego del caos: punto aleatorio + una de N transformaciones afines por iteración.
-   - Presets: triángulo de Sierpinski (3 transformaciones) y helecho de Barnsley (4, con probabilidades).
-   - Controles: número de puntos, preset, color por transformación y botón para animar la construcción.
-   - Mostrar en el panel el número de puntos dibujados.
-   Reglas: ver CONTRIBUTING.md. Este archivo debe funcionar sin instalar nada.
+   Módulo 2 · Sistemas de funciones iteradas (IFS) y juego del caos
+   Se parte de un punto cualquiera y, en cada paso, se elige al azar una de las
+   transformaciones del IFS y se aplica al punto. Tras descartar los primeros puntos,
+   todos caen sobre el atractor (el fractal) y se acumulan en una imagen de densidad.
+   - Juego del caos: x' = r·x + (1 − r)·v, con v un vértice elegido al azar.
+   - Helecho de Barnsley: x' = a·x + b·y + e,  y' = c·x + d·y + f, con probabilidades p.
    ===================================================================== */
 
 const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");   // Si necesitas GPU, cambia a getContext("webgl") (ver módulo 1)
+const ctx = canvas.getContext("2d");
+const $ = id => document.getElementById(id);
 
-/* Estado del módulo: guarda aquí todos los parámetros */
-const DEFAULTS = { p: 50 };
+const PALETTE = [[245,185,66],[79,209,197],[239,106,138],[138,180,255],[180,140,255],[123,224,123],[255,160,90],[230,233,240]];
+
+const PRESETS = {
+  helecho: {
+    name: "Helecho de Barnsley", base: [110, 220, 125],
+    // [a, b, c, d, e, f, p]
+    maps: [[0, 0, 0, 0.16, 0, 0, 0.01], [0.85, 0.04, -0.04, 0.85, 0, 1.6, 0.85],
+           [0.2, -0.26, 0.23, 0.22, 0, 1.6, 0.07], [-0.15, 0.28, 0.26, 0.24, 0, 0.44, 0.07]],
+    bounds: [-2.75, 2.75, 0, 10.1],
+    hint: "Cada transformación es una copia deformada del helecho entero: la 1.ª dibuja el tronco, la 2.ª es el helecho achicado y subido un poco, la 3.ª la hoja izquierda y la 4.ª la derecha."
+  },
+  triangulo: {
+    name: "Triángulo de Sierpinski", base: [245, 185, 66], n: 3, rDefault: 0.5,
+    verts: [[0, 0], [1, 0], [0.5, Math.sqrt(3) / 2]], bounds: [0, 1, 0, Math.sqrt(3) / 2],
+    hint: "Reglas: elige al azar uno de los 3 vértices y salta una fracción r del camino hacia él. Con r = 0,5 aparece Sierpinski; cambia r y mira qué pasa."
+  },
+  alfombra: {
+    name: "Alfombra de Sierpinski", base: [79, 209, 197], n: 8, rDefault: 1 / 3,
+    verts: [[0, 0], [0.5, 0], [1, 0], [0, 0.5], [1, 0.5], [0, 1], [0.5, 1], [1, 1]], bounds: [0, 1, 0, 1],
+    hint: "Reglas: elige al azar uno de los 8 vértices (4 esquinas y 4 puntos medios) y salta 2/3 del camino hacia él, es decir, r = 1/3."
+  }
+};
+
+const DEFAULTS = { fig: "triangulo", r: 0.5, n: 5.4, col: false };
 const state = { ...DEFAULTS };
 
-/* Ajusta el lienzo a la pantalla y a la densidad de píxeles */
+let W = 0, H = 0, count, rr, gg, bb, img, job = null, view = null, raf = 0;
+
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
 function resize() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const w = Math.floor(canvas.clientWidth * dpr), h = Math.floor(canvas.clientHeight * dpr);
-  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; return true; }
+  return false;
 }
 
-/* ---------------------------------------------------------------------
-   TODO: implementa aquí tu algoritmo. Se llama cada vez que algo cambia.
-   Dibuja en `ctx`; el tamaño real del lienzo es canvas.width × canvas.height.
-   --------------------------------------------------------------------- */
-function render() {
-  resize();
-  const W = canvas.width, H = canvas.height;
-  ctx.fillStyle = "#0b0d12"; ctx.fillRect(0, 0, W, H);
-
-  // Ejemplo mínimo: una circunferencia cuyo radio depende del parámetro. Bórralo.
-  ctx.strokeStyle = "#f5b942"; ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(W * 0.6, H / 2, (state.p / 100) * Math.min(W, H) * 0.35, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.fillStyle = "#8b93a7"; ctx.font = `${Math.round(16 * (W / canvas.clientWidth))}px system-ui`;
-  ctx.textAlign = "center";
-  ctx.fillText("Módulo 2 · implementa render()", W * 0.6, H - 40);
-
-  document.getElementById("stats").textContent = "Parámetro: " + state.p;   // TODO: muestra tus datos (iteraciones, puntos, dimensión…)
+/* Encuadre: el fractal ocupa el área libre a la derecha del panel */
+function fitView(p) {
+  const cw = canvas.clientWidth, u = W / cw;
+  const left = cw > 560 ? 304 * u : 0, top = cw > 560 ? 0 : H * 0.48;
+  const aw = W - left - 24 * u, ah = H - top - 24 * u, [x0, x1, y0, y1] = p.bounds;
+  const s = Math.min(aw / (x1 - x0), ah / (y1 - y0)) * 0.94;
+  view = { s, ox: left + 12 * u + (aw - (x1 - x0) * s) / 2 - x0 * s, oy: top + 12 * u + (ah - (y1 - y0) * s) / 2 + y1 * s };
 }
 
-/* ---------- Controles (patrón común a todos los módulos) ---------- */
-const $ = id => document.getElementById(id);
+function start() {
+  cancelAnimationFrame(raf);                              // evita dos bucles de dibujo sobre el mismo trabajo
+  resize(); W = canvas.width; H = canvas.height;
+  count = new Uint32Array(W * H); rr = new Float32Array(W * H); gg = new Float32Array(W * H); bb = new Float32Array(W * H);
+  img = ctx.createImageData(W, H);
+  const p = PRESETS[state.fig]; fitView(p);
+  job = { done: 0, total: Math.round(Math.pow(10, state.n)), x: 0.1, y: 0.1, rnd: mulberry32(2024), p };
+  if (p.maps) { let s = 0; job.cum = p.maps.map(m => (s += m[6])); }
+  stepJob();
+}
 
-$("p").oninput = e => { state.p = +e.target.value; $("vP").textContent = state.p; render(); };
+function stepJob() {
+  const j = job; if (!j) return;
+  const { p, rnd } = j, batch = Math.min(Math.max(150000, j.total / 12), j.total - j.done), { s, ox, oy } = view;
+  let x = j.x, y = j.y;
+  for (let t = 0; t < batch; t++) {
+    let i;
+    if (p.maps) {
+      const u = rnd(); i = 0; while (i < 3 && u > j.cum[i]) i++;
+      const m = p.maps[i], nx = m[0] * x + m[1] * y + m[4]; y = m[2] * x + m[3] * y + m[5]; x = nx;
+    } else {
+      i = (rnd() * p.n) | 0; const v = p.verts[i], r = state.r;
+      x = r * x + (1 - r) * v[0]; y = r * y + (1 - r) * v[1];
+    }
+    if (j.done + t < 20) continue;                       // se descartan los primeros puntos
+    const px = (x * s + ox) | 0, py = (oy - y * s) | 0;
+    if (px < 0 || py < 0 || px >= W || py >= H) continue;
+    const k = py * W + px, c = PALETTE[i % PALETTE.length];
+    count[k]++; rr[k] += c[0]; gg[k] += c[1]; bb[k] += c[2];
+  }
+  j.x = x; j.y = y; j.done += batch;
+  paint();
+  if (j.done < j.total) raf = requestAnimationFrame(stepJob); else { job = null; updateStats(); }
+  if (job) updateStats();
+}
 
-$("reset").onclick = () => {
-  Object.assign(state, DEFAULTS);
-  $("p").value = state.p; $("vP").textContent = state.p;
-  render();
-};
+function paint() {
+  const d = img.data, n = W * H, base = PRESETS[state.fig].base;
+  let cmax = 1; for (let i = 0; i < n; i++) if (count[i] > cmax) cmax = count[i];
+  const lg = Math.log(1 + cmax);
+  for (let i = 0; i < n; i++) {
+    const c = count[i], o = 4 * i;
+    if (!c) { d[o] = 11; d[o + 1] = 13; d[o + 2] = 18; d[o + 3] = 255; continue; }
+    const v = 0.3 + 0.7 * Math.pow(Math.log(1 + c) / lg, 0.8);
+    const R = state.col ? rr[i] / c : base[0], G = state.col ? gg[i] / c : base[1], B = state.col ? bb[i] / c : base[2];
+    d[o] = R * v + 11 * (1 - v); d[o + 1] = G * v + 13 * (1 - v); d[o + 2] = B * v + 18 * (1 - v); d[o + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
 
+const fmt = (v, d = 3) => v.toLocaleString("es", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+function updateStats() {
+  const p = PRESETS[state.fig], done = job ? job.done : Math.round(Math.pow(10, state.n));
+  let html = `<b>${p.name}</b><br>Puntos dibujados: <b>${done.toLocaleString("es")}</b>${job ? " …" : ""}<br>`;
+  if (p.maps) html += "Dimensión: sin fórmula simple (transformaciones afines). Se puede medir con el módulo 5.";
+  else {
+    const lim = 1 / (p.n === 3 ? 2 : 3), r = state.r;
+    if (r <= lim + 1e-9) html += `Dimensión de semejanza ln ${p.n} / ln(1/r) = <b>${fmt(Math.log(p.n) / Math.log(1 / r))}</b>`;
+    else html += "Con este r las copias <b>se solapan</b>: ya no es el fractal original y la fórmula deja de valer.";
+  }
+  $("stats").innerHTML = html;
+}
+
+/* ---------- Controles ---------- */
+function syncControls() {
+  const p = PRESETS[state.fig];
+  $("fig").value = state.fig; $("r").value = state.r; $("n").value = state.n; $("col").checked = state.col;
+  $("rCtl").classList.toggle("hidden", !!p.maps);
+  $("hint").textContent = p.hint;
+  $("vR").textContent = fmt(state.r, 2); $("vN").textContent = Math.round(Math.pow(10, state.n)).toLocaleString("es");
+}
+
+$("fig").onchange = e => { state.fig = e.target.value; const p = PRESETS[state.fig]; if (p.rDefault) state.r = p.rDefault; syncControls(); start(); };
+$("r").oninput = e => { state.r = +e.target.value; syncControls(); start(); };
+$("n").oninput = e => { state.n = +e.target.value; syncControls(); start(); };
+$("col").onchange = e => { state.col = e.target.checked; paint(); };
+$("reset").onclick = () => { Object.assign(state, DEFAULTS); syncControls(); start(); };
 $("shot").onclick = () => {
-  render();
   const a = document.createElement("a");
   a.download = "modulo-2.png";
   a.href = canvas.toDataURL("image/png");
   a.click();
 };
 
-window.addEventListener("resize", render);
+let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(start, 120); });
 
 /* ---------- Arranque ---------- */
-$("vP").textContent = state.p;
-render();
+syncControls(); start();
 </script>
 </body>
 </html>
