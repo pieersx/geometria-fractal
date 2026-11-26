@@ -24,7 +24,8 @@
   .row { display: flex; gap: 6px; }
   button, select { font: inherit; color: var(--text); background: #1c2230; border: 1px solid var(--line);
     border-radius: 8px; padding: 6px 10px; cursor: pointer; }
-  button:hover, select:hover { border-color: var(--accent); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  button:hover:not(:disabled), select:hover { border-color: var(--accent); }
   button.active { background: var(--accent); color: #1a1405; border-color: var(--accent); font-weight: 600; }
   .row > button { flex: 1; }
   select { width: 100%; }
@@ -55,6 +56,8 @@
     font-size: 12px; font-variant-numeric: tabular-nums; }
   .stats b { color: var(--text); font-weight: 500; }
   #warn { color: var(--accent); display: none; margin-top: 6px; }
+  a.back { color: var(--muted); font-size: 12px; text-decoration: none; display: inline-block; margin-bottom: 8px; }
+  a.back:hover { color: var(--accent); }
   .hint { margin-top: 10px; color: var(--muted); font-size: 12px; }
   #nogl { display: none; position: fixed; inset: 0; place-items: center; text-align: center; padding: 24px; }
   @media (max-width: 560px) { #panel { width: calc(100% - 32px); max-height: 46%; } }
@@ -70,6 +73,7 @@
 <div id="nogl">Tu navegador no soporta WebGL. Prueba con Chrome, Firefox o Edge actualizados.</div>
 
 <div id="panel">
+  <a class="back" href="../../index.html">← Portada</a>
   <h1>Geometría fractal</h1>
   <div class="sub">Módulo 1 · Conjuntos de escape (Mandelbrot / Julia)</div>
 
