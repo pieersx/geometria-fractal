@@ -111,7 +111,7 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 | ¿Por qué falla el zoom muy profundo? | La GPU usa números de 32 bits; al ampliar, dos píxeles vecinos dejan de distinguirse y la imagen se pixela. |
 | ¿En el juego del caos, por qué sale la figura si es aleatorio? | Cada salto contrae el punto hacia el atractor; tras unos pocos pasos queda sobre él y los siguientes lo recubren. |
 | ¿Qué diferencia hay entre IFS y L-system? | El IFS aplica transformaciones geométricas a un punto. El L-system reescribe texto y luego lo interpreta como dibujo. |
-| ¿Por qué la cadena del L-system crece tanto? | Cada símbolo se reemplaza en paralelo: con Koch se multiplica por 4 en cada generación. |
+| ¿Por qué la cadena del L-system crece tanto? | Cada símbolo se reemplaza en paralelo: con Koch el número de segmentos se multiplica por 4 en cada generación. |
 | ¿La dimensión que muestra el terreno es medida? | No. Es una estimación teórica a partir de la rugosidad ($D = 3 - H$). Medirla sería tarea del módulo 5. |
 | ¿Cómo se valida el box-counting? | Con formas de dimensión conocida: Koch ≈ 1,262 y Sierpinski ≈ 1,585. |
 | ¿Qué fuentes usaron? | Mandelbrot (1967), Lindenmayer (1968), Barnsley y Demko (1985), Fournier et al. (1982), Liebovitch y Toth (1989). Con DOI en el informe. |

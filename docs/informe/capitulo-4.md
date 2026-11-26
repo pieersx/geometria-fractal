@@ -48,7 +48,7 @@ En un L-system **estocástico**, un símbolo puede tener varias producciones, ca
 
 En 3D, la orientación de la tortuga se describe con tres vectores perpendiculares: **H** (hacia dónde avanza), **L** (su izquierda) y **U** (arriba). Cada giro es una rotación de dos de esos vectores alrededor del tercero: `+ −` giran alrededor de **U**, `& ^` alrededor de **L** y `\ /` alrededor de **H**. Así, una regla de texto puede describir ramas que salen en cualquier dirección del espacio.
 
-El **tropismo** imita la acción de la gravedad o de la luz: después de cada paso, la dirección **H** se inclina un poco hacia un vector fijo **T**. En el módulo, **T** apunta hacia abajo, de modo que las ramas se curvan como si cedieran a su propio peso. Un valor negativo las curva hacia arriba.
+El **tropismo** imita la acción de la gravedad o de la luz: antes de cada segmento de una rama, la dirección **H** se inclina un poco hacia un vector fijo **T**. En el módulo, **T** apunta hacia abajo, de modo que las ramas se curvan como si cedieran a su propio peso. Un valor negativo las curva hacia arriba.
 
 ### En la aplicación
 

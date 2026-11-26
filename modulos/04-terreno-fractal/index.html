@@ -53,7 +53,7 @@
   <h1>Geometría fractal</h1>
   <div class="sub">Módulo 4 · Terreno fractal (diamond-square)</div>
 
-  <label for="presets">Paisajes famosos</label>
+  <label for="presets">Paisajes predefinidos</label>
   <select autocomplete="off" id="presets">
     <option value="0">Cordillera alpina</option>
     <option value="1">Isla solitaria</option>
@@ -112,6 +112,8 @@
 "use strict";
 const canvas = document.getElementById("c");
 const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true, antialias: true });
+canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); const n = document.getElementById("nogl"); n.textContent = "Se perdió el contexto gráfico. Recarga la página."; n.style.display = "flex"; });
+
 if (!gl) {
   document.getElementById("nogl").style.display = "grid";
   document.getElementById("panel").style.display = "none";
@@ -472,7 +474,8 @@ canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointercancel", endPointer);
 canvas.addEventListener("wheel", e => {
   e.preventDefault();
-  zoom(Math.exp(clamp(e.deltaY, -120, 120) * 0.0015));
+  const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1);   // Firefox envía líneas, no píxeles
+  zoom(Math.exp(clamp(dy, -120, 120) * 0.0015));
 }, { passive: false });
 canvas.addEventListener("keydown", e => {
   switch (e.key) {
