@@ -3,7 +3,7 @@
 Trabajo colaborativo del curso **Computación Visual** (8.º ciclo, Ingeniería de Sistemas). Grupo 8.
 Exposición: **02/12/2026** · 20 minutos.
 
-Aplicación web interactiva (HTML + JavaScript; WebGL en los módulos 1 y 4) que muestra los algoritmos de geometría fractal en tiempo real. No requiere instalación.
+Aplicación web interactiva (HTML + JavaScript; WebGL en los módulos 1 y 4 y en el modo 3D del módulo 3) que muestra los algoritmos de geometría fractal en tiempo real. No requiere instalación.
 
 ## Módulos
 
@@ -11,7 +11,7 @@ Aplicación web interactiva (HTML + JavaScript; WebGL en los módulos 1 y 4) que
 |---|--------|------------------------|-------------|--------|
 | 1 | [Conjuntos de escape](modulos/01-conjuntos-escape) | Mandelbrot y Julia con zoom interactivo | Pachas Auris, Pieers Fernando | Prototipo listo |
 | 2 | [IFS y Chaos Game](modulos/02-ifs-chaos-game) | Helecho de Barnsley, triángulo de Sierpinski | Cerna Aguilar, Emily Andrea | Pendiente |
-| 3 | [L-systems](modulos/03-l-systems) | Plantas y curva de Koch por reglas de reescritura | Flores Cortez, Valeria Alexandra | Pendiente |
+| 3 | [L-systems](modulos/03-l-systems) | Plantas, árboles y curvas de Koch y del dragón por reglas de reescritura | Flores Cortez, Valeria Alexandra | Prototipo listo |
 | 4 | [Terreno fractal](modulos/04-terreno-fractal) | Ruido fBm o diamond-square en 3D | Sihuacollo Sierra, Keyla Noemi | Prototipo listo |
 | 5 | [Dimensión fractal](modulos/05-dimension-fractal) | Box-counting sobre una imagen cargada por el usuario | Puente Carmen, Rodrigo Joaquin | Pendiente |
 

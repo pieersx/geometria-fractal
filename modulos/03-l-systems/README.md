@@ -1,19 +1,23 @@
 # Módulo 3 · L-systems
 
 **Responsable:** Flores Cortez, Valeria Alexandra
-**Estado:** pendiente
+**Estado:** prototipo listo (Canvas 2D y WebGL para el modo 3D)
 
-## Qué debe entregar
+Base de Valeria (árbol con ramas por nivel e irregularidad), rediseñada con el estilo de los módulos 1 y 4: lienzo a pantalla completa y panel flotante.
 
-- `index.html` autocontenido que funcione sin instalar nada
-- Curva de Koch y al menos una planta, con reglas de reescritura editables
-- Controles en un panel a la izquierda y lienzo a pantalla completa (referencia: módulo 1)
+## Qué hace
+
+- Reescritura paralela del axioma con reglas editables, incluidas reglas **estocásticas** con peso (`X(0.5)=F[+X]`) y semilla reproducible.
+- Tortuga gráfica: `F G A B` dibujan, `f` avanza sin dibujar, `+ −` giran, `|` da media vuelta y `[ ]` ramifican.
+- Nueve ejemplos: curva y copo de Koch, triángulo de Sierpinski, curva del dragón, planta, árbol en un paisaje, bosque estocástico, **árbol 3D** y **curva de Hilbert 3D**.
+- **Modo 3D (WebGL):** tortuga con vectores H, L, U (`& ^` inclinan, `\ /` rotan sobre el eje), ramas como tubos iluminados, tropismo, hojas, viento en el *vertex shader* y cámara orbital.
+- **Paso a paso:** lee la cadena símbolo por símbolo, explica cada acción y muestra la pila.
+- Panel mínimo: ejemplo, generaciones, ángulo y un control propio de cada ejemplo (ramas por nivel, otro bosque o gravedad). El resto (axioma, reglas, irregularidad, viento, semilla, hojas, paisaje, giro sobre el eje, paso a paso y cadena por generación) está en **⚙ Opciones avanzadas**, plegado por defecto.
+- **Ver crecer:** anima la tortuga en el orden en que lee la cadena.
+- Zoom y arrastre con ratón, gestos táctiles o teclado (flechas, + / − y 0); exportación a PNG.
+- Muestra símbolos, segmentos, hojas, la cadena de cada generación y la dimensión teórica de los fractales geométricos.
+- Límites de seguridad: 1 500 000 símbolos y 400 000 segmentos.
 
 ## Para el informe
 
-Descripción del algoritmo, fortalezas, debilidades y un caso práctico de aplicación. Texto en `docs/informe/`.
-
-## Cómo empezar
-
-`index.html` ya trae la plantilla base: panel de controles, lienzo, botones Reiniciar y Guardar PNG.
-Busca los comentarios `TODO` y reemplaza la función `render()` por tu algoritmo. La lista de qué implementar está al inicio del `<script>`.
+Capítulo 4: `docs/informe/capitulo-4.md`. Capturas en `docs/presentacion/capturas/modulo3-*.png`. Guion de la demostración y guía para la exposición: `docs/presentacion/guion-modulo3.md`.
