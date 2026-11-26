@@ -16,11 +16,21 @@ pre { padding: .5em .8em; white-space: pre-wrap; page-break-inside: avoid; }
 .tok { font-size: 2px; line-height: 0; color: #fff; }
 
 /* Portada */
-.portada { text-align: center; page-break-after: always; padding-top: 1cm; }
-.portada p { margin: .5em 0; text-align: center; }
-.portada .univ { font-size: 15pt; font-weight: bold; }
-.portada .titulo { font-size: 20pt; font-weight: bold; margin: 2.5cm 0 .5cm; }
-.portada .integrantes { margin-top: 1.5cm; }
+.portada { text-align: center; page-break-after: always; padding-top: .5cm; min-height: 23.5cm; position: relative; }
+.portada p { margin: .4em 0; text-align: center; }
+.portada .logo { display: block; margin: 0 auto .6cm; max-height: 3.2cm; }
+.portada .univ { font-size: 15pt; font-weight: bold; letter-spacing: .02em; }
+.portada .lema { font-size: 11pt; color: #444; margin-bottom: .8em; }
+.portada .fac { font-size: 12.5pt; }
+.portada .bloque-titulo { margin: 2.2cm 0 1.6cm; padding: .9cm 0; border-top: 2px solid #000; border-bottom: 2px solid #000; }
+.portada .tipo { font-size: 11pt; text-transform: uppercase; letter-spacing: .14em; color: #444; margin: 0 0 .5em; }
+.portada .titulo { font-size: 21pt; font-weight: bold; line-height: 1.25; margin: 0; }
+.portada .curso p { font-size: 12pt; margin: .3em 0; }
+.portada .integrantes { margin-top: 1.4cm; }
+.portada .int-t { font-weight: bold; text-transform: uppercase; letter-spacing: .1em; font-size: 11pt; margin-bottom: .5em; }
+.portada .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.2cm; width: 14cm; margin: 0 auto; text-align: left; }
+.portada .cols p { text-align: center; font-size: 11.5pt; margin: .25em 0; }
+.portada .pie-portada { position: absolute; left: 0; right: 0; bottom: 0; font-size: 12pt; }
 
 /* Índice y listas */
 .front { text-align: left; font-size: 11.5pt; line-height: 1.35; }
