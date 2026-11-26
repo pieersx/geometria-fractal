@@ -1,6 +1,6 @@
 # Guion de la exposición (20 minutos)
 
-**Presentación:** [geometria-fractal-presentacion.pdf](geometria-fractal-presentacion.pdf) · 18 diapositivas · **Fecha: 02/12/2026**
+**Presentación:** [geometria-fractal-presentacion.pdf](geometria-fractal-presentacion.pdf) · 19 diapositivas · **Fecha: 02/12/2026**
 
 Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea en una frase → ejemplo con números pequeños → qué se ve en la app*.
 
@@ -13,14 +13,14 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 | 4 | Cinco técnicas, una aplicación | Camila | 1:00 |
 | 5–7 | Módulo 1: Mandelbrot, Julia y cómo se forman | Pieers | 3:30 |
 | 8 | Módulo 2: IFS y juego del caos | Emily | 2:00 |
-| 9 | Módulo 3: L-systems | Valeria | 2:00 |
-| 10–11 | Módulo 4: terreno fractal | Keyla | 2:30 |
-| 12 | Módulo 5: box-counting | Rodrigo | 2:00 |
-| 13 | Hilo conductor: la curva de Koch | Rodrigo | 1:00 |
-| 14 | Demostración en vivo | Pieers | 1:30 |
-| 15–16 | Fortalezas, debilidades y conclusiones | Camila | 1:30 |
-| 17–18 | Referencias y preguntas | Todos | resto |
-| | **Total** | | **≈ 19:30** |
+| 9–10 | Módulo 3: L-systems (2D, paso a paso y 3D) | Valeria | 2:30 |
+| 11–12 | Módulo 4: terreno fractal | Keyla | 2:30 |
+| 13 | Módulo 5: box-counting | Rodrigo | 2:00 |
+| 14 | Hilo conductor: la curva de Koch | Rodrigo | 1:00 |
+| 15 | Demostración en vivo | Pieers | 1:30 |
+| 16–17 | Fortalezas, debilidades y conclusiones | Camila | 1:30 |
+| 18–19 | Referencias y preguntas | Todos | resto |
+| | **Total** | | **≈ 20:00** |
 
 📌 Ensayar el 01/12 **con cronómetro**. Si una persona pasa de su tiempo, se recorta la diapositiva 13 o la 15, nunca la demo.
 
@@ -54,16 +54,17 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 - **Helecho de Barnsley:** 4 transformaciones con probabilidades distintas (≈ 1 %, 85 %, 7 %, 7 %). Una hace el tallo, otra las hojas sucesivas y dos las hojas laterales.
 - **En la app:** elegir fractal, número de puntos y velocidad de dibujo.
 
-## Diapositiva 9 · Valeria (módulo 3) — *ajustar al terminar el módulo*
+## Diapositivas 9–10 · Valeria (módulo 3)
 
-**Mensaje:** se reescribe un texto y luego se dibuja.
+**Mensaje:** se reescribe un texto y luego se dibuja. Detalle de la demo y preguntas probables: [guion-modulo3.md](guion-modulo3.md).
 
 - **Ejemplo con números (Koch):** axioma `F`; regla `F → F+F−−F+F`. Generación 1 tiene **4** `F`, generación 2 tiene **16**, generación 3 tiene **64**: crece como $4^n$.
 - **Tortuga:** `F` avanza, `+` y `−` giran 60°, `[` y `]` guardan y recuperan posición (así se ramifica una planta).
 - **Dimensión de Koch:** $D = \ln 4 / \ln 3 \approx 1{,}262$.
-- **En la app:** editar la regla, el ángulo y las generaciones, y ver el dibujo al instante.
+- **En la app:** subir las generaciones de Koch, mostrar el **paso a paso** (la pila de `[ ]`), **Ver crecer** el árbol y girar el **árbol 3D** (WebGL).
+- **Diapositiva 10:** paso a paso y curva de Hilbert 3D; cerrar con el crecimiento exponencial (4 096 → 32 768 segmentos).
 
-## Diapositivas 10–11 · Keyla (módulo 4)
+## Diapositivas 11–12 · Keyla (módulo 4)
 
 **Mensaje:** un solo parámetro, la rugosidad, controla qué tan áspero es el terreno.
 
@@ -74,16 +75,16 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 - **Semilla:** la misma semilla reproduce el mismo terreno (por defecto 4817).
 - **En la app:** se dibuja en WebGL, con agua, cielo y niebla.
 
-## Diapositivas 12–13 · Rodrigo (módulo 5) — *ajustar al terminar el módulo*
+## Diapositivas 13–14 · Rodrigo (módulo 5) — *ajustar al terminar el módulo*
 
 **Mensaje:** se puede medir qué tan fractal es una imagen contando cajas.
 
 - **Pasos:** binarizar la imagen, cubrirla con cajas de lado ε, contar las cajas ocupadas *N(ε)* y repetir con varios ε.
 - **Por qué log-log:** si $N(\varepsilon) \propto \varepsilon^{-D}$, en escala logarítmica queda una **recta** y su **pendiente** es *D*.
-- **Validación (diap. 13):** generar Koch con el módulo 3 y medirlo con el módulo 5. Debe dar cerca de 1,262. También Sierpinski ≈ 1,585.
+- **Validación (diap. 14):** generar Koch con el módulo 3 y medirlo con el módulo 5. Debe dar cerca de 1,262. También Sierpinski ≈ 1,585.
 - **Ser honestos:** el resultado depende de la binarización y del rango de ε; un objeto real no es autosimilar hasta el infinito.
 
-## Diapositiva 14 · Pieers (demostración en vivo)
+## Diapositiva 15 · Pieers (demostración en vivo)
 
 1. Pulsar **Modo presentación** en el módulo 1 y avanzar con las flechas (8 escenas: de todo negro al conjunto, la órbita que escapa, el zoom y el vínculo con Julia).
 2. Con **Vista dividida**, una persona del público elige el punto de Mandelbrot y se ve su Julia al instante.
@@ -92,10 +93,10 @@ Regla para todos: **explicar sin leer**. Cada idea sigue el mismo orden: *idea e
 
 ⚠️ **Plan B:** si falla el proyector o el internet, reproducir el video. El propio módulo 1 lo genera con **Grabar video** (archivo `.webm` con el recorrido completo). La app también funciona sin internet abriendo `index.html`.
 
-## Diapositivas 15–16 · Camila (cierre)
+## Diapositivas 16–17 · Camila (cierre)
 
 - Reglas simples producen estructuras complejas.
-- Cada técnica tiene fortalezas y límites propios (diap. 15).
+- Cada técnica tiene fortalezas y límites propios (diap. 16).
 - La aplicación interactiva hace visible lo que la fórmula solo describe.
 - La dimensión fractal conecta la teoría con imágenes reales.
 

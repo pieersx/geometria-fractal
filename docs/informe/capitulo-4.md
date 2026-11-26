@@ -113,16 +113,16 @@ Los L-systems se usan para **generar vegetación procedural** en videojuegos, ci
 
 ## 4.5 Capturas y demostración
 
-![Árbol en un paisaje](../presentacion/capturas/modulo3-arbol.png){width=78% nota="Captura propia del módulo 3. Axioma `X`, regla `X → F[−X][X][+X]FX`, `F → FF`; 5 generaciones, 24°, irregularidad 8°."}
+![Árbol en un paisaje](../presentacion/capturas/modulo3-arbol.png){width=62% nota="Captura propia del módulo 3. Axioma `X`, regla `X → F[−X][X][+X]FX`, `F → FF`; 5 generaciones, 24°, irregularidad 8°."}
 
-![Bosque estocástico](../presentacion/capturas/modulo3-bosque.png){width=78% nota="Captura propia. Tres reglas para `X` con pesos 0,34 / 0,33 / 0,33; semilla 2024 y 5 árboles. Cada árbol usa otra semilla derivada."}
+![Bosque estocástico](../presentacion/capturas/modulo3-bosque.png){width=62% nota="Captura propia. Tres reglas para `X` con pesos 0,34 / 0,33 / 0,33; semilla 2024 y 5 árboles. Cada árbol usa otra semilla derivada."}
 
-![Curva del dragón](../presentacion/capturas/modulo3-dragon.png){width=78% nota="Captura propia. 12 generaciones (4 096 segmentos). El color sigue el orden en que la tortuga recorre la curva."}
+![Curva del dragón](../presentacion/capturas/modulo3-dragon.png){width=62% nota="Captura propia. 12 generaciones (4 096 segmentos). El color sigue el orden en que la tortuga recorre la curva."}
 
-![Modo paso a paso](../presentacion/capturas/modulo3-paso-a-paso.png){width=78% nota="Captura propia. Planta de 3 generaciones en el símbolo 120: la cadena resalta el símbolo leído y los círculos azules marcan las posiciones guardadas en la pila."}
+![Modo paso a paso](../presentacion/capturas/modulo3-paso-a-paso.png){width=62% nota="Captura propia. Planta de 3 generaciones en el símbolo 120: la cadena resalta el símbolo leído y los círculos azules marcan las posiciones guardadas en la pila."}
 
-![Árbol 3D](../presentacion/capturas/modulo3-arbol3d.png){width=78% nota="Captura propia. Tortuga 3D con giro sobre el eje de 137,5°, tropismo 0,12 y 6 generaciones (1 827 segmentos), dibujado con WebGL."}
+![Árbol 3D](../presentacion/capturas/modulo3-arbol3d.png){width=62% nota="Captura propia. Tortuga 3D con giro sobre el eje de 137,5°, tropismo 0,12 y 6 generaciones (1 827 segmentos), dibujado con WebGL."}
 
-![Curva de Hilbert 3D](../presentacion/capturas/modulo3-hilbert3d.png){width=78% nota="Captura propia. Generación 3: una sola curva de 511 segmentos que visita los 512 puntos de un cubo de 8 × 8 × 8."}
+![Curva de Hilbert 3D](../presentacion/capturas/modulo3-hilbert3d.png){width=62% nota="Captura propia. Generación 3: una sola curva de 511 segmentos que visita los 512 puntos de un cubo de 8 × 8 × 8."}
 
 <div class="demo"><img src="img/qr-modulo-3.svg" alt="Código QR del módulo 3"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/03-l-systems/</span></p></div>
