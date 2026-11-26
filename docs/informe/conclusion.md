@@ -8,4 +8,4 @@ Cada técnica tiene un perfil propio. Los conjuntos de escape aprovechan el para
 
 Desde la computación visual, el proyecto mostró el valor de combinar fundamentos matemáticos con una implementación interactiva: la interfaz con controles en tiempo real permite comprender el efecto de cada parámetro mejor que una descripción escrita. El uso de módulos independientes y de una plantilla común facilitó el trabajo en equipo.
 
-Como **trabajo futuro** se identifican: aumentar la precisión del zoom en los conjuntos de escape, añadir variantes estocásticas a los L-systems, incorporar erosión a los terrenos y validar el box-counting con formas de dimensión conocida.
+Como **trabajo futuro** se identifican: aumentar la precisión del zoom en los conjuntos de escape, extender los L-systems a reglas paramétricas o a tres dimensiones, incorporar erosión a los terrenos y validar el box-counting con formas de dimensión conocida.

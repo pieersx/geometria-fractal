@@ -1,19 +1,21 @@
 # Módulo 3 · L-systems
 
 **Responsable:** Flores Cortez, Valeria Alexandra
-**Estado:** pendiente
+**Estado:** prototipo listo (Canvas 2D)
 
-## Qué debe entregar
+Base de Valeria (árbol con ramas por nivel e irregularidad), rediseñada con el estilo de los módulos 1 y 4: lienzo a pantalla completa y panel flotante.
 
-- `index.html` autocontenido que funcione sin instalar nada
-- Curva de Koch y al menos una planta, con reglas de reescritura editables
-- Controles en un panel a la izquierda y lienzo a pantalla completa (referencia: módulo 1)
+## Qué hace
+
+- Reescritura paralela del axioma con reglas editables, incluidas reglas **estocásticas** con peso (`X(0.5)=F[+X]`) y semilla reproducible.
+- Tortuga gráfica: `F G A B` dibujan, `f` avanza sin dibujar, `+ −` giran, `|` da media vuelta y `[ ]` ramifican.
+- Siete ejemplos: curva y copo de Koch, triángulo de Sierpinski, curva del dragón, planta, árbol en un paisaje y bosque estocástico.
+- Controles: generaciones, ángulo, ramas por nivel, número de árboles, irregularidad, viento, semilla, hojas y paisaje.
+- **Ver crecer:** anima la tortuga en el orden en que lee la cadena.
+- Zoom y arrastre con ratón, gestos táctiles o teclado (flechas, + / − y 0); exportación a PNG.
+- Muestra símbolos, segmentos, hojas, la cadena de cada generación y la dimensión teórica de los fractales geométricos.
+- Límites de seguridad: 1 500 000 símbolos y 400 000 segmentos.
 
 ## Para el informe
 
-Descripción del algoritmo, fortalezas, debilidades y un caso práctico de aplicación. Texto en `docs/informe/`.
-
-## Cómo empezar
-
-`index.html` ya trae la plantilla base: panel de controles, lienzo, botones Reiniciar y Guardar PNG.
-Busca los comentarios `TODO` y reemplaza la función `render()` por tu algoritmo. La lista de qué implementar está al inicio del `<script>`.
+Capítulo 4: `docs/informe/capitulo-4.md`. Capturas en `docs/presentacion/capturas/modulo3-*.png`.
