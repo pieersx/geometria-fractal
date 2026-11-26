@@ -1,5 +1,9 @@
 # Capítulo 4. L-systems
 
+::: resumen
+**Resumen del capítulo.** Un L-system reescribe cadenas de símbolos que una tortuga gráfica interpreta como dibujo. Sirve para la curva de Koch y para plantas ramificadas.
+:::
+
 > **Estado:** borrador. El módulo 3 está pendiente; el texto describe lo que se planea implementar. **Su responsable debe ajustarlo al terminar.**
 
 ## 4.1 Descripción del algoritmo
@@ -19,9 +23,11 @@ En cada generación, las reglas se aplican a **todos** los símbolos a la vez. L
 | `[` | Guardar posición y orientación (apilar) |
 | `]` | Recuperar posición y orientación (desapilar) |
 
+: Símbolos del intérprete de tortuga
+
 ### Ejemplos que se implementarán
 
-- **Curva de Koch.** Axioma `F`, regla `F → F+F−−F+F`, ángulo 60°. Dimensión `ln 4 / ln 3 ≈ 1,262`.
+- **Curva de Koch.** Axioma `F`, regla `F → F+F−−F+F`, ángulo 60°. Dimensión $\ln 4 / \ln 3 \approx 1{,}262$.
 - **Planta con ramificación.** Axioma `F`, regla `F → FF+[+F−F−F]−[−F+F+F]`, ángulo cercano a 22,5°. Los corchetes generan las ramas.
 
 La aplicación permitirá **editar las reglas**, el ángulo y el número de generaciones, y mostrará el resultado de inmediato.
@@ -47,4 +53,5 @@ Los L-systems se usan para **generar vegetación procedural** en videojuegos, ci
 ## 4.5 Capturas y demostración
 
 - Captura: **[pendiente — módulo 3]**
-- Demostración: `modulos/03-l-systems/index.html`
+
+<div class="demo"><img src="img/qr-modulo-3.svg" alt="Código QR del módulo 3"><p><strong>Pruébalo en la aplicación.</strong><br>Escanea el código o abre la dirección:<br><span class="url">https://pieersx.github.io/geometria-fractal/modulos/03-l-systems/</span></p></div>
